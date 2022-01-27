@@ -3,34 +3,24 @@ Created on 22.01.2022
 
 @author: vital
 '''
-import pandas as pd
 
 class TweetNumbersConnector(object):
     '''
-    classdocs
+    Add tweets and economic figures together
     '''
 
 
-    def __init__(self, params):
+    def __init__(self):
         '''
         Constructor
         '''
+        
+    def getFiguresValue(self,allNumbersDf,postDate):
+        return float(allNumbersDf.loc[(allNumbersDf['from_date'] <= postDate) & (allNumbersDf['to_date'] >= postDate)]['value'])  
     def getTweetsWithNumbers(self,allTweetsDf, allNumbersDf):
-        allTweetsWithNumbersDf = allTweetsDf.copy()
-        allTweetsWithNumbersDf['value'] = 
-        
-        allTweetsWithNumbersDf.apply
-        
-        (lambda row: row.a + row.b, axis=1)
-        
-        
-        postdate = int(companyTweets.iloc[[0]]["post_date"])
-        
-        
-        print(numbers.loc[(numbers ['from_date'] <= postdate) & (numbers['to_date'] >= postdate)]['value'])    
-        
-        
-        
-        
-            
-        return []
+        allTweetsWithNumbersDf =  allTweetsDf.copy()
+        allTweetsWithNumbersDf['value'] = allTweetsWithNumbersDf.apply(
+            lambda x: self.getFiguresValue(allNumbersDf,x["post_date"]),axis = 1
+        )
+        return  allTweetsWithNumbersDf
+    
