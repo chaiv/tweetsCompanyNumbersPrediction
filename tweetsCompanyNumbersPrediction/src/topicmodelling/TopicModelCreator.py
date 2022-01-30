@@ -17,4 +17,4 @@ class TopicModelCreator(object):
         Constructor
         '''
     def createModel(self,sentences):
-        return Top2Vec(sentences)
+        return Top2Vec(documents=sentences,speed="learn", workers=8)
