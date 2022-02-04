@@ -1,3 +1,3 @@
 eclipse.preferences.version=1
-encoding//src/kagglepreprocess/companyTweetEval.py=utf-8
-encoding//src/kagglepreprocess/companyTweetMerge.py=utf-8
+encoding//src/tweetpreprocess/companyTweetEval.py=utf-8
+encoding//src/tweetpreprocess/companyTweetMerge.py=utf-8
