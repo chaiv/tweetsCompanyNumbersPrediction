@@ -50,7 +50,7 @@ class FiguresDiscretizerTest(unittest.TestCase):
                   )
         percentChangeCalculator = FiguresPercentChangeCalculator ("value")
         discretizer = FiguresDiscretizer(percentChangeCalculator.getFiguresWithClasses(figures),'percentChange', 5)
-        print(discretizer.getFiguresWithClasses())
+        #print(discretizer.getFiguresWithClasses())
 
     def testFiguresPercentChangeCalculator(self):
         figures =  pd.DataFrame(
