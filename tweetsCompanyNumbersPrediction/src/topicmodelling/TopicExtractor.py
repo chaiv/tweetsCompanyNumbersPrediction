@@ -18,4 +18,6 @@ class TopicExtractor(object):
       
     def getNumTopics(self): 
         return self.topicModel.get_num_topics()
-      
+    
+    def get_topics(self):
+        return self.topicModel.get_topics()
