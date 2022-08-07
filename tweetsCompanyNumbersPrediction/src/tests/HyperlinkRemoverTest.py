@@ -4,13 +4,14 @@ Created on 05.08.2022
 @author: vital
 '''
 import unittest
+from tweetpreprocess.wordfiltering.HyperlinkFilter import HyperlinkFilter
 
-
-class Test(unittest.TestCase):
+class  HyperlinkFilterTest(unittest.TestCase):
 
 
     def testName(self):
-        sentence = "Images showing the first Battery Swap Station http://imgur.com/dummylink via @imgur"
+        text = "Images showing the first Battery Swap Station http://imgur.com/dummylink via @imgur"
+        self.assertEqual("Images showing the first Battery Swap Station  via @imgur", HyperlinkFilter().filter(text))
         pass
 
 
