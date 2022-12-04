@@ -12,9 +12,10 @@ from topicmodelling.TopicModelCreator import TopicModelCreator
 class TopicExtractorTest(unittest.TestCase):
 
     def testTopicExtraction(self):
-        tweets = pd.read_csv (r'G:\Meine Ablage\promotion\companyTweets\CompanyTweetsAppleFirst1000.csv')
-        topicExtractor = TopicExtractor(TopicModelCreator(1).createModel(tweets["body"].tolist()))
+        modelpath =  r'G:\Meine Ablage\promotion\companyTweets\TopicModelAAPLFirst100000.csv'
+        topicExtractor = TopicExtractor(TopicModelCreator().load(modelpath))
         self.assertTrue(topicExtractor.getNumTopics()>0)
+        print(topicExtractor.get_topicwords())
         pass
 
 

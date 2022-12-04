@@ -24,4 +24,4 @@ class TFIDFVectorizer(object):
         return  allTweetsWithTFIDFVectorsDf       
     
     def getFeatureNames(self):
-        return self.tfidf_vectorizer.get_feature_names()   
+        return self.tfidf_vectorizer.get_feature_names_out()   
