@@ -12,7 +12,7 @@ from topicmodelling.TopicModelCreator import TopicModelCreator
 class TopicExtractorTest(unittest.TestCase):
 
     def testTopicExtraction(self):
-        modelpath =  r'G:\Meine Ablage\promotion\companyTweets\TopicModelAAPLFirst100000.csv'
+        modelpath =  r'G:\Meine Ablage\promotion\companyTweets\TopicModelAAPLFirst1000'
         topicExtractor = TopicExtractor(TopicModelCreator().load(modelpath))
         self.assertTrue(topicExtractor.getNumTopics()>0)
         print(topicExtractor.get_topicwords())

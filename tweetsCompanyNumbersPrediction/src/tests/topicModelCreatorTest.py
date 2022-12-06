@@ -11,8 +11,8 @@ class Test(unittest.TestCase):
 
 
     def testModelCreateAndSave(self):
-        modelPath = r'G:\Meine Ablage\promotion\companyTweets\TopicModelAAPLFirst100000.csv'
-        tweets = pd.read_csv (r'G:\Meine Ablage\promotion\companyTweets\CompanyTweetsAAPLFirst100000.csv')
+        modelPath = r'G:\Meine Ablage\promotion\companyTweets\TopicModelAAPLFirst1000'
+        tweets = pd.read_csv (r'G:\Meine Ablage\promotion\companyTweets\CompanyTweetsAAPLFirst1000.csv')
         model = TopicModelCreator(1).createModel(tweets["body"].tolist())
         model.save( modelPath)
         self.assertIsNotNone(TopicModelCreator(1).load( modelPath)) 
