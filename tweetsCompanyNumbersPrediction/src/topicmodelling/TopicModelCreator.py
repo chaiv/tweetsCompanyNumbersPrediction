@@ -18,9 +18,9 @@ class TopicModelCreator(object):
         '''
         Constructor
         '''
-    def createModel(self,sentences):
+    def createModel(self,sentences, sentencesIds):
         #return Top2Vec(documents=sentences,embedding_model='universal-sentence-encoder',min_count=self.minVocabWordCount)
-        return Top2Vec(documents=sentences,speed="learn", workers=8,min_count=self.minVocabWordCount)
+        return Top2Vec(documents=sentences, document_ids = sentencesIds,speed="learn", workers=8,min_count=self.minVocabWordCount)
     
     def load(self,path):
         return Top2Vec.load(path)
