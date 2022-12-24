@@ -1,0 +1,4 @@
+gensim==4.2.0
+pandas==1.4.4
+scikit_learn==1.2.0
+top2vec==1.0.27

@@ -8,7 +8,22 @@ import pandas as pd
 from tweetpreprocess.TweetDataframeQuery import TweetDataframeQuery
 from tweetpreprocess.TweetQueryParams import TweetQueryParams
 
-class Test(unittest.TestCase):
+class TweetQueryTest(unittest.TestCase):
+    
+    
+    def testWhenQueryParamIdsThenReturnSecondRow(self):
+        tweetsDf = pd.DataFrame(
+                  [
+                  (1),
+                  (2),
+                  (3)
+                  ],
+                  columns=['tweet_id']
+                  )
+        resultDf = TweetDataframeQuery().query(tweetsDf, TweetQueryParams(tweetIds=[2]))
+        self.assertEquals(1,resultDf.size)  
+        self.assertEquals(2,resultDf.iloc[0]['tweet_id'])  
+        
 
 
     def testWhenQueryNoParamTheReturnOriginalDf(self):
@@ -35,7 +50,7 @@ class Test(unittest.TestCase):
                   columns=['ticker_symbol']
                   )
         
-        resultDf = TweetDataframeQuery().query(tweetsDf, TweetQueryParams("company1"))
+        resultDf = TweetDataframeQuery().query(tweetsDf, TweetQueryParams(companyName ="company1"))
         self.assertEquals(1,resultDf.size)  
         self.assertEquals("company1",resultDf.iloc[0]['ticker_symbol'])  
         pass
@@ -50,7 +65,7 @@ class Test(unittest.TestCase):
                   columns=['ticker_symbol']
                   )
         
-        resultDf = TweetDataframeQuery().query(tweetsDf, TweetQueryParams(None,2))
+        resultDf = TweetDataframeQuery().query(tweetsDf, TweetQueryParams(firstNTweets =2))
         self.assertEquals(2,resultDf.size)  
         self.assertEquals("company1",resultDf.iloc[0]['ticker_symbol'])  
         self.assertEquals("company2",resultDf.iloc[1]['ticker_symbol'])  

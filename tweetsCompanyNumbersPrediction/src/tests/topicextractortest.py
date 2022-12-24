@@ -7,6 +7,8 @@ import unittest
 import pandas as pd
 from topicmodelling.TopicExtractor import TopicExtractor
 from topicmodelling.TopicModelCreator import TopicModelCreator
+from tweetpreprocess.TweetDataframeQuery import TweetDataframeQuery
+from tweetpreprocess.TweetQueryParams import TweetQueryParams
 
 
 class TopicExtractorTest(unittest.TestCase):
@@ -17,12 +19,23 @@ class TopicExtractorTest(unittest.TestCase):
     def testWhenFindSentencesFromTopicThenOk(self):
         modelpath =  r'G:\Meine Ablage\promotion\companyTweets\TopicModelAAPLFirst1000'
         documents, document_scores, document_ids = self.topicExtractor.search_documents_by_topic(0, 5)
+        sampleId = 551094968698171392
         self.assertEqual(
-            551094968698171392,
+            sampleId,
                 document_ids[0]
             )
         
-        
+        tweetsDf = pd.DataFrame(
+                  [
+                   (1111),    
+                  (sampleId),
+                   (1110)
+                  ],
+                  columns=['tweet_id']
+                  )
+        resultDf = TweetDataframeQuery().query(tweetsDf, TweetQueryParams(tweetIds=document_ids))
+        self.assertEquals(1,resultDf.size)  
+        self.assertEquals(sampleId,resultDf.iloc[0]['tweet_id'])  
     
     
 
