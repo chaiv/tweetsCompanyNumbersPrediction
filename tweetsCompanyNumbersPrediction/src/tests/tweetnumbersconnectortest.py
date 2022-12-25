@@ -10,8 +10,6 @@ from tweetnumbersconnector.tweetnumbersconnector import TweetNumbersConnector
 
 
 class TweetsNumbersConnectorTest(unittest.TestCase):
-    
-   
 
 
     def testTweetNumbersConnector(self):
