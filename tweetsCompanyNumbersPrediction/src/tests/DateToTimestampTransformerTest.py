@@ -20,7 +20,6 @@ class DateToTimestampTransformerTest(unittest.TestCase):
                   columns=["from_date","to_date"]
                   )
             dfWithTSP = DateToTimestampDataframeTransformer().addTimestampColumns(testDf)
-            print(dfWithTSP)
             self.assertEqual(2,len(dfWithTSP.index))
             self.assertEquals(1412114400,dfWithTSP.iloc[0]['from_tsp'])  
             self.assertEquals(1419980400,dfWithTSP.iloc[0]['to_tsp'])  

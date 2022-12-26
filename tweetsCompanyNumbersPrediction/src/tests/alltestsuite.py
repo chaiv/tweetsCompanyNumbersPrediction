@@ -11,6 +11,8 @@ from tests import HyperlinkRemoverTest
 from tests import StopWordsFilterTest
 from tests import TextFilterTest
 from tests import TweetQueryTest
+from tests import DateToTimestampTransformerTest
+from tests import DateToTSPTest
 
 loader = unittest.TestLoader()
 suite  = unittest.TestSuite()
@@ -22,5 +24,7 @@ suite.addTests(loader.loadTestsFromModule(HyperlinkRemoverTest))
 suite.addTests(loader.loadTestsFromModule(StopWordsFilterTest))
 suite.addTests(loader.loadTestsFromModule(TextFilterTest))
 suite.addTests(loader.loadTestsFromModule(TweetQueryTest))
+suite.addTests(loader.loadTestsFromModule(DateToTimestampTransformerTest))
+suite.addTests(loader.loadTestsFromModule(DateToTSPTest))
 runner = unittest.TextTestRunner(verbosity=3)
 result = runner.run(suite)

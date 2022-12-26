@@ -7,8 +7,26 @@ import unittest
 import pandas as pd
 from tweetpreprocess.TweetDataframeQuery import TweetDataframeQuery
 from tweetpreprocess.TweetQueryParams import TweetQueryParams
+from tweetpreprocess.DateToTSP import DateToTSP
 
 class TweetQueryTest(unittest.TestCase):
+    
+    def testWhenQueryParamDateThenReturnThirdRow(self):
+         
+        dateToTSP = DateToTSP()
+        
+          
+        tweetsDf = pd.DataFrame(
+                  [
+                  (1, dateToTSP.dateStrToTSPInt("01/01/2022"), dateToTSP.dateStrToTSPInt("01/03/2022")),
+                  (2, dateToTSP.dateStrToTSPInt("01/02/2022"), dateToTSP.dateStrToTSPInt("01/05/2022")),
+                  (3, dateToTSP.dateStrToTSPInt("01/03/2022"), dateToTSP.dateStrToTSPInt("01/06/2022"))
+                  ],
+                  columns=['tweet_id','from_date','to_date']
+                  )
+        resultDf = TweetDataframeQuery().query(tweetsDf, TweetQueryParams(fromDateStr='01/03/2022',toDateStr ='01/07/2022'))
+        self.assertEquals(1,len(resultDf.index))  
+        self.assertEquals(3,resultDf.iloc[0]['tweet_id'])  
     
     
     def testWhenQueryParamIdsThenReturnSecondRow(self):
