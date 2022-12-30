@@ -3,26 +3,25 @@ Created on 25.12.2022
 
 @author: vital
 '''
-import datetime
 from tweetpreprocess.DateToTSP import DateToTSP
 
 class DateToTimestampDataframeTransformer(object):
 
 
-    def __init__(self, fromDateColumn='from_date',toDateColumn='to_date',fromTSPColumn = 'from_tsp',toTSPColumn = 'to_tsp',dateToTSP=DateToTSP()):
-        self.fromDateColumn = fromDateColumn
-        self.toDateColumn = toDateColumn
-        self.fromTSPColumn = fromTSPColumn
-        self.toTSPColumn = toTSPColumn
+    def __init__(self, dateColumnNames=['from_date','to_date'],tspColumnNames = ['from_tsp','to_tsp'],dateToTSP=DateToTSP()):
+        if len(dateColumnNames) != len(tspColumnNames):
+            raise Exception("Date and tsp column number must match!")
         self.dateToTSP = dateToTSP
+        self.dateColumnNames = dateColumnNames
+        self.tspColumnNames = tspColumnNames
         
         
     def addTSPColumn(self,numbersDf,dateColumn,tspColumn):    
         numbersDf[tspColumn] = numbersDf.apply(lambda row: self.dateToTSP.dateStrToTSPInt(row[dateColumn]), axis=1)
         return numbersDf        
         
-    def addTimestampColumns(self,numbersDf):    
-        numbersDf = self.addTSPColumn(numbersDf,self.fromDateColumn,  self.fromTSPColumn)
-        numbersDf = self.addTSPColumn(numbersDf,self.toDateColumn,  self.toTSPColumn)
+    def addTimestampColumns(self,numbersDf): 
+        for i in range(len(self.dateColumnNames)):   
+            numbersDf = self.addTSPColumn(numbersDf,self.dateColumnNames[i], self.tspColumnNames[i])
         return numbersDf
     

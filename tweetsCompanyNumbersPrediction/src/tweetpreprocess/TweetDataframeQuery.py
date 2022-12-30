@@ -7,11 +7,11 @@ Created on 18.12.2022
 class TweetDataframeQuery(object):
 
 
-    def __init__(self,tweetDfCompanyColumn='ticker_symbol',tweetDfIdColumn='tweet_id',fromDateColumn='from_date',toDateColumn='to_date'):
+    def __init__(self,tweetDfCompanyColumn='ticker_symbol',tweetDfIdColumn='tweet_id',fromTSPColumn='from_date',toTSPColumn='to_date'):
         self.tweetDfCompanyColumn = tweetDfCompanyColumn
         self.tweetDfIdColumn = tweetDfIdColumn
-        self.fromDateColumn = fromDateColumn
-        self.toDateColumn = toDateColumn
+        self.fromTSPColumn = fromTSPColumn
+        self.toTSPColumn = toTSPColumn
 
         
         
@@ -24,9 +24,9 @@ class TweetDataframeQuery(object):
         if(queryParams.tweetIds is not None):
             companyTweets = companyTweets[companyTweets[self.tweetDfIdColumn].isin(queryParams.tweetIds)]
         if(queryParams.fromDateTSP is not None):
-            companyTweets = companyTweets[companyTweets[self.fromDateColumn]>=queryParams.fromDateTSP]
+            companyTweets = companyTweets[companyTweets[self.fromTSPColumn]>=queryParams.fromDateTSP]
         if(queryParams.toDateTSP is not None):
-            companyTweets = companyTweets[companyTweets[self.toDateColumn]<=queryParams.toDateTSP]
+            companyTweets = companyTweets[companyTweets[self.toTSPColumn]<=queryParams.toDateTSP]
         if(queryParams.firstNTweets is not None): #Order important, first n tweets must be selected at the end!
             companyTweets = companyTweets[:queryParams.firstNTweets] 
         return companyTweets

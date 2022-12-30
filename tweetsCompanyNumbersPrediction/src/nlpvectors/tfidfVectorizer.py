@@ -12,7 +12,7 @@ class TFIDFVectorizer(object):
     '''
 
 
-    def __init__(self,allTweetsDf,tfidfvectorsColumnName):
+    def __init__(self,allTweetsDf,tfidfvectorsColumnName="tfidf"):
         self.tfidfvectorsColumnName = tfidfvectorsColumnName
         self.allTweetsDf = allTweetsDf
         self.tfidf_vectorizer=TfidfVectorizer(use_idf=True) 
