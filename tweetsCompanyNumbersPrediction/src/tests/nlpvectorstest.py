@@ -21,7 +21,7 @@ class NLPVectorsTest(unittest.TestCase):
                   ],
                   columns=["body"]
                   )
-        tfidfVectorizer = TFIDFVectorizer(tweets,'tfidfvectors')
+        tfidfVectorizer = TFIDFVectorizer(tweets,tfidfvectorsColumnName='tfidfvectors')
         self.assertEqual( 54, tfidfVectorizer.getFeatureNames().__len__())
         self.assertEqual( 'accelerating', tfidfVectorizer.getFeatureNames()[0])
         self.assertEqual( 0.0, tfidfVectorizer.getTweetsWithTFIDFVectors().iloc[0]['tfidfvectors'][0])

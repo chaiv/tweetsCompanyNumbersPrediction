@@ -13,6 +13,7 @@ from tests import TextFilterTest
 from tests import TweetQueryTest
 from tests import DateToTimestampTransformerTest
 from tests import DateToTSPTest
+from tests import PipelineTest
 
 loader = unittest.TestLoader()
 suite  = unittest.TestSuite()
@@ -26,5 +27,6 @@ suite.addTests(loader.loadTestsFromModule(TextFilterTest))
 suite.addTests(loader.loadTestsFromModule(TweetQueryTest))
 suite.addTests(loader.loadTestsFromModule(DateToTimestampTransformerTest))
 suite.addTests(loader.loadTestsFromModule(DateToTSPTest))
+suite.addTests(loader.loadTestsFromModule(PipelineTest))
 runner = unittest.TextTestRunner(verbosity=3)
 result = runner.run(suite)

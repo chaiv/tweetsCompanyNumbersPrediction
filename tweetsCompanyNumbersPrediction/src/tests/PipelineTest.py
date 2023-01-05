@@ -8,11 +8,16 @@ import pandas as pd
 from tweetpreprocess.DateToTSP import DateToTSP
 from tweetpreprocess.DateToTimestampTransformer import DateToTimestampDataframeTransformer
 from tweetnumbersconnector.tweetnumbersconnector import TweetNumbersConnector
+from tweetpreprocess.TweetDataframeQuery import TweetDataframeQuery
+from tweetpreprocess.TweetQueryParams import TweetQueryParams
+from nlpvectors.tfidfVectorizer import TFIDFVectorizer
 
 class PipelineTest(unittest.TestCase):
 
 
     def testWhenAllPipelineStepsThenCompletedDf(self):
+        
+        dateFormat='%d/%m/%Y %H:%M:%S'
         
         tweets = pd.DataFrame(
                   [
@@ -25,28 +30,42 @@ class PipelineTest(unittest.TestCase):
                   columns=["tweet_id","post_date","body","ticker_symbol"]
                   )
         
-        tweetsWithTSP = DateToTimestampDataframeTransformer(
-            dateColumnNames=["post_date"],
-            tspColumnNames= ["post_tsp"],
-            dateToTSP=DateToTSP(dateFormat='%d/%m/%Y %H:%M:%S')
-            ).addTimestampColumns(tweets)
-        
         figures =  pd.DataFrame(
                   [
-                  ("31/12/2024","01/01/2025",939880000.15),
-                  ("10/03/2023","20/03/2023",1200000000.15),
-                  ("28/02/2023","02/03/2023",963800000.15),
-                  ("01/02/2022","01/02/2022",11000200.15)
+                  ("31/12/2024 00:00:00","01/01/2025 23:59:59",9.15),
+                  ("10/03/2023 00:00:00","20/03/2023 23:59:59",12.15),
+                  ("28/02/2023 00:00:00","02/03/2023 23:59:59",8.15),
+                  ("01/01/2022 00:00:00","01/01/2022 23:59:59",11)
                   ],
                   columns=["from_date","to_date","value"]
                   )
         
-        figuresWithTSP = DateToTimestampDataframeTransformer().addTimestampColumns(figures)
+        tweetsWithTSP = DateToTimestampDataframeTransformer(
+            dateColumnNames=["post_date"],
+            tspColumnNames= ["post_tsp"],
+            dateToTSP=DateToTSP(dateFormat=dateFormat)
+            ).addTimestampColumns(tweets)
+                
+        figuresWithTSP = DateToTimestampDataframeTransformer(dateToTSP=DateToTSP(dateFormat=dateFormat)).addTimestampColumns(figures)
         
-        tweetsWithNumbes = TweetNumbersConnector(fromTSPColumn = 'from_tsp',toTSPColumn ='to_tsp',valueColumn = 'value',postTSPColumn = 'post_tsp').getTweetsWithNumbers(tweetsWithTSP, figuresWithTSP)
+        tweetsWithNumbers = TweetNumbersConnector(
+            postDateColumn ="post_date").getTweetsWithNumbers(tweetsWithTSP, figuresWithTSP)
+            
+        self.assertEqual(11, tweetsWithNumbers.iloc[0]["value"])    
+        self.assertEqual(11, tweetsWithNumbers.iloc[1]["value"]) 
+        self.assertEqual(8.15, tweetsWithNumbers.iloc[2]["value"])     
+        self.assertEqual(12.15, tweetsWithNumbers.iloc[3]["value"])        
+        self.assertEqual(9.15, tweetsWithNumbers.iloc[4]["value"])  
+
+        tweetsFilteredByIds = TweetDataframeQuery().query( tweetsWithNumbers, TweetQueryParams(tweetIds=["2","4","5"]))
         
+        self.assertEqual(3, len(tweetsFilteredByIds))  
         
-        print(tweetsWithNumbes)
+        tfidfVectorizer = TFIDFVectorizer(tweetsFilteredByIds)
+        
+        tweetsWithTFIDF = tfidfVectorizer.getTweetsWithTFIDFVectors()
+        
+        self.assertEqual( 0.28456870659163674, tweetsWithTFIDF.iloc[0]['tfidf'][1])
         
         pass
 

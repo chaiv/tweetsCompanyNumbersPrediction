@@ -12,11 +12,11 @@ class TFIDFVectorizer(object):
     '''
 
 
-    def __init__(self,allTweetsDf,tfidfvectorsColumnName="tfidf"):
+    def __init__(self,allTweetsDf,tweetBodyName = 'body',tfidfvectorsColumnName="tfidf"):
         self.tfidfvectorsColumnName = tfidfvectorsColumnName
         self.allTweetsDf = allTweetsDf
         self.tfidf_vectorizer=TfidfVectorizer(use_idf=True) 
-        self.tfidf_vectorizer_vectors=self.tfidf_vectorizer.fit_transform(allTweetsDf['body'])
+        self.tfidf_vectorizer_vectors=self.tfidf_vectorizer.fit_transform(allTweetsDf[tweetBodyName])
         
     def getTweetsWithTFIDFVectors(self):  
         allTweetsWithTFIDFVectorsDf = self.allTweetsDf.copy()
