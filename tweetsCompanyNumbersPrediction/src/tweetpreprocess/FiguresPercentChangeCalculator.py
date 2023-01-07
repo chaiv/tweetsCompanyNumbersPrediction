@@ -10,7 +10,8 @@ class FiguresPercentChangeCalculator(object):
     '''
 
 
-    def __init__(self, percentChangeColumnName):
+    def __init__(self, valueColumnName='value',percentChangeColumnName='percentChange'):
+        self.valueColumnName = valueColumnName
         self.percentChangeColumnName = percentChangeColumnName
         
         
@@ -19,10 +20,10 @@ class FiguresPercentChangeCalculator(object):
         previousFigureValue = None
         for i, row in figuresDf.iterrows():
             if(previousFigureValue != None):
-                percentChanges.append(row[self.percentChangeColumnName]/previousFigureValue)
+                percentChanges.append(row[self.valueColumnName]/previousFigureValue)
             else:
                 percentChanges.append(None)    
-            previousFigureValue = row[self.percentChangeColumnName]
+            previousFigureValue = row[self.valueColumnName]
         figuresWithPercentChangesDf = figuresDf.copy()     
-        figuresWithPercentChangesDf["percentChange"]= percentChanges      
+        figuresWithPercentChangesDf[self.percentChangeColumnName]= percentChanges      
         return figuresWithPercentChangesDf[1:]

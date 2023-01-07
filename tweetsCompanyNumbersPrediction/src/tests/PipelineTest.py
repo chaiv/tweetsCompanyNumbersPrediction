@@ -11,11 +11,16 @@ from tweetnumbersconnector.tweetnumbersconnector import TweetNumbersConnector
 from tweetpreprocess.TweetDataframeQuery import TweetDataframeQuery
 from tweetpreprocess.TweetQueryParams import TweetQueryParams
 from nlpvectors.tfidfVectorizer import TFIDFVectorizer
+from tweetpreprocess.wordfiltering.HyperlinkFilter import HyperlinkFilter
+from tweetpreprocess.wordfiltering.TextFilter import TextFilter
+from tweetpreprocess.TweetTextFilterTransformer import TweetTextFilterTransformer
+from tweetpreprocess.FiguresPercentChangeCalculator import FiguresPercentChangeCalculator
+from tweetpreprocess.FiguresIncreaseDecreaseClassCalculator import FiguresIncreaseDecreaseClassCalculator
 
 class PipelineTest(unittest.TestCase):
 
 
-    def testWhenAllPipelineStepsThenCompletedDf(self):
+    def testPipelineSteps(self):
         
         dateFormat='%d/%m/%Y %H:%M:%S'
         
@@ -32,10 +37,11 @@ class PipelineTest(unittest.TestCase):
         
         figures =  pd.DataFrame(
                   [
-                  ("31/12/2024 00:00:00","01/01/2025 23:59:59",9.15),
-                  ("10/03/2023 00:00:00","20/03/2023 23:59:59",12.15),
+                  ("01/01/2021 00:00:00","31/12/2022 23:59:59",10),#These dates are not in tweets, needed to calculate initial percent change
+                  ("01/01/2022 00:00:00","01/01/2022 23:59:59",11),
                   ("28/02/2023 00:00:00","02/03/2023 23:59:59",8.15),
-                  ("01/01/2022 00:00:00","01/01/2022 23:59:59",11)
+                  ("10/03/2023 00:00:00","20/03/2023 23:59:59",12.15),
+                  ("31/12/2024 00:00:00","01/01/2025 23:59:59",9.15)
                   ],
                   columns=["from_date","to_date","value"]
                   )
@@ -48,24 +54,27 @@ class PipelineTest(unittest.TestCase):
                 
         figuresWithTSP = DateToTimestampDataframeTransformer(dateToTSP=DateToTSP(dateFormat=dateFormat)).addTimestampColumns(figures)
         
+        figuresWithClasses =  FiguresIncreaseDecreaseClassCalculator().getFiguresWithClasses(FiguresPercentChangeCalculator ().getFiguresWithClasses(figuresWithTSP))
+        
         tweetsWithNumbers = TweetNumbersConnector(
-            postDateColumn ="post_date").getTweetsWithNumbers(tweetsWithTSP, figuresWithTSP)
-            
-        self.assertEqual(11, tweetsWithNumbers.iloc[0]["value"])    
-        self.assertEqual(11, tweetsWithNumbers.iloc[1]["value"]) 
-        self.assertEqual(8.15, tweetsWithNumbers.iloc[2]["value"])     
-        self.assertEqual(12.15, tweetsWithNumbers.iloc[3]["value"])        
-        self.assertEqual(9.15, tweetsWithNumbers.iloc[4]["value"])  
+            valueColumn="class",
+            postDateColumn ="post_date").getTweetsWithNumbers(tweetsWithTSP,  figuresWithClasses)
+        
+        textfiltetedTweetsWithNumbers  = TweetTextFilterTransformer(TextFilter([HyperlinkFilter()])).filterTextColumns(tweetsWithNumbers)  
 
-        tweetsFilteredByIds = TweetDataframeQuery().query( tweetsWithNumbers, TweetQueryParams(tweetIds=["2","4","5"]))
-        
-        self.assertEqual(3, len(tweetsFilteredByIds))  
-        
-        tfidfVectorizer = TFIDFVectorizer(tweetsFilteredByIds)
+        tfidfVectorizer = TFIDFVectorizer(textfiltetedTweetsWithNumbers )
         
         tweetsWithTFIDF = tfidfVectorizer.getTweetsWithTFIDFVectors()
+                 
+        self.assertEqual(1, tweetsWithTFIDF .iloc[0]["class"])    
+        self.assertEqual(1, tweetsWithTFIDF .iloc[1]["class"]) 
+        self.assertEqual(0, tweetsWithTFIDF .iloc[2]["class"])     
+        self.assertEqual(1, tweetsWithTFIDF .iloc[3]["class"])        
+        self.assertEqual(0, tweetsWithTFIDF .iloc[4]["class"])  
         
-        self.assertEqual( 0.28456870659163674, tweetsWithTFIDF.iloc[0]['tfidf'][1])
+        self.assertFalse("http://imgur.com/dummylink" in tweetsWithTFIDF .iloc[0]['body'] )
+        
+        self.assertEqual( 0.34706676322953556, tweetsWithTFIDF.iloc[3]['tfidf'][0])
         
         pass
 

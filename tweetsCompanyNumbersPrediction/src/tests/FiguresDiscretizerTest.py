@@ -49,7 +49,7 @@ class FiguresDiscretizerTest(unittest.TestCase):
                   columns=["from_date","to_date","value"]
                   )
         percentChangeCalculator = FiguresPercentChangeCalculator ("value")
-        discretizer = FiguresDiscretizer(percentChangeCalculator.getFiguresWithClasses(figures),'percentChange', 5)
+        discretizer = FiguresDiscretizer(percentChangeCalculator.getFiguresWithClasses(figures),5,'percentChange')
         figuresWithClasses = discretizer.getFiguresWithClasses()
         self.assertEqual(1.0, figuresWithClasses.iloc[0]["class"])
 

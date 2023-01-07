@@ -14,6 +14,8 @@ from tests import TweetQueryTest
 from tests import DateToTimestampTransformerTest
 from tests import DateToTSPTest
 from tests import PipelineTest
+from tests import TweetDataframeSorterTest
+from tests import FiguresIncreaseDecreaseClassCalculatorTest
 
 loader = unittest.TestLoader()
 suite  = unittest.TestSuite()
@@ -28,5 +30,7 @@ suite.addTests(loader.loadTestsFromModule(TweetQueryTest))
 suite.addTests(loader.loadTestsFromModule(DateToTimestampTransformerTest))
 suite.addTests(loader.loadTestsFromModule(DateToTSPTest))
 suite.addTests(loader.loadTestsFromModule(PipelineTest))
+suite.addTests(loader.loadTestsFromModule(TweetDataframeSorterTest))
+suite.addTests(loader.loadTestsFromModule(FiguresIncreaseDecreaseClassCalculatorTest))
 runner = unittest.TextTestRunner(verbosity=3)
 result = runner.run(suite)
