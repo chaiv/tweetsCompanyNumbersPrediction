@@ -5,11 +5,9 @@ Created on 26.12.2022
 '''
 import unittest
 import pandas as pd
-from tweetpreprocess.DateToTSP import DateToTSP
+from tweetpreprocess.DateToTSP import DateTSPConverter
 from tweetpreprocess.DateToTimestampTransformer import DateToTimestampDataframeTransformer
 from tweetnumbersconnector.tweetnumbersconnector import TweetNumbersConnector
-from tweetpreprocess.TweetDataframeQuery import TweetDataframeQuery
-from tweetpreprocess.TweetQueryParams import TweetQueryParams
 from nlpvectors.tfidfVectorizer import TFIDFVectorizer
 from tweetpreprocess.wordfiltering.HyperlinkFilter import HyperlinkFilter
 from tweetpreprocess.wordfiltering.TextFilter import TextFilter
@@ -49,16 +47,15 @@ class PipelineTest(unittest.TestCase):
         tweetsWithTSP = DateToTimestampDataframeTransformer(
             dateColumnNames=["post_date"],
             tspColumnNames= ["post_tsp"],
-            dateToTSP=DateToTSP(dateFormat=dateFormat)
+            dateToTSP=DateTSPConverter(dateFormat=dateFormat)
             ).addTimestampColumns(tweets)
                 
-        figuresWithTSP = DateToTimestampDataframeTransformer(dateToTSP=DateToTSP(dateFormat=dateFormat)).addTimestampColumns(figures)
+        figuresWithTSP = DateToTimestampDataframeTransformer(dateToTSP=DateTSPConverter(dateFormat=dateFormat)).addTimestampColumns(figures)
         
         figuresWithClasses =  FiguresIncreaseDecreaseClassCalculator().getFiguresWithClasses(FiguresPercentChangeCalculator ().getFiguresWithClasses(figuresWithTSP))
         
         tweetsWithNumbers = TweetNumbersConnector(
-            valueColumn="class",
-            postDateColumn ="post_date").getTweetsWithNumbers(tweetsWithTSP,  figuresWithClasses)
+            valueColumn="class").getTweetsWithNumbers(tweetsWithTSP,  figuresWithClasses)
         
         textfiltetedTweetsWithNumbers  = TweetTextFilterTransformer(TextFilter([HyperlinkFilter()])).filterTextColumns(tweetsWithNumbers)  
 

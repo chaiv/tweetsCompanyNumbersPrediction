@@ -20,8 +20,8 @@ class TweetsNumbersConnectorTest(unittest.TestCase):
                   columns=["from_tsp","to_tsp","value"]
                   )
         connector = TweetNumbersConnector()
-        self.assertEqual(100, connector.getFiguresValue(figures, 2,2) )
-        self.assertEqual(101, connector.getFiguresValue(figures, 6,6) )
+        self.assertEqual(100, connector.getFiguresValue(figures, 2) )
+        self.assertEqual(101, connector.getFiguresValue(figures, 6) )
         self.assertEqual(100, connector.getFiguresValue(figures, 2) )
         self.assertEqual(101, connector.getFiguresValue(figures, 6) )
     

@@ -3,12 +3,12 @@ Created on 25.12.2022
 
 @author: vital
 '''
-from tweetpreprocess.DateToTSP import DateToTSP
+from tweetpreprocess.DateToTSP import DateTSPConverter
 
 class DateToTimestampDataframeTransformer(object):
 
 
-    def __init__(self, dateColumnNames=['from_date','to_date'],tspColumnNames = ['from_tsp','to_tsp'],dateToTSP=DateToTSP()):
+    def __init__(self, dateColumnNames=['from_date','to_date'],tspColumnNames = ['from_tsp','to_tsp'],dateToTSP=DateTSPConverter()):
         if len(dateColumnNames) != len(tspColumnNames):
             raise Exception("Date and tsp column number must match!")
         self.dateToTSP = dateToTSP

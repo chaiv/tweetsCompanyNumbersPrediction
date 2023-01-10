@@ -12,7 +12,7 @@ from tests import StopWordsFilterTest
 from tests import TextFilterTest
 from tests import TweetQueryTest
 from tests import DateToTimestampTransformerTest
-from tests import DateToTSPTest
+from tests import DateTSPConverterTest
 from tests import PipelineTest
 from tests import TweetDataframeSorterTest
 from tests import FiguresIncreaseDecreaseClassCalculatorTest
@@ -28,7 +28,7 @@ suite.addTests(loader.loadTestsFromModule(StopWordsFilterTest))
 suite.addTests(loader.loadTestsFromModule(TextFilterTest))
 suite.addTests(loader.loadTestsFromModule(TweetQueryTest))
 suite.addTests(loader.loadTestsFromModule(DateToTimestampTransformerTest))
-suite.addTests(loader.loadTestsFromModule(DateToTSPTest))
+suite.addTests(loader.loadTestsFromModule(DateTSPConverterTest))
 suite.addTests(loader.loadTestsFromModule(PipelineTest))
 suite.addTests(loader.loadTestsFromModule(TweetDataframeSorterTest))
 suite.addTests(loader.loadTestsFromModule(FiguresIncreaseDecreaseClassCalculatorTest))

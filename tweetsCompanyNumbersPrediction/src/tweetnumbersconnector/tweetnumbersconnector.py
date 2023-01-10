@@ -3,21 +3,23 @@ Created on 22.01.2022
 
 @author: vital
 '''
+from tweetpreprocess.DateToTSP import DateTSPConverter
 
 class TweetNumbersConnector(object):
     '''
-    Add tweets and economic figures together
+    Connects tweets and economic figures
     '''
 
 
-    def __init__(self,fromTSPColumn = 'from_tsp',toTSPColumn ='to_tsp',valueColumn = 'value',postTSPColumn = 'post_tsp',postDateColumn = None):
+    def __init__(self,fromTSPColumn = 'from_tsp',toTSPColumn ='to_tsp',valueColumn = 'value',postTSPColumn = 'post_tsp',dateTSPConverter = DateTSPConverter()
+                 ):
         self.fromTSPColumn = fromTSPColumn
         self.toTSPColumn = toTSPColumn
         self.valueColumn = valueColumn
         self.postTSPColumn = postTSPColumn
-        self.postDateColumn = postDateColumn
+        self.dateTSPConverter = dateTSPConverter
         
-    def getFiguresValue(self,allNumbersDf,postTSP,postDate=None):
+    def getFiguresValue(self,allNumbersDf,postTSP):
         value =  allNumbersDf.loc[
                 (allNumbersDf[ self.fromTSPColumn] <= postTSP) 
                 & 
@@ -25,10 +27,10 @@ class TweetNumbersConnector(object):
                 ][self.valueColumn]
             
         if (len(value)==0):
-            raise Exception("No value for tsp found: "+str(postTSP)+" "+str(postDate))
+            raise Exception("No numbers value for tsp found: "+str(postTSP)+" "+str(self.dateTSPConverter.tspIntToDate(postTSP)))
         
         if (len(value)>1):
-            raise Exception("Only one value per tsp allowed, but multiple values match tsp: "+str(postTSP)+" "+str(postDate))
+            raise Exception("Only one numbers value per tsp allowed, but multiple values match tsp: "+str(postTSP)+" "+str(self.dateTSPConverter.tspIntToDate(postTSP)))
         return float(value)  
     
     
@@ -39,8 +41,7 @@ class TweetNumbersConnector(object):
         allTweetsWithNumbersDf[self.valueColumn] = allTweetsWithNumbersDf.apply(
             lambda x: self.getFiguresValue(
                 allNumbersDf,
-                x[self.postTSPColumn],
-                postDate = (x[self.postDateColumn] if  (self.postDateColumn is not None) else None)  
+                x[self.postTSPColumn]
                 )
             ,axis = 1
         )

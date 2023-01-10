@@ -15,7 +15,7 @@ class TFIDFVectorizer(object):
     def __init__(self,allTweetsDf,tweetBodyName = 'body',tfidfvectorsColumnName="tfidf"):
         self.tfidfvectorsColumnName = tfidfvectorsColumnName
         self.allTweetsDf = allTweetsDf
-        self.tfidf_vectorizer=TfidfVectorizer(use_idf=True) 
+        self.tfidf_vectorizer=TfidfVectorizer(use_idf=True,max_features = 1000) 
         self.tfidf_vectorizer_vectors=self.tfidf_vectorizer.fit_transform(allTweetsDf[tweetBodyName])
         
     def getTweetsWithTFIDFVectors(self):  

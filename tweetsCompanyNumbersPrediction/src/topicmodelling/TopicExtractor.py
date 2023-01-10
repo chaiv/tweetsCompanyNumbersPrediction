@@ -14,6 +14,11 @@ class TopicExtractor(object):
 
     def __init__(self, topicModel):
         self.topicModel = topicModel
+        
+     
+     
+    def getDocumentVectorByDocumentIndex(self,index):
+        return self.topicModel.model.docvecs[index]    
       
       
     def getNumTopics(self): 

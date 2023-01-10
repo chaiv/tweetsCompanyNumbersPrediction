@@ -13,11 +13,10 @@ from tweetpreprocess.TweetQueryParams import TweetQueryParams
 
 class TopicExtractorTest(unittest.TestCase):
     
-    modelpath =  r'G:\Meine Ablage\promotion\companyTweets\TopicModelAAPLFirst1000'
+    modelpath =  r'C:\Users\vital\Google Drive\promotion\companyTweets\TopicModelAAPLFirst1000'
     topicExtractor = TopicExtractor(TopicModelCreator().load(modelpath))
     
     def testWhenFindSentencesFromTopicThenOk(self):
-        modelpath =  r'G:\Meine Ablage\promotion\companyTweets\TopicModelAAPLFirst1000'
         documents, document_scores, document_ids = self.topicExtractor.search_documents_by_topic(0, 5)
         sampleId = 551094968698171392
         self.assertEqual(
@@ -36,7 +35,12 @@ class TopicExtractorTest(unittest.TestCase):
         resultDf = TweetDataframeQuery().query(tweetsDf, TweetQueryParams(tweetIds=document_ids))
         self.assertEquals(1,resultDf.size)  
         self.assertEquals(sampleId,resultDf.iloc[0]['tweet_id'])  
+        
     
+    
+    def testGetDocumentVector(self):
+        self.assertAlmostEqual(0.01063707,self.topicExtractor.getDocumentVectorByDocumentIndex(0)[0],4)  
+   
     
 
     def testTopicExtraction(self):

@@ -7,13 +7,13 @@ import unittest
 import pandas as pd
 from tweetpreprocess.TweetDataframeQuery import TweetDataframeQuery
 from tweetpreprocess.TweetQueryParams import TweetQueryParams
-from tweetpreprocess.DateToTSP import DateToTSP
+from tweetpreprocess.DateToTSP import DateTSPConverter
 
 class TweetQueryTest(unittest.TestCase):
     
     def testWhenQueryParamDateThenReturnThirdRow(self):
          
-        dateToTSP = DateToTSP()
+        dateToTSP = DateTSPConverter()
         
           
         tweetsDf = pd.DataFrame(

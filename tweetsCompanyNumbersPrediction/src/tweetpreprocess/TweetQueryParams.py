@@ -3,13 +3,13 @@ Created on 18.12.2022
 
 @author: vital
 '''
-from tweetpreprocess.DateToTSP import DateToTSP
+from tweetpreprocess.DateToTSP import DateTSPConverter
 
 class TweetQueryParams(object):
  
 
 
-    def __init__(self, companyName = None, firstNTweets = None, tweetIds = None, fromDateStr = None, toDateStr = None,dateToTSP=DateToTSP()):
+    def __init__(self, companyName = None, firstNTweets = None, tweetIds = None, fromDateStr = None, toDateStr = None,dateToTSP=DateTSPConverter()):
         self.companyName = companyName
         self.firstNTweets = firstNTweets
         self.tweetIds = tweetIds

@@ -4,15 +4,20 @@ Created on 26.12.2022
 @author: vital
 '''
 import unittest
-from tweetpreprocess.DateToTSP import DateToTSP
+import datetime
+from tweetpreprocess.DateToTSP import DateTSPConverter
 
-class DateToTSPTest(unittest.TestCase):
+class DateTSPConverterTest(unittest.TestCase):
 
 
     def testWhenCorrectDateStrThenReturnTSP(self):
-        self.assertEqual(1640991600, DateToTSP().dateStrToTSPInt("01/01/2022"))
-        self.assertEqual(1640991600, DateToTSP("%d-%m-%y").dateStrToTSPInt("01-01-22"))
-        self.assertEqual(1640991600, DateToTSP("%d.%m.%Y").dateStrToTSPInt("01.01.2022"))        
+        self.assertEqual(1640991600, DateTSPConverter().dateStrToTSPInt("01/01/2022"))
+        self.assertEqual(1640991600, DateTSPConverter("%d-%m-%y").dateStrToTSPInt("01-01-22"))
+        self.assertEqual(1640991600, DateTSPConverter("%d.%m.%Y").dateStrToTSPInt("01.01.2022"))        
+        pass
+    
+    def testWhenCorrectTSPIntThenReturnDate(self):
+        self.assertEqual(datetime.datetime(2017, 1, 1, 1, 31,0),DateTSPConverter().tspIntToDate(1483230660))   
         pass
 
 
