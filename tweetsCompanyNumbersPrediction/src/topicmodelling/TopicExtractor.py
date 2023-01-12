@@ -3,10 +3,11 @@ Created on 29.01.2022
 
 @author: vital
 '''
+from nlpvectors.FeatureVectorMapper import FeatureVectorMapper
 
 
 
-class TopicExtractor(object):
+class TopicExtractor(FeatureVectorMapper):
     '''
     classdocs
     '''
@@ -14,13 +15,14 @@ class TopicExtractor(object):
 
     def __init__(self, topicModel):
         self.topicModel = topicModel
-        
-     
-     
-    def getDocumentVectorByDocumentIndex(self,index):
+          
+    def getFeatureVectorByTweetIndex(self,index):
         return self.topicModel.model.docvecs[index]    
       
-      
+    def getFeatureVectors(self):
+        return self.topicModel.model.docvecs
+    
+    
     def getNumTopics(self): 
         return self.topicModel.get_num_topics()
     

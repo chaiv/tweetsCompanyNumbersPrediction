@@ -39,7 +39,7 @@ class TopicExtractorTest(unittest.TestCase):
     
     
     def testGetDocumentVector(self):
-        self.assertAlmostEqual(0.01063707,self.topicExtractor.getDocumentVectorByDocumentIndex(0)[0],4)  
+        self.assertAlmostEqual(0.01063707,self.topicExtractor.getFeatureVectorByTweetIndex(0)[0],4)  
    
     
 
