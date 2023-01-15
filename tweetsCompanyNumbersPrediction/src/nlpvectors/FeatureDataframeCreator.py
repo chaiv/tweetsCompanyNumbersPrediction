@@ -20,7 +20,7 @@ class FeatureDataframeCreator(object):
     
     def createFeatureDataframe(self, tweetsWithClassesDf):
         featuresDf = tweetsWithClassesDf[[self.tweetIdColumnName,self.postTSPColumnName,self.classColumnName]]
-        tweetsWithClassesDf[self.featuresColumnName]=self.featureVectorMapper.getFeatureVectors()
+        featuresDf[self.featuresColumnName]=self.featureVectorMapper.getFeatureVectors()
         return featuresDf
         
            

@@ -10,5 +10,8 @@ class FeatureVectorMapper(object):
     def getFeatureVectorByTweetIndex(self, index):
         pass 
     
+    def getFeatureVectorByTweetId(self,tweetId):
+        pass
+    
     def getFeatureVectors(self):
         pass  

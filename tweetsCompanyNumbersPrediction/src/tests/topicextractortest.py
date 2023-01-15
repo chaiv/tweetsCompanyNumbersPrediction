@@ -9,11 +9,12 @@ from topicmodelling.TopicExtractor import TopicExtractor
 from topicmodelling.TopicModelCreator import TopicModelCreator
 from tweetpreprocess.TweetDataframeQuery import TweetDataframeQuery
 from tweetpreprocess.TweetQueryParams import TweetQueryParams
+from tweetpreprocess.DataDirHelper import DataDirHelper
 
 
 class TopicExtractorTest(unittest.TestCase):
     
-    modelpath =  r'C:\Users\vital\Google Drive\promotion\companyTweets\TopicModelAAPLFirst1000'
+    modelpath =  DataDirHelper().getDataDir()+ "companyTweets\TopicModelAAPLFirst1000"
     topicExtractor = TopicExtractor(TopicModelCreator().load(modelpath))
     
     def testWhenFindSentencesFromTopicThenOk(self):
@@ -40,6 +41,7 @@ class TopicExtractorTest(unittest.TestCase):
     
     def testGetDocumentVector(self):
         self.assertAlmostEqual(0.01063707,self.topicExtractor.getFeatureVectorByTweetIndex(0)[0],4)  
+        self.assertAlmostEqual(0.01063707,self.topicExtractor.getFeatureVectorByTweetId(550441509175443456)[0],4)  
    
     
 

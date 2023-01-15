@@ -18,6 +18,9 @@ class TopicExtractor(FeatureVectorMapper):
           
     def getFeatureVectorByTweetIndex(self,index):
         return self.topicModel.model.docvecs[index]    
+    
+    def getFeatureVectorByTweetId(self,tweetId):
+        return self.topicModel.model.docvecs[self.topicModel.doc_id2index[tweetId]]
       
     def getFeatureVectors(self):
         return self.topicModel.model.docvecs
