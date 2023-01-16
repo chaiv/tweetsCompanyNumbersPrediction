@@ -12,10 +12,12 @@ from tests import StopWordsFilterTest
 from tests import TextFilterTest
 from tests import TweetQueryTest
 from tests import DateToTimestampTransformerTest
-from tests import DateTSPConverterTest
+from tests import DateToTSPTest
 from tests import PipelineTest
 from tests import TweetDataframeSorterTest
 from tests import FiguresIncreaseDecreaseClassCalculatorTest
+from tests.FeatureDataframeCreatorTest import FeatureDataframeCreatorTest
+from tests.TweetTextFilterTransformerTest import TweetTextFilterTransformerTest
 
 loader = unittest.TestLoader()
 suite  = unittest.TestSuite()
@@ -28,9 +30,11 @@ suite.addTests(loader.loadTestsFromModule(StopWordsFilterTest))
 suite.addTests(loader.loadTestsFromModule(TextFilterTest))
 suite.addTests(loader.loadTestsFromModule(TweetQueryTest))
 suite.addTests(loader.loadTestsFromModule(DateToTimestampTransformerTest))
-suite.addTests(loader.loadTestsFromModule(DateTSPConverterTest))
+suite.addTests(loader.loadTestsFromModule(DateToTSPTest))
 suite.addTests(loader.loadTestsFromModule(PipelineTest))
 suite.addTests(loader.loadTestsFromModule(TweetDataframeSorterTest))
 suite.addTests(loader.loadTestsFromModule(FiguresIncreaseDecreaseClassCalculatorTest))
+suite.addTests(loader.loadTestsFromModule(FeatureDataframeCreatorTest))
+suite.addTests(loader.loadTestsFromModule(TweetTextFilterTransformerTest))
 runner = unittest.TextTestRunner(verbosity=3)
 result = runner.run(suite)

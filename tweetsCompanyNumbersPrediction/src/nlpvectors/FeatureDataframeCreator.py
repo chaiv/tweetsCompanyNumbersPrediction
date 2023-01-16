@@ -3,7 +3,7 @@ Created on 12.01.2023
 
 @author: vital
 '''
-
+import pandas as pd
 class FeatureDataframeCreator(object):
     '''
     classdocs
@@ -19,8 +19,10 @@ class FeatureDataframeCreator(object):
     
     
     def createFeatureDataframe(self, tweetsWithClassesDf):
-        featuresDf = tweetsWithClassesDf[[self.tweetIdColumnName,self.postTSPColumnName,self.classColumnName]]
-        featuresDf[self.featuresColumnName]=self.featureVectorMapper.getFeatureVectors()
+        featuresDf = pd.DataFrame(self.featureVectorMapper.getFeatureVectorsAsArray())
+        featuresDf[self.tweetIdColumnName] = tweetsWithClassesDf[self.tweetIdColumnName]
+        featuresDf[self.postTSPColumnName] = tweetsWithClassesDf[self.postTSPColumnName]
+        featuresDf[self.classColumnName] = tweetsWithClassesDf[self.classColumnName]
         return featuresDf
         
            

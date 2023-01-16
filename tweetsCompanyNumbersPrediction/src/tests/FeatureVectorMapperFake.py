@@ -17,5 +17,5 @@ class FeatureVectorMapperFake(FeatureVectorMapper):
     def getFeatureVectorByTweetIndex(self, index):
         return self.vectorsToReturn[index]
     
-    def getFeatureVectors(self):
+    def getFeatureVectorsAsArray(self):
         return self.vectorsToReturn    
