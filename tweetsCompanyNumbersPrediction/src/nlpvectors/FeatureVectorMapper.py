@@ -14,4 +14,7 @@ class FeatureVectorMapper(object):
         pass
     
     def getFeatureVectorsAsArray(self):
-        pass  
+        pass 
+    
+    def getFeatureVectorSize(self):
+        pass 

@@ -44,8 +44,16 @@ class TopicExtractorTest(unittest.TestCase):
         self.assertAlmostEqual(0.01063707,self.topicExtractor.getFeatureVectorByTweetId(550441509175443456)[0],4)  
    
     def testAllDocumentVectors(self):
-        self.assertEquals(self.topicExtractor.getFeatureVectorByTweetIndex(0),self.topicExtractor.getFeatureVectorsAsArray()[0])  
+        self.assertEquals(
+            self.topicExtractor.getFeatureVectorByTweetIndex(0).all(),
+            self.topicExtractor.getFeatureVectorsAsArray()[0].all()
+            )  
         pass
+    
+    def testGetDocumentVectorSize(self):
+        self.assertEquals(300,self.topicExtractor.getFeatureVectorSize())  
+        pass
+
 
     def testTopicExtraction(self):
         self.assertTrue(self.topicExtractor.getNumTopics()>0)

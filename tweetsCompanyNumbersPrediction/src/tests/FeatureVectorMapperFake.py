@@ -18,4 +18,7 @@ class FeatureVectorMapperFake(FeatureVectorMapper):
         return self.vectorsToReturn[index]
     
     def getFeatureVectorsAsArray(self):
-        return self.vectorsToReturn    
+        return self.vectorsToReturn  
+    
+    def getFeatureVectorSize(self):
+        return 3   

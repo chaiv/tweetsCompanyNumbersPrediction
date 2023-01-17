@@ -23,11 +23,10 @@ class TopicExtractor(FeatureVectorMapper):
         return self.topicModel.model.docvecs[self.topicModel.doc_id2index[tweetId]]
       
     def getFeatureVectorsAsArray(self):
-        # vectors = []
-        # for i in range(0,len(self.topicModel.model.docvecs)):
-        #     vectors.append(self.getFeatureVectorByTweetIndex(i))
-        # return vectors
         return self.topicModel.model.dv.vectors
+    
+    def getFeatureVectorSize(self):
+        return self.topicModel.model.docvecs.vector_size
     
     def getNumTopics(self): 
         return self.topicModel.get_num_topics()
