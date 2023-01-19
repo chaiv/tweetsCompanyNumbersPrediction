@@ -8,9 +8,9 @@ from tweetpreprocess.DataDirHelper import DataDirHelper
 from topicmodelling.TopicExtractor import TopicExtractor
 from topicmodelling.TopicModelCreator import TopicModelCreator
 from nlpvectors.FeatureDataframeCreator import FeatureDataframeCreator
-tweets = pd.read_csv (DataDirHelper().getDataDir()+ 'companyTweets\\amazonTweetsWithNumbers.csv')
-modelpath =  r'C:\Users\vital\Desktop\df\amazonTopicModel'
+tweets = pd.read_csv (DataDirHelper().getDataDir()+ 'companyTweets\\CompanyTweetsAAPLFirst1000WithNumbers.csv')
+modelpath =  DataDirHelper().getDataDir()+ "companyTweets\TopicModelAAPLFirst1000"
 mapper = TopicExtractor(TopicModelCreator().load(modelpath))
-featuresClassesDf = FeatureDataframeCreator(mapper,classColumnName="value").createFeatureDataframe(tweets)
+featuresClassesDf = FeatureDataframeCreator(mapper,classColumnName="class").createFeatureDataframe(tweets)
 print(featuresClassesDf)
-featuresClassesDf.to_csv (DataDirHelper().getDataDir()+ 'companyTweets\\FeaturesClassesAmazon.csv')
+featuresClassesDf.to_csv (DataDirHelper().getDataDir()+ 'companyTweets\\FeaturesClassesAAPLFirst1000.csv')
