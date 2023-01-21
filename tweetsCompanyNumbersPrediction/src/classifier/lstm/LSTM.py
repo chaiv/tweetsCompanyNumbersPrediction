@@ -10,14 +10,14 @@ import torch.nn.functional as F
 #https://towardsdatascience.com/text-classification-with-pytorch-7111dae111a6
 class LSTM(nn.ModuleList):
 
-    def __init__(self, args):
+    def __init__(self, batch_size=64, hidden_dim =128,lstm_layers=2,input_size=300 ):
         super(LSTM, self).__init__()
         
         # Hyperparameters
-        self.batch_size = args.batch_size
-        self.hidden_dim = args.hidden_dim
-        self.LSTM_layers = args.lstm_layers
-        self.input_size = args.max_words
+        self.batch_size = batch_size
+        self.hidden_dim = hidden_dim
+        self.LSTM_layers = lstm_layers
+        self.input_size = input_size
         
         self.dropout = nn.Dropout(0.5)
         self.embedding = nn.Embedding(self.input_size, self.hidden_dim, padding_idx=0)
