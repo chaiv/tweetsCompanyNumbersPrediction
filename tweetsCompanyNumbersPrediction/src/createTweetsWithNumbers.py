@@ -18,13 +18,14 @@ from tweetpreprocess.FiguresIncreaseDecreaseClassCalculator import FiguresIncrea
 from tweetpreprocess.FiguresPercentChangeCalculator import FiguresPercentChangeCalculator
 
 numbersDfDateFormat='%d/%m/%Y %H:%M:%S'
-tweets = pd.read_csv (DataDirHelper().getDataDir()+ "companyTweets\CompanyTweetsAAPLFirst1000.csv")
-tweetsSubselect = TweetDataframeSorter(postTSPColumnName="post_date").sortByPostTSPAsc(TweetDataframeQuery().query(tweets, TweetQueryParams(companyName ="AAPL")))
+company = "AMZN"
+tweets = pd.read_csv (DataDirHelper().getDataDir()+ "companyTweets\CompanyTweets.csv")
+tweetsSubselect = TweetDataframeSorter(postTSPColumnName="post_date").sortByPostTSPAsc(TweetDataframeQuery().query(tweets, TweetQueryParams(companyName =company)))
 numbers = pd.read_csv (DataDirHelper().getDataDir()+ "companyTweets\\amazonQuarterRevenue.csv")
 numbersDfWithTSP = DateToTimestampDataframeTransformer(dateToTSP=DateTSPConverter(dateFormat=numbersDfDateFormat)).addTimestampColumns(numbers)
 numbersWithClasses =  FiguresIncreaseDecreaseClassCalculator().getFiguresWithClasses(FiguresPercentChangeCalculator ().getFiguresWithClasses(numbersDfWithTSP))
 tweetsWithNumbers = TweetNumbersConnector(postTSPColumn = "post_date",valueColumn="class").getTweetsWithNumbers(tweetsSubselect, numbersWithClasses)
 textfiltetedTweetsWithNumbers  = TweetTextFilterTransformer(TextFilter([HyperlinkFilter()])).filterTextColumns(tweetsWithNumbers)  
 print(textfiltetedTweetsWithNumbers )
-textfiltetedTweetsWithNumbers.to_csv(DataDirHelper().getDataDir()+"companyTweets\CompanyTweetsAAPLFirst1000WithNumbers.csv")
+textfiltetedTweetsWithNumbers.to_csv(DataDirHelper().getDataDir()+"companyTweets\CompanyTweetsAmazon.csv")
 
