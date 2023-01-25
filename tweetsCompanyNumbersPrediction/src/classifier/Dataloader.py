@@ -4,7 +4,6 @@ Created on 25.01.2023
 @author: vital
 '''
 from torch.utils.data import Dataset, DataLoader
-from sklearn.preprocessing import StandardScaler
 import torch
 
 class Dataset(Dataset):

@@ -28,8 +28,7 @@ class FeatureDataframeCreatorTest(unittest.TestCase):
                 [8,9,10]
             ])
         result = FeatureDataframeCreator(mapper).createFeatureDataframe(tweets)
-        print(result)
-        firstvector=result["features"].iloc[0]
+        firstvector=list(result.iloc[:,0:3].to_numpy()[0])
         self.assertEqual(firstvector,[1,2,3] )
         pass
 

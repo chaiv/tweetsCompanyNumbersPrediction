@@ -19,8 +19,10 @@ class FeatureDataframeCreator(object):
     
     
     def createFeatureDataframe(self, tweetsWithClassesDf):
-        featuresDf = tweetsWithClassesDf[[self.tweetIdColumnName,self.postTSPColumnName,self.classColumnName]]
-        featuresDf[self.featuresColumnName] = pd.Series(self.featureVectorMapper.getFeatureVectorsAsArray())
+        featuresDf = pd.DataFrame(self.featureVectorMapper.getFeatureVectorsAsArray())
+        featuresDf[self.tweetIdColumnName] = tweetsWithClassesDf[self.tweetIdColumnName]
+        featuresDf[self.postTSPColumnName] = tweetsWithClassesDf[self.postTSPColumnName]
+        featuresDf[self.classColumnName] = tweetsWithClassesDf[self.classColumnName]
         return featuresDf
         
            

@@ -1,12 +1,9 @@
-#importing the libraries
-import numpy as np
-import matplotlib.pyplot as plt
 import torch
 import pandas as pd
-
-#importing the dataset
 from tweetpreprocess.DataDirHelper import DataDirHelper
 from classifier.Dataloader import Dataloader
+from classifier.FNN import FNN
+from torch import nn
 
 featuresDf = pd.read_pickle(DataDirHelper().getDataDir()+ 'companyTweets\\featuresClassesAmazon.pkl')
 #featuresDf = pd.read_csv(DataDirHelper().getDataDir()+ 'companyTweets\\FeaturesClassesAAPLFirst1000.csv')
@@ -21,26 +18,10 @@ x = sc.fit_transform(x)
 deviceToUse = torch.device("cuda:0")
 trainloader =  Dataloader(x,y).getTrainsetDataloader()   
     
-    
-#TODO Testset loader
-from torch import nn
-from torch.nn import functional as F
-class Net(nn.Module):
-    def __init__(self,input_shape):
-        super(Net,self).__init__()
-        self.fc1 = nn.Linear(input_shape,32,device=deviceToUse)
-        self.fc2 = nn.Linear(32,64,device=deviceToUse)
-        self.fc3 = nn.Linear(64,1,device=deviceToUse)  
-    def forward(self,x):
-        x = torch.relu(self.fc1(x))
-        x = torch.relu(self.fc2(x))
-        x = torch.sigmoid(self.fc3(x))
-        return x
-    
 #hyper parameters
 learning_rate = 0.01
 epochs = 700# Model , Optimizer, Loss
-model = Net(input_shape=x.shape[1]).to(deviceToUse)
+model = FNN(input_shape=x.shape[1]).to(deviceToUse)
 optimizer = torch.optim.SGD(model.parameters(),lr=learning_rate)
 loss_fn = nn.BCELoss()
 
