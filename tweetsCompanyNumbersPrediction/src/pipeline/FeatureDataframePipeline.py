@@ -36,9 +36,9 @@ class FeatureDataframePipeline(object):
         numbersDfWithTSP = DateToTimestampDataframeTransformer(dateToTSP=DateTSPConverter(dateFormat= self.numbersDfDateFormat)).addTimestampColumns(numbersDf)
         numbersWithClasses =  FiguresIncreaseDecreaseClassCalculator().getFiguresWithClasses(FiguresPercentChangeCalculator ().getFiguresWithClasses(numbersDfWithTSP))
         tweetsWithNumbers = TweetNumbersConnector(postTSPColumn = self.postTSPColumnName,valueColumn="class").getTweetsWithNumbers(tweetsSubselect, numbersWithClasses)
+        # TODO: Porter Stemmer Filter, Numerical Values filter, lower filter and before topic modelling!
         textfiltetedTweetsWithNumbers  = TweetTextFilterTransformer(TextFilter([HyperlinkFilter()])).filterTextColumns(tweetsWithNumbers)  
         return textfiltetedTweetsWithNumbers
-    
     def createDoc2VecFeaturesDf(self, tweetsWithNumbersDf,topicModelPath):
         mapper = TopicExtractor(TopicModelCreator().load(topicModelPath))
         featuresDf = FeatureDataframeCreator(mapper,classColumnName="class").createFeatureDataframe(tweetsWithNumbersDf)
