@@ -1,18 +1,17 @@
-#importing the librariesimport torch
+#importing the libraries
 import numpy as np
 import matplotlib.pyplot as plt
 import torch
 import pandas as pd
 
 #importing the dataset
-from sklearn.datasets import load_breast_cancer
 from tweetpreprocess.DataDirHelper import DataDirHelper
-data = load_breast_cancer()
+from classifier.Dataloader import Dataloader
 
 featuresDf = pd.read_pickle(DataDirHelper().getDataDir()+ 'companyTweets\\featuresClassesAmazon.pkl')
 #featuresDf = pd.read_csv(DataDirHelper().getDataDir()+ 'companyTweets\\FeaturesClassesAAPLFirst1000.csv')
-x = list(featuresDf.iloc[:,1:301].to_numpy())
-y = list(featuresDf["class"])
+x = featuresDf.iloc[:,1:301].to_numpy()
+y = featuresDf["class"].to_numpy()
 
 #feature scaling
 from sklearn.preprocessing import StandardScaler
@@ -20,23 +19,10 @@ sc = StandardScaler()
 x = sc.fit_transform(x)
 
 deviceToUse = torch.device("cuda:0")
-
-#defining dataset class
-from torch.utils.data import Dataset, DataLoader
-class dataset(Dataset):
-    def __init__(self,x,y):
-        self.x = torch.tensor(x,dtype=torch.float32).to(deviceToUse )
-        self.y = torch.tensor(y,dtype=torch.float32).to(deviceToUse )
-        self.length = self.x.shape[0]
- 
-    def __getitem__(self,idx):
-        return self.x[idx],self.y[idx]  
-    def __len__(self):
-        return self.length
+trainloader =  Dataloader(x,y).getTrainsetDataloader()   
     
-trainset = dataset(x,y)#DataLoader
-trainloader = DataLoader(trainset,batch_size=258944 ,shuffle=False)
-
+    
+#TODO Testset loader
 from torch import nn
 from torch.nn import functional as F
 class Net(nn.Module):
