@@ -6,6 +6,7 @@ from classifier.FNN import FNN
 from torch import nn
 from classifier.Trainer import Trainer
 
+#https://medium.com/@CVxTz/add-interpretability-to-your-nlp-model-the-easy-way-using-captum-ec56f538f746
 #https://stats.stackexchange.com/questions/258166/good-accuracy-despite-high-loss-value
 
 featuresDf = pd.read_pickle(DataDirHelper().getDataDir()+ 'companyTweets\\featuresClassesAmazon.pkl')
