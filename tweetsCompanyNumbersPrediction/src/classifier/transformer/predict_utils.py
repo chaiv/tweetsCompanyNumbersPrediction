@@ -5,8 +5,8 @@ from captum.attr import LayerIntegratedGradients
 
 from colour import Color
 
-from interpretable_nlp.models import Transformer
-from interpretable_nlp.nlp_utils import MAX_LEN, tokenize, PAD_IDX, CLS_IDX, SEP_IDX
+from classifier.transformer.models import Transformer
+from classifier.transformer.nlp_utils import MAX_LEN, PAD_IDX, VOCAB_SIZE,CLS_IDX,SEP_IDX, tokenize
 
 
 COLOR_RANGE = list(Color("red").range_to(Color("white"), 10)) + list(

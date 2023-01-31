@@ -16,6 +16,7 @@ from torch.utils.data import Dataset
 
 from classifier.transformer.models import Transformer
 from classifier.transformer.nlp_utils import MAX_LEN, PAD_IDX, VOCAB_SIZE, tokenize
+from classifier.transformer.predict_utils import attribution_fun,attribution_to_html
 
 class Dataset(Dataset):
     def __init__(self, dataframe):
@@ -56,7 +57,7 @@ def generate_batch(data_batch, pad_idx):
 
 if __name__ == "__main__":
     batch_size = 1
-    epochs = 10
+    epochs = 1
 
     df = pd.DataFrame(
                   [
@@ -146,6 +147,10 @@ if __name__ == "__main__":
     trainer.fit(model, train_loader, val_loader)
 
     trainer.test(model, dataloaders=test_loader)
+    
+    tokens, attr = attribution_fun("One fucking star", model,torch.device("cpu"))
+    
+    print(attribution_to_html(tokens, attr))
 
     # DATALOADER: 0
     # TEST
