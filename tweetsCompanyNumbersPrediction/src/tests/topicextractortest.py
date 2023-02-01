@@ -60,7 +60,10 @@ class TopicExtractorTest(unittest.TestCase):
         topic_words, word_scores, topic_scores, topic_nums =  self.topicExtractor.searchTopics(keywords=["work"], num_topics=self.topicExtractor.getNumTopics())
         self.assertAlmostEqual(topic_scores[0],0.9831678519450329,3 )
         pass
-
+    
+    def testWordIndexes(self):
+       self.assertEquals(2706, len(self.topicExtractor.getWordIndexes()))
+        
 
 if __name__ == "__main__":
     # import sys;sys.argv = ['', 'TopicExtractorTest.testTopicExtraction']

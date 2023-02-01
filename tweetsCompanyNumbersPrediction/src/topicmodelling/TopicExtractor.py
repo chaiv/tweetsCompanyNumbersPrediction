@@ -6,11 +6,13 @@ Created on 29.01.2022
 from nlpvectors.FeatureVectorMapper import FeatureVectorMapper
 
 
-
 class TopicExtractor(FeatureVectorMapper):
     '''
     classdocs
     '''
+
+    def getWordIndexes(self):
+        return self.topicModel.word_indexes
 
 
     def __init__(self, topicModel):
