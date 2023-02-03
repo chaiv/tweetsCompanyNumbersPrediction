@@ -8,7 +8,7 @@ from top2vec.Top2Vec import default_tokenizer
 
 MAX_LEN = 280 #Tweet max length 
 
-class DefaultTokenizer(object):
+class TokenizerTop2Vec(object):
     '''
     classdocs
     '''
