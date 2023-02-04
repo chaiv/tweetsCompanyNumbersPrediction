@@ -17,9 +17,9 @@ from torch.utils.data import Dataset
 
 from classifier.transformer.models import Transformer
 from tweetpreprocess.DataDirHelper import DataDirHelper
-from topicmodelling.TopicExtractor import TopicExtractor
-from topicmodelling.TopicModelCreator import TopicModelCreator
 from nlpvectors.TokenizerTop2Vec import TokenizerTop2Vec
+
+torch.set_float32_matmul_precision('medium')
 
 class Dataset(Dataset):
     def __init__(self, dataframe,tokenizer, textColumnName = "body" , classColumnName = "class"):
@@ -32,8 +32,8 @@ class Dataset(Dataset):
         return self.dataframe.shape[0]
 
     def __getitem__(self, idx):
-        text = str(self.dataframe.loc[idx, self.textColumnName])
-        label = self.dataframe.loc[idx,  self.classColumnName]
+        text = str(self.dataframe[self.textColumnName].iloc[idx])
+        label = self.dataframe[self.classColumnName].iloc[idx]
 
         x = self.tokenizer.encode(text)
         y = label
@@ -53,13 +53,13 @@ def generate_batch(data_batch, pad_idx):
     return x_input, y_output
 
 if  __name__ == "__main__":
-    batch_size = 64
+    batch_size = 2048
     epochs = 10
+    num_workers = 16
+    
 
-    df = pd.read_csv(DataDirHelper().getDataDir()+ 'companyTweets\\CompanyTweetsAAPLFirst1000WithNumbers.csv')
-    modelpath =  DataDirHelper().getDataDir()+ "companyTweets\TopicModelAAPLFirst1000"
-    topicExtractor = TopicExtractor(TopicModelCreator().load(modelpath))
-    tokenizer = TokenizerTop2Vec(topicExtractor.getWordIndexes())
+    df = pd.read_csv(DataDirHelper().getDataDir()+ 'companyTweets\\amazonTweetsWithNumbers.csv')
+    tokenizer = TokenizerTop2Vec(DataDirHelper().getDataDir()+ "companyTweets\TokenizerAmazon.json")
     pad_token_idx = tokenizer.getPADTokenID()
     vocab_size = tokenizer.getVocabularyLength()
 
@@ -77,28 +77,28 @@ if  __name__ == "__main__":
     train_loader = DataLoader(
         train_data,
         batch_size=batch_size,
-        num_workers=5,
+        num_workers=num_workers,
         shuffle=True,
         collate_fn=partial(generate_batch, pad_idx=pad_token_idx),
     )
     val_loader = DataLoader(
         val_data,
         batch_size=batch_size,
-        num_workers=5,
+        num_workers=num_workers,
         shuffle=False,
         collate_fn=partial(generate_batch, pad_idx=pad_token_idx),
     )
     test_loader = DataLoader(
         test_data,
         batch_size=batch_size,
-        num_workers=5,
+        num_workers=num_workers,
         shuffle=False,
         collate_fn=partial(generate_batch, pad_idx=pad_token_idx),
     )
 
     base_path = Path(__file__).parents[1]
 
-    model = Transformer(lr=1e-4, n_outputs=3, vocab_size=vocab_size)
+    model = Transformer(lr=1e-4, n_outputs=2, vocab_size=vocab_size+2) #https://discuss.pytorch.org/t/solved-assertion-srcindex-srcselectdimsize-failed-on-gpu-for-torch-cat/1804/13
 
     logger = TensorBoardLogger(
         save_dir=DataDirHelper().getDataDir()+ 'companyTweets\\modellogs',
@@ -117,7 +117,8 @@ if  __name__ == "__main__":
 
     trainer = pl.Trainer(
         max_epochs=epochs,
-        gpus=1,
+        accelerator='gpu',
+        devices=1,
         logger=logger,
         callbacks=[checkpoint_callback, early_stopping],
         accumulate_grad_batches=1,

@@ -4,7 +4,7 @@ Created on 01.02.2023
 @author: vital
 '''
 from top2vec.Top2Vec import default_tokenizer
-
+import json
 
 MAX_LEN = 280 #Tweet max length 
 
@@ -12,10 +12,10 @@ class TokenizerTop2Vec(object):
     '''
     classdocs
     '''
-
-
-    def __init__(self, word_indexes):
-        self.word_indexes = word_indexes
+    def __init__(self, dictionaryPath):
+        with open(dictionaryPath) as json_file:
+            dictionary = json.load(json_file)
+        self.word_indexes = dictionary
     
     def getVocabularyLength(self):
         return len(self.word_indexes)

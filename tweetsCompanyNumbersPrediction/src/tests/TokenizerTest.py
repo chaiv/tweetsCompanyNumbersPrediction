@@ -5,17 +5,13 @@ Created on 03.02.2023
 '''
 import unittest
 from classifier.transformer.nlp_utils import tokenize
-from topicmodelling.TopicExtractor import TopicExtractor
-from topicmodelling.TopicModelCreator import TopicModelCreator
 from tweetpreprocess.DataDirHelper import DataDirHelper
 from nlpvectors.TokenizerTop2Vec import TokenizerTop2Vec
 
+
 class Test(unittest.TestCase):
     
-    modelpath =  DataDirHelper().getDataDir()+ "companyTweets\TopicModelAAPLFirst1000"
-    topicExtractor = TopicExtractor(TopicModelCreator().load(modelpath))
-    tokenizerTop2Vec = TokenizerTop2Vec(topicExtractor.getWordIndexes())
-
+    tokenizerTop2Vec = TokenizerTop2Vec(DataDirHelper().getDataDir()+ "companyTweets\TokenizerAAPLFirst1000.json")
 
     def testNlpUtilTokenizer(self):
         text = "lx21 made $10,008  on $AAPL -Check it out!  Learn #howtotrade  $EXE $WATT $IMRS $CACH $GMO"
