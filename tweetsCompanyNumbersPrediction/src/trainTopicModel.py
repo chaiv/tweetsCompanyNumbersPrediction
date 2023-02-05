@@ -5,11 +5,13 @@ Created on 10.01.2023
 '''
 import pandas as pd
 from topicmodelling.TopicModelCreator import TopicModelCreator
+from tweetpreprocess.DataDirHelper import DataDirHelper
 
-tweets = pd.read_csv (r'C:\Users\vital\Google Drive\promotion\companyTweets\amazonTweetsWithNumbers')  
+
+tweets = pd.read_csv (DataDirHelper().getDataDir()+ "companyTweets\\amazonTweetsWithNumbers.csv")  
 documents = []
 for index, row in tweets.iterrows():
     documents.append(str(row["body"]))
-model = TopicModelCreator(5).createModel(documents, tweets["tweet_id"].tolist())
-model.save(r"C:\Users\vital\Desktop\df\amazonTopicModel")
+model = TopicModelCreator().createModel(documents, tweets["tweet_id"].tolist())
+model.save(DataDirHelper().getDataDir()+ "companyTweets\\amazonTopicModel")
 

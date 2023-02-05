@@ -63,6 +63,7 @@ class TopicExtractorTest(unittest.TestCase):
     
     def testWordIndexes(self):
        self.assertEquals(2706, len(self.topicExtractor.getWordIndexes()))
+    
         
 
 if __name__ == "__main__":

@@ -26,6 +26,9 @@ class Test(unittest.TestCase):
         self.assertIsNotNone(self.tokenizerTop2Vec.encode(text))
         pass
 
+    def testGetWords(self):
+        tokenizer = TokenizerTop2Vec(DataDirHelper().getDataDir()+ "companyTweets\TokenizerAmazon.json")
+        self.assertEquals([626, 36850],tokenizer.encode("Follow @StockMoney62"))
 
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']
