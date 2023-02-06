@@ -17,6 +17,7 @@ from torch.utils.data import Dataset
 from classifier.transformer.models import Transformer
 from classifier.transformer.nlp_utils import MAX_LEN, PAD_IDX, VOCAB_SIZE, tokenize
 from classifier.transformer.predict_utils import attribution_fun,attribution_to_html
+from tweetpreprocess.DataDirHelper import DataDirHelper
 
 class Dataset(Dataset):
     def __init__(self, dataframe):
@@ -57,7 +58,7 @@ def generate_batch(data_batch, pad_idx):
 
 if __name__ == "__main__":
     batch_size = 1
-    epochs = 1
+    epochs = 10
 
     df = pd.DataFrame(
                   [
@@ -122,15 +123,15 @@ if __name__ == "__main__":
 
     # model.load_state_dict(torch.load(model_path)["state_dict"])
 
-    logger = TensorBoardLogger(
-        save_dir=str(base_path / "logs"),
-        name="sentiment",
-    )
+    # logger = TensorBoardLogger(
+    #     save_dir=str(base_path / "logs"),
+    #     name="sentiment",
+    # )
 
     checkpoint_callback = ModelCheckpoint(
         monitor="valid_loss",
         mode="min",
-        dirpath=base_path / "models",
+        dirpath=DataDirHelper().getDataDir()+ 'companyTweets\\model',
         filename="sentiment",
         save_weights_only=True,
     )
@@ -140,7 +141,7 @@ if __name__ == "__main__":
     trainer = pl.Trainer(
         max_epochs=epochs,
         gpus=1,
-        logger=logger,
+        logger=False,
         callbacks=[checkpoint_callback, early_stopping],
         accumulate_grad_batches=1,
     )
@@ -148,9 +149,9 @@ if __name__ == "__main__":
 
     trainer.test(model, dataloaders=test_loader)
     
-    tokens, attr = attribution_fun("One fucking star", model,torch.device("cpu"))
+    #tokens, attr = attribution_fun("One fucking star", model,torch.device("cpu"))
     
-    print(attribution_to_html(tokens, attr))
+    #print(attribution_to_html(tokens, attr))
 
     # DATALOADER: 0
     # TEST

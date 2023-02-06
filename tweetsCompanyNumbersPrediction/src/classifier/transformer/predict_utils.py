@@ -63,8 +63,10 @@ def attribution_fun(text: str, model: Transformer, device: torch.device):
 
     x = x.to(device)
     ref = ref.to(device)
+    
+    predicted = model(x)[0].argmax(0).item()
 
-    base_class = 2
+    base_class = 1
 
     lig = LayerIntegratedGradients(
         model,
@@ -78,4 +80,4 @@ def attribution_fun(text: str, model: Transformer, device: torch.device):
     attributions_ig = attributions_ig[0, 1:-1, :].sum(dim=-1).cpu()
     attributions_ig = attributions_ig / attributions_ig.abs().max()
 
-    return tokenized.tokens[1:-1], attributions_ig.tolist()
+    return predicted, tokenized.tokens[1:-1], attributions_ig.tolist()

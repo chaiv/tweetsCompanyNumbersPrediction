@@ -23,7 +23,10 @@ class TokenizerTop2Vec(object):
     def getPADTokenID(self):
         return self.getVocabularyLength()+1   
     
+    def tokenize(self,text):
+        return default_tokenizer(text)
+    
     def encode(self,text):
-        tokens = default_tokenizer(text)
+        tokens = self.tokenize(text)
         return [self.word_indexes[token] for token in tokens]
         
