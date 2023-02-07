@@ -54,7 +54,7 @@ def generate_batch(data_batch, pad_idx):
 
 if  __name__ == "__main__":
     batch_size = 2048
-    epochs = 10
+    epochs = 50
     num_workers = 16
     
 

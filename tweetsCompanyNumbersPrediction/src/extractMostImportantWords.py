@@ -36,7 +36,7 @@ def attribution_fun(tokenizer,base_class, text: str, model: Transformer):
 tokenizer = TokenizerTop2Vec(DataDirHelper().getDataDir()+ "companyTweets\TokenizerAmazon.json")
 vocab_size = tokenizer.getVocabularyLength()
 model = Transformer(lr=1e-4, n_outputs=2, vocab_size=vocab_size+2)
-checkpoint = torch.load(DataDirHelper().getDataDir()+"companyTweets\\model\\amazonTweetpredict.ckpt")
+checkpoint = torch.load(DataDirHelper().getDataDir()+"companyTweets\\model\\amazonTweetpredict39Epochs.ckpt")
 model.load_state_dict(checkpoint['state_dict'])
 model.eval()
 text = "$AMZN - 21st Century Fox Earnings: An EPS Beat, but Revenue Misses Expectations" 
