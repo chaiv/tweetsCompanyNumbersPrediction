@@ -96,8 +96,6 @@ if  __name__ == "__main__":
         collate_fn=partial(generate_batch, pad_idx=pad_token_idx),
     )
 
-    base_path = Path(__file__).parents[1]
-
     model = Transformer(lr=1e-4, n_outputs=2, vocab_size=vocab_size+2) #https://discuss.pytorch.org/t/solved-assertion-srcindex-srcselectdimsize-failed-on-gpu-for-torch-cat/1804/13
 
     logger = TensorBoardLogger(

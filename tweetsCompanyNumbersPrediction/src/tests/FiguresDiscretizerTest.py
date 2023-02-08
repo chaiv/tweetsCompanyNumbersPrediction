@@ -9,9 +9,25 @@ from tweetpreprocess.FiguresPercentChangeCalculator import FiguresPercentChangeC
 from tweetpreprocess.FiguresDiscretizer import FiguresDiscretizer
 
 class FiguresDiscretizerTest(unittest.TestCase):
+    
+    
+    def testFiguresDiscretizerOnInt(self):
+        figures =  pd.DataFrame(
+                  [
+                  (1.20),    
+                  (1.05),
+                  (0.87 ),
+                  (1.11),
+                  (0.50)
+                  ],
+                  columns=["value"]
+                  )
+        discretizer = FiguresDiscretizer(figures ,4,'value')
+        figuresWithClasses = discretizer.getFiguresWithClasses()
+        print(figuresWithClasses)
 
 
-    def testFiguresDiscretizer(self):
+    def testFiguresDiscretizerOnFloat(self):
         figures =  pd.DataFrame(
                   [
                   ("01/10/2014", "31/12/2014",0.95700),    

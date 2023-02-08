@@ -29,7 +29,9 @@ class TweetDataframeExploreTest(unittest.TestCase):
                   [
                   ("Hehe hello test"),
                   ("tweet data hehe"),
-                  ("random word")
+                  ("random word"),
+                  (1.00),
+                  ()
                   ],
                   columns=["body"]
                   )

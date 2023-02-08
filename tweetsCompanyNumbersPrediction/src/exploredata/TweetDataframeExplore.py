@@ -17,6 +17,6 @@ class TweetDataframeExplore(object):
         return  self.dataframe[ self.classColumnName].value_counts() 
     
     def getMostFrequentWords(self, firstN):  
-        return  pd.Series(' '.join(self.dataframe[self.bodyColumnName]).lower().split()).value_counts()[:firstN]
+        return  pd.Series(' '.join(self.dataframe[self.bodyColumnName].astype("string")).lower().split()).value_counts()[:firstN]
     
     
