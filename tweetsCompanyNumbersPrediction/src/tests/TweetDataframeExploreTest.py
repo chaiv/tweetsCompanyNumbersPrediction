@@ -14,14 +14,15 @@ class TweetDataframeExploreTest(unittest.TestCase):
     def testClassCounts(self):
         df =  pd.DataFrame(
                   [
-                  (1),
-                  (2),
-                  (2)
+                  (1.0),
+                  (2.0),
+                  (2.0),
+                  (2.0)
                   ],
                   columns=["class"]
                   )
         value_counts = TweetDataframeExplore(df).getClassDistribution() #descending
-        self.assertEqual([2,1],list(value_counts))
+        self.assertEqual([3,1],list(value_counts))
         pass
     
     def testWordCounts(self):

@@ -18,6 +18,8 @@ from torch.utils.data import Dataset
 from classifier.transformer.models import Transformer
 from tweetpreprocess.DataDirHelper import DataDirHelper
 from nlpvectors.TokenizerTop2Vec import TokenizerTop2Vec
+from tweetpreprocess.EqualClassSampler import EqualClassSampler
+from exploredata.TweetDataframeExplore import TweetDataframeExplore
 
 torch.set_float32_matmul_precision('medium')
 
@@ -54,11 +56,13 @@ def generate_batch(data_batch, pad_idx):
 
 if  __name__ == "__main__":
     batch_size = 2048
-    epochs = 50
+    epochs = 10
     num_workers = 16
     
 
-    df = pd.read_csv(DataDirHelper().getDataDir()+ 'companyTweets\\amazonTweetsWithNumbers.csv')
+    df = pd.read_csv(DataDirHelper().getDataDir()+ 'companyTweets\\amazonTweetsWithNumbers.csv')    
+    df = EqualClassSampler().getDfWithEqualNumberOfClassSamples(df)
+    
     tokenizer = TokenizerTop2Vec(DataDirHelper().getDataDir()+ "companyTweets\TokenizerAmazon.json")
     pad_token_idx = tokenizer.getPADTokenID()
     vocab_size = tokenizer.getVocabularyLength()
@@ -92,7 +96,7 @@ if  __name__ == "__main__":
         test_data,
         batch_size=batch_size,
         num_workers=num_workers,
-        shuffle=False,
+        shuffle=True,
         collate_fn=partial(generate_batch, pad_idx=pad_token_idx),
     )
 
