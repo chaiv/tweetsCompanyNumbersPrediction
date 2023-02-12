@@ -13,8 +13,9 @@ if  __name__ == "__main__":
     tokenizer = TokenizerTop2Vec(DataDirHelper().getDataDir()+ "companyTweets\TokenizerAmazon.json")
     vocab_size = tokenizer.getVocabularyLength()
     model = Transformer(lr=1e-4, n_outputs=2, vocab_size=vocab_size+2)
-    checkpoint = torch.load(DataDirHelper().getDataDir()+"companyTweets\\model\\amazonTweetpredict39Epochs.ckpt")
+    checkpoint = torch.load(DataDirHelper().getDataDir()+"companyTweets\\model\\amazonTweetPredict.ckpt")
     model.load_state_dict(checkpoint['state_dict'])
     df = pd.read_csv(DataDirHelper().getDataDir()+ 'companyTweets\\amazonTweetsWithNumbers.csv')
     df = df[df["class"]==1.0]
-    Predictor(model,tokenizer,batch_size = 2048, num_workers=16).test(df)
+    print(df)
+    Predictor(model,tokenizer).test(df)
