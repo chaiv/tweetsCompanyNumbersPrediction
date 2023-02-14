@@ -37,7 +37,7 @@ class Predictor(object):
         )
         trainer.test(self.model, dataloaders=test_loader)
         
-    def predictOne(self,sentence):
+    def predictOne(self, sentence):
         x_Tokenids = self.tokenizer.encode(sentence)
         x = torch.tensor([x_Tokenids], dtype=torch.long).to(self.deviceToUse)
         with torch.no_grad():
@@ -65,14 +65,14 @@ class Predictor(object):
     
     
 
-    def calculateWordScores(self,text: str,observed_class):
-        tokens = self.tokenizer.tokenize(text)
-        tokens_idx = self.tokenizer.encode(text)
+    def calculateWordScoresOne(self,sentence: str,observed_class):
+        tokens = self.tokenizer.tokenize(sentence)
+        tokens_idx = self.tokenizer.encode(sentence)
         tokens_idx += [self.tokenizer.getPADTokenID()]*(256 - len(tokens_idx))
-        x = torch.tensor([tokens_idx], dtype=torch.long)
+        x = torch.tensor([tokens_idx], dtype=torch.long).to(self.deviceToUse)
         ref = torch.tensor(
         [[self.tokenizer.getPADTokenID()] * (len(tokens_idx))], dtype=torch.long
-        )
+        ).to(self.deviceToUse)
         lig = LayerIntegratedGradients(
             self.model,
             self.model.embeddings.embedding,
@@ -80,8 +80,36 @@ class Predictor(object):
         attributions_ig, delta = lig.attribute(
             x, ref, n_steps=500, return_convergence_delta=True, target=observed_class
         )
-        attributions_ig = attributions_ig[0, 1:-1, :].sum(dim=-1).cpu()
+        print(attributions_ig)
+        attributions_ig = attributions_ig[0, :, :].sum(dim=-1).cpu()
         attributions_ig = attributions_ig / attributions_ig.abs().max()
         return tokens, attributions_ig.tolist()      
+    
+    def calculateWordScoresMultiple(self, sentences, observed_class):
+        token_lists = [self.tokenizer.tokenize(sentence) for sentence in sentences]
+        tokens_idxs = [self.tokenizer.encode(sentence) for sentence in sentences]
+        padded_tokens_idxs = []
+        for tokens_idx in tokens_idxs:
+            tokens_idx += [self.tokenizer.getPADTokenID()] * (256 - len(tokens_idx))
+            padded_tokens_idxs.append(tokens_idx)
+        x = torch.tensor(padded_tokens_idxs, dtype=torch.long).to(self.deviceToUse)
+        ref = torch.tensor(
+            [[self.tokenizer.getPADTokenID()] * 256] * len(sentences), dtype=torch.long
+            ).to(self.deviceToUse)
+        lig = LayerIntegratedGradients(
+            self.model,
+            self.model.embeddings.embedding,
+            )
+        attributions_ig, delta = lig.attribute(
+            x, ref, n_steps=500, return_convergence_delta=True, target=observed_class
+            )
+        attributions_ig = attributions_ig[:, :, :].sum(dim=-1).cpu()
+        attributions_ig = attributions_ig / attributions_ig.abs().max(dim=1, keepdim=True)[0]
+        scores = []
+        for i in range(len(sentences)):
+            tokens = token_lists[i]
+            attributions_ig_list = attributions_ig[i].tolist()
+            scores.append((tokens, attributions_ig_list))
+        return scores
         
             
