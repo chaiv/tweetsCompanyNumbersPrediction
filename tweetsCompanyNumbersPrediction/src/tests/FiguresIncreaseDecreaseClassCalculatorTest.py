@@ -21,6 +21,7 @@ class FiguresIncreaseDecreaseClassCalculatorTest(unittest.TestCase):
                   columns=['percentChange']
                   )
         resultDf = FiguresIncreaseDecreaseClassCalculator().getFiguresWithClasses(figures);
+        print(resultDf.dtypes)
         self.assertEqual(1,resultDf.iloc[0]["class"])
         self.assertEqual(0,resultDf.iloc[1]["class"])
         self.assertEqual(0,resultDf.iloc[2]["class"])
