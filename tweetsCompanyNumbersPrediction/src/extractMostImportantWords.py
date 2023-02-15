@@ -24,7 +24,7 @@ sentences = df["body"].tolist()
 predictions = predictor.predictMultipleInChunks(sentences,chunkSize=10000)
 df['predicted_class'] = predictions
 correctly_predicted_df = df.loc[df['class'] == df['predicted_class']]
-print(correctly_predicted_df)
+correctly_predicted_df.to_csv(DataDirHelper().getDataDir()+ "companyTweets\\amazonCorrectlyPredicted.csv")
 
 
 

@@ -29,7 +29,7 @@ def predict_sentiment(text: str, model: Transformer, device: torch.device):
     x = x.to(device)
 
     with torch.no_grad():
-        y_hat = model(x).cpu()
+        y_hat = model(x)
         _, predicted = torch.max(y_hat, 1)
         predicted_class = predicted.item()
 
