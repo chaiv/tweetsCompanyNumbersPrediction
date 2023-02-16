@@ -3,35 +3,28 @@ Created on 15.02.2023
 
 @author: vital
 '''
-
 class PredictionClassMapper(object):
     '''
     classdocs
     '''
 
 
-    def __init__(self, params):
-        pass
+    def __init__(self,index_to_class_dict,class_to_economic_interpretation_dict):
+        self.index_to_class_dict = index_to_class_dict
+        self.class_to_economic_interpretation_dict = class_to_economic_interpretation_dict
     
     
-    def index_to_class(self,index):
-        pass 
-    
-    def class_to_economic_interpretation(self,classVal):   
-        pass
-        
+    def class_to_index(self,classValue):
+        for key, val in self.index_to_class_dict.items():
+            if val == classValue:
+                return key
 
-class BinaryClassMapper(PredictionClassMapper):
-    
-    def __init__(self):
-        self.index_to_class_dict = {0: 1, 1 : 0}
-        self.class_to_economic_interpretation_dict = {1: "increase", 0: "decrease"}
-        pass
-    
     
     def index_to_class(self,index):
         return  self.index_to_class_dict[index]
     
-    def class_to_economic_interpretation(self,classVal):  
+    def class_to_economic_interpretation(self,classVal):   
         return self.class_to_economic_interpretation_dict[classVal]
+        
+
     
