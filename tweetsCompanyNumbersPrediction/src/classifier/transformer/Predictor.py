@@ -57,7 +57,7 @@ class Predictor(object):
             y_hat = self.model(x)
             _, predicted = torch.max(y_hat, 1)
             predicted_classes = predicted.tolist()
-            return [self.predictionClassMapper.index_to_class(pred) for pred in predicted_classes]
+        return [self.predictionClassMapper.index_to_class(pred) for pred in predicted_classes]
     
     def predictMultipleInChunks(self,sentences, chunkSize):
         predictions = []
@@ -76,7 +76,7 @@ class Predictor(object):
             token_to_attrib[token] = attribution
         return token_to_attrib
     
-
+    #To determine which class the features are contributing to, it is necessary to analyze the prediction scores obtained by the model. In the code snippet provided, the target is set to 0, which means that IG is computing the attributions with respect to class 0. If the prediction score for class 0 is higher, then the negative attribution values indicate that the input features are contributing to the prediction of class 0. Otherwise, if the prediction score for class 1 is higher, the negative attribution values indicate that the input features are contributing to the prediction of class 1.
     def calculateWordScoresOne(self,sentence: str,observed_class):
         tokens = self.tokenizer.tokenize(sentence)
         tokens_idx = self.tokenizer.encode(sentence)
