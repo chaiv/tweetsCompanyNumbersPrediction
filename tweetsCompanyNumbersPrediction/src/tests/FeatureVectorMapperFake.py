@@ -14,10 +14,10 @@ class FeatureVectorMapperFake(FeatureVectorMapper):
     def __init__(self, vectorsToReturn):
         self.vectorsToReturn = vectorsToReturn
         
-    def getFeatureVectorByTweetIndex(self, index):
+    def getDocumentVectorByTweetIndex(self, index):
         return self.vectorsToReturn[index]
     
-    def getFeatureVectorsAsArray(self):
+    def getDocumentVectorsAsArray(self):
         return self.vectorsToReturn  
     
     def getFeatureVectorSize(self):

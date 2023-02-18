@@ -7,13 +7,13 @@ Created on 12.01.2023
 class FeatureVectorMapper(object):
     '''
     '''
-    def getFeatureVectorByTweetIndex(self, index):
+    def getDocumentVectorByTweetIndex(self, index):
         pass 
     
-    def getFeatureVectorByTweetId(self,tweetId):
+    def getDocumentVectorByTweetId(self,tweetId):
         pass
     
-    def getFeatureVectorsAsArray(self):
+    def getDocumentVectorsAsArray(self):
         pass 
     
     def getFeatureVectorSize(self):

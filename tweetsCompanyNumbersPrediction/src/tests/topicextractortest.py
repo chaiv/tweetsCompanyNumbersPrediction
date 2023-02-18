@@ -40,13 +40,13 @@ class TopicExtractorTest(unittest.TestCase):
     
     
     def testGetDocumentVector(self):
-        self.assertAlmostEqual(0.01063707,self.topicExtractor.getFeatureVectorByTweetIndex(0)[0],4)  
-        self.assertAlmostEqual(0.01063707,self.topicExtractor.getFeatureVectorByTweetId(550441509175443456)[0],4)  
+        self.assertAlmostEqual(0.01063707,self.topicExtractor.getDocumentVectorByTweetIndex(0)[0],4)  
+        self.assertAlmostEqual(0.01063707,self.topicExtractor.getDocumentVectorByTweetId(550441509175443456)[0],4)  
    
     def testAllDocumentVectors(self):
         self.assertEquals(
-            self.topicExtractor.getFeatureVectorByTweetIndex(0).all(),
-            self.topicExtractor.getFeatureVectorsAsArray()[0].all()
+            self.topicExtractor.getDocumentVectorByTweetIndex(0).all(),
+            self.topicExtractor.getDocumentVectorsAsArray()[0].all()
             )  
         pass
     
@@ -63,6 +63,13 @@ class TopicExtractorTest(unittest.TestCase):
     
     def testWordIndexes(self):
        self.assertEquals(2706, len(self.topicExtractor.getWordIndexes()))
+       
+    def testWordVectors(self):
+        self.assertEquals(300,len(self.topicExtractor.getWordVectorsOfWords(["apple","interesting"])[0]))
+        self.assertEquals(2,len(self.topicExtractor.getWordVectorsOfWords(["apple","interesting"])))
+        
+    
+    
     
         
 
