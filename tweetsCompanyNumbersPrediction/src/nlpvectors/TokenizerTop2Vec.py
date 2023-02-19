@@ -5,6 +5,7 @@ Created on 01.02.2023
 '''
 from top2vec.Top2Vec import default_tokenizer
 import json
+from tagging.PosDepTagger import PosDepTagger
 
 MAX_LEN = 280 #Tweet max length 
 
@@ -26,6 +27,14 @@ class TokenizerTop2Vec(object):
     def tokenize(self,text):
         return default_tokenizer(text)
     
+    def tokenizeWithTagging(self,text,posDepTagger: PosDepTagger):
+        tokenizedWithTags = []
+        tokensWithTags = posDepTagger.get_tags(text)
+        for index,token,pos,dep in tokensWithTags:
+            if(len(default_tokenizer(token))>0):
+                tokenizedWithTags.append([index,token,pos,dep])
+        return tokenizedWithTags
+        
     def encode(self,text):
         tokens = self.tokenize(text)
         return [self.word_indexes[token] for token in tokens]

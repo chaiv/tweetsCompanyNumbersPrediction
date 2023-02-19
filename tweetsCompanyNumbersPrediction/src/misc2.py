@@ -8,8 +8,9 @@ from topicmodelling.TopicExtractor import TopicExtractor
 from topicmodelling.TopicModelCreator import TopicModelCreator
 from tweetpreprocess.DataDirHelper import DataDirHelper
 
-modelpath =  DataDirHelper().getDataDir()+ "companyTweets\\TopicModelAAPLFirst1000"
+modelpath =  DataDirHelper().getDataDir()+ "companyTweets\\amazonTopicModel"
 topicExtractor = TopicExtractor(TopicModelCreator().load(modelpath))
-print(topicExtractor.searchTopics(["cheating"], 2))
+topic_words, word_scores, topic_nums = topicExtractor.get_topics()
+print(topic_words[0])
 
 

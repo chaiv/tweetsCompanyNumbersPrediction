@@ -7,11 +7,18 @@ import unittest
 from classifier.transformer.nlp_utils import tokenize
 from tweetpreprocess.DataDirHelper import DataDirHelper
 from nlpvectors.TokenizerTop2Vec import TokenizerTop2Vec
+from tagging.PosDepTagger import PosDepTagger
 
 
 class Test(unittest.TestCase):
     
     tokenizerTop2Vec = TokenizerTop2Vec(DataDirHelper().getDataDir()+ "companyTweets\TokenizerAAPLFirst1000.json")
+
+    def testTokenizedWithTags(self):
+        text = "test 1 2 3 or _example above tooooooooooooloooooooog"
+        print(self.tokenizerTop2Vec.tokenize(text))
+        print(self.tokenizerTop2Vec.tokenizeWithTagging(text, PosDepTagger()))
+
 
     def testNlpUtilTokenizer(self):
         text = "lx21 made $10,008  on $AAPL -Check it out!  Learn #howtotrade  $EXE $WATT $IMRS $CACH $GMO"
