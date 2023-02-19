@@ -13,8 +13,8 @@ from classifier.PredictionClassMappers import BINARY_0_1
 tokenizer = TokenizerTop2Vec(DataDirHelper().getDataDir()+ "companyTweets\TokenizerAmazon.json")
 vocab_size = tokenizer.getVocabularyLength()
 model = Transformer(lr=1e-4, n_outputs=2, vocab_size=vocab_size+2)
-#deviceToUse = torch.device("cuda:0")
-deviceToUse = torch.device("cpu")
+deviceToUse = torch.device("cuda:0")
+#deviceToUse = torch.device("cpu")
 model = model.to(deviceToUse)
 checkpoint = torch.load(DataDirHelper().getDataDir()+"companyTweets\\model\\amazonTweetPredict.ckpt",map_location=deviceToUse)
 model.load_state_dict(checkpoint['state_dict'])
@@ -23,12 +23,11 @@ predictor = Predictor(model,tokenizer,BINARY_0_1,deviceToUse=deviceToUse )
 sentence1= "The free delivery gambit in retail  $AMZN $WMT $TGT $BBY"
 sentence2 = "$AMZN News Updated Saturday, January 3, 2015 8:10:29 PM $NHMD $RPG $DXD $BIIB"
 observed_class = 0
-tokens,attributions = predictor.calculateWordScoresOne(sentence1, observed_class)
-
+tokens,attributions = predictor.calculateWordScoresOne(sentence1, observed_class,n_steps=500,internal_batch_size = 10)
 print(predictor.predictOne(sentence1))
-print(predictor.predictOne(sentence2))
 print(sum(attributions))
-print(predictor.calculateWordScoresOneAsDict(sentence1, observed_class))
+print(tokens,attributions)
+print(predictor.calculateWordScoresMultiple([sentence1,sentence2], observed_class,n_steps=500,internal_batch_size = 10))
 #print(predictor.calculateWordScoresMultiple([sentence1,sentence2], BINARY_1_0.class_to_index(observed_class)))
 #print(predictor.calculateWordScoresOne(sentence1, 1));
 

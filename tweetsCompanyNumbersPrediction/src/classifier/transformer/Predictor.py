@@ -77,7 +77,7 @@ class Predictor(object):
         return token_to_attrib
     
     #To determine which class the features are contributing to, it is necessary to analyze the prediction scores obtained by the model. In the code snippet provided, the target is set to 0, which means that IG is computing the attributions with respect to class 0. If the prediction score for class 0 is higher, then the negative attribution values indicate that the input features are contributing to the prediction of class 0. Otherwise, if the prediction score for class 1 is higher, the negative attribution values indicate that the input features are contributing to the prediction of class 1.
-    def calculateWordScoresOne(self,sentence: str,observed_class):
+    def calculateWordScoresOne(self,sentence: str,observed_class,n_steps = 500,internal_batch_size=None):
         tokens = self.tokenizer.tokenize(sentence)
         tokens_idx = self.tokenizer.encode(sentence)
         tokens_idx += [self.tokenizer.getPADTokenID()]*(256 - len(tokens_idx))
@@ -90,13 +90,14 @@ class Predictor(object):
             self.model.embeddings.embedding,
         )
         attributions_ig, delta = lig.attribute(
-            x, ref, n_steps=500, return_convergence_delta=True, target=observed_class
+            x, ref, n_steps=n_steps, return_convergence_delta=True, target=observed_class,
+            internal_batch_size= internal_batch_size
         )
         attributions_ig = attributions_ig[0, :, :].sum(dim=-1).cpu()
         attributions_ig = attributions_ig / attributions_ig.abs().max()
         return tokens, attributions_ig.tolist()      
     
-    def calculateWordScoresMultiple(self, sentences, observed_class):
+    def calculateWordScoresMultiple(self, sentences, observed_class,n_steps=500,internal_batch_size = 10):
         token_lists = [self.tokenizer.tokenize(sentence) for sentence in sentences]
         tokens_idxs = [self.tokenizer.encode(sentence) for sentence in sentences]
         padded_tokens_idxs = []
@@ -113,7 +114,8 @@ class Predictor(object):
             self.model.embeddings.embedding,
             )
         attributions_ig, delta = lig.attribute(
-            x, ref, n_steps=500, return_convergence_delta=True, target=observed_class
+            x, ref, n_steps=n_steps, return_convergence_delta=True, target=observed_class,
+            internal_batch_size = internal_batch_size
             )
         attributions_ig = attributions_ig[:, :, :].sum(dim=-1).cpu()
         attributions_ig = attributions_ig / attributions_ig.abs().max(dim=1, keepdim=True)[0]
