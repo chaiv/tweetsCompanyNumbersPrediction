@@ -14,11 +14,23 @@ class Test(unittest.TestCase):
     
     tokenizerTop2Vec = TokenizerTop2Vec(DataDirHelper().getDataDir()+ "companyTweets\TokenizerAAPLFirst1000.json")
 
-    def testTokenizedWithTags(self):
-        text = "test 1 2 3 or _example above tooooooooooooloooooooog"
-        print(self.tokenizerTop2Vec.tokenize(text))
-        print(self.tokenizerTop2Vec.tokenizeWithTagging(text, PosDepTagger()))
 
+    def testTokenizedWithIndex(self):
+        text = "Tesla is cool"
+        result = self.tokenizerTop2Vec.tokenizeWithIndex(text)
+        self.assertEqual(3,
+            len(result[0]))
+        self.assertEqual(3,
+            len(result[1]))
+
+
+    def testTokenizedWithTags(self):
+        text = "Tesla is cool"
+        result = self.tokenizerTop2Vec.tokenizeWithTagging(text, PosDepTagger())
+        self.assertEqual(3,
+            len(result))
+        self.assertEqual('nsubj', result[0][3])
+      
 
     def testNlpUtilTokenizer(self):
         text = "lx21 made $10,008  on $AAPL -Check it out!  Learn #howtotrade  $EXE $WATT $IMRS $CACH $GMO"

@@ -27,6 +27,16 @@ class TokenizerTop2Vec(object):
     def tokenize(self,text):
         return default_tokenizer(text)
     
+    def tokenizeWithIndex(self,text):
+        indexes = []
+        tokens = []
+        splits = text.split()
+        for index in range(len(splits)): 
+            if(len(default_tokenizer(splits[index]))>0):
+                indexes.append(index) 
+                tokens.append(splits[index])
+        return indexes, tokens            
+    
     def tokenizeWithTagging(self,text,posDepTagger: PosDepTagger):
         tokenizedWithTags = []
         tokensWithTags = posDepTagger.get_tags(text)

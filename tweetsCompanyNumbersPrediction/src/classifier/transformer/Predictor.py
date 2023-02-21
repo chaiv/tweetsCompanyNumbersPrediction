@@ -98,7 +98,8 @@ class Predictor(object):
         return tokens, attributions_ig.tolist()      
     
     def calculateWordScoresMultiple(self, sentences, observed_class,n_steps=500,internal_batch_size = 10):
-        token_lists = [self.tokenizer.tokenize(sentence) for sentence in sentences]
+        index_token_lists = [self.tokenizer.tokenizeWithIndex(sentence) for sentence in sentences]
+        indexes_lists, token_lists = zip(*index_token_lists)
         tokens_idxs = [self.tokenizer.encode(sentence) for sentence in sentences]
         padded_tokens_idxs = []
         for tokens_idx in tokens_idxs:
@@ -121,9 +122,10 @@ class Predictor(object):
         attributions_ig = attributions_ig / attributions_ig.abs().max(dim=1, keepdim=True)[0]
         scores = []
         for i in range(len(sentences)):
+            indexes = indexes_lists[i]
             tokens = token_lists[i]
             attributions_ig_list = attributions_ig[i].tolist()
-            scores.append((tokens, attributions_ig_list))
+            scores.append((indexes, tokens, attributions_ig_list))
         return scores
         
             
