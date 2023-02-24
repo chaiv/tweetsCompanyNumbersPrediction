@@ -9,15 +9,24 @@ from torch.utils.data.dataloader import DataLoader
 import pytorch_lightning as pl
 import torch
 from functools import partial
-from captum.attr import LayerIntegratedGradients
 from classifier.PredictionClassMapper import PredictionClassMapper
+from featureinterpretation.AttributionsCalculator import AttributionsCalculator
+from nlpvectors.AbstractTokenizer import AbstractTokenizer
+
 
 
 class Predictor(object):
 
-    def __init__(self, model: Transformer, tokenizer,predictionClassMapper: PredictionClassMapper,deviceToUse = torch.device("cuda:0") ):
+    def __init__(self, 
+                 model: Transformer, 
+                 tokenizer : AbstractTokenizer,
+                 predictionClassMapper: PredictionClassMapper,
+                 attributionsCalculator:  AttributionsCalculator,
+                 deviceToUse = torch.device("cuda:0") 
+                 ):
         self.model = model
         self.tokenizer = tokenizer
+        self.attributionsCalculator = attributionsCalculator
         self.deviceToUse = deviceToUse
         self.predictionClassMapper = predictionClassMapper
     
@@ -69,35 +78,7 @@ class Predictor(object):
         return predictions
     
     
-    def calculateWordScoresOneAsDict(self,sentence: str,observed_class):
-        tokens, attributions = self.calculateWordScoresOne(sentence,observed_class)
-        token_to_attrib = {}
-        for token, attribution in zip(tokens, attributions):
-            token_to_attrib[token] = attribution
-        return token_to_attrib
-    
-    #To determine which class the features are contributing to, it is necessary to analyze the prediction scores obtained by the model. In the code snippet provided, the target is set to 0, which means that IG is computing the attributions with respect to class 0. If the prediction score for class 0 is higher, then the negative attribution values indicate that the input features are contributing to the prediction of class 0. Otherwise, if the prediction score for class 1 is higher, the negative attribution values indicate that the input features are contributing to the prediction of class 1.
-    def calculateWordScoresOne(self,sentence: str,observed_class,n_steps = 500,internal_batch_size=None):
-        tokens = self.tokenizer.tokenize(sentence)
-        tokens_idx = self.tokenizer.encode(sentence)
-        tokens_idx += [self.tokenizer.getPADTokenID()]*(256 - len(tokens_idx))
-        x = torch.tensor([tokens_idx], dtype=torch.long).to(self.deviceToUse)
-        ref = torch.tensor(
-        [[self.tokenizer.getPADTokenID()] * (len(tokens_idx))], dtype=torch.long
-        ).to(self.deviceToUse)
-        lig = LayerIntegratedGradients(
-            self.model,
-            self.model.embeddings.embedding,
-        )
-        attributions_ig, delta = lig.attribute(
-            x, ref, n_steps=n_steps, return_convergence_delta=True, target=observed_class,
-            internal_batch_size= internal_batch_size
-        )
-        attributions_ig = attributions_ig[0, :, :].sum(dim=-1).cpu()
-        attributions_ig = attributions_ig / attributions_ig.abs().max()
-        return tokens, attributions_ig.tolist()      
-    
-    def calculateWordScoresMultiple(self, sentences, observed_class,n_steps=500,internal_batch_size = 10):
+    def calculateWordScores(self, sentences : list, observed_class,n_steps=500,internal_batch_size = 10):
         index_token_lists = [self.tokenizer.tokenizeWithIndex(sentence) for sentence in sentences]
         indexes_lists, token_lists = zip(*index_token_lists)
         tokens_idxs = [self.tokenizer.encode(sentence) for sentence in sentences]
@@ -110,16 +91,7 @@ class Predictor(object):
         ref = torch.tensor(
             ref_tokens, dtype=torch.long
             ).to(self.deviceToUse)            
-        lig = LayerIntegratedGradients(
-            self.model,
-            self.model.embeddings.embedding,
-            )
-        attributions_ig, delta = lig.attribute(
-            x, ref, n_steps=n_steps, return_convergence_delta=True, target=observed_class,
-            internal_batch_size = internal_batch_size
-            )
-        attributions_ig = attributions_ig[:, :, :].sum(dim=-1).cpu()
-        attributions_ig = attributions_ig / attributions_ig.abs().max(dim=1, keepdim=True)[0]
+        attributions_ig = self.attributionsCalculator.attribute(x, ref, n_steps, observed_class, internal_batch_size)
         scores = []
         for i in range(len(sentences)):
             indexes = indexes_lists[i]

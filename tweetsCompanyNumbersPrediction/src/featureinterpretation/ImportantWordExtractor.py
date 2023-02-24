@@ -12,6 +12,7 @@ from tweetpreprocess.DataDirHelper import DataDirHelper
 from classifier.transformer.Predictor import Predictor
 from classifier.PredictionClassMappers import BINARY_0_1
 from featureinterpretation.TokenAttributionStore import TokenAttributionStore
+from featureinterpretation.AttributionsCalculator import AttributionsCalculator
 
 class MyClass(object):
     '''
@@ -33,8 +34,8 @@ checkpoint = torch.load(DataDirHelper().getDataDir()+"companyTweets\\model\\amaz
 model.load_state_dict(checkpoint['state_dict'])
 model.eval()  
 predictionClassMapper = BINARY_0_1 
-tokenAttributionStore = TokenAttributionStore()
-predictor = Predictor(model,tokenizer,predictionClassMapper)
+attributionCalculator = AttributionsCalculator(model,model.embeddings.embedding)
+predictor = Predictor(model,tokenizer,predictionClassMapper,attributionCalculator)
 df = pd.DataFrame(
                   [
                   ("id1","company next charger will automatically connect to your car"),
@@ -46,9 +47,10 @@ df = pd.DataFrame(
                   columns=["tweet_id","body"]
                   )
 
+tokenAttributionStore = TokenAttributionStore()
 tweet_ids = df["tweet_id"].tolist()
 sentences = df["body"].tolist()
-word_scores = predictor.calculateWordScoresMultiple(sentences, 1)
+word_scores = predictor.calculateWordScores(sentences, 1)
 tweet_ids_with_word_scores = [(x,) + y for x, y in zip(tweet_ids, word_scores)]
 tokenAttributionStore.add_multiple_data(tweet_ids_with_word_scores)    
 print(tokenAttributionStore.to_dataframe())

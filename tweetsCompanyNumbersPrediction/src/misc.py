@@ -23,6 +23,6 @@ predictor = Predictor(model,tokenizer,BINARY_0_1,deviceToUse=deviceToUse )
 sentence1= "The free delivery gambit in retail  $AMZN $WMT $TGT $BBY"
 sentence2 = "$AMZN News Updated Saturday, January 3, 2015 8:10:29 PM $NHMD $RPG $DXD $BIIB"
 observed_class = 0
-print(predictor.calculateWordScoresMultiple([sentence1,sentence2], observed_class,n_steps=500,internal_batch_size = 10))
+print(predictor.calculateWordScores([sentence1,sentence2], observed_class,n_steps=500,internal_batch_size = 10))
 
 

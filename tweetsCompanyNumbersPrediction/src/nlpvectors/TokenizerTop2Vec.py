@@ -6,10 +6,11 @@ Created on 01.02.2023
 from top2vec.Top2Vec import default_tokenizer
 import json
 from tagging.PosDepTagger import PosDepTagger
+from nlpvectors.AbstractTokenizer import AbstractTokenizer
 
 MAX_LEN = 280 #Tweet max length 
 
-class TokenizerTop2Vec(object):
+class TokenizerTop2Vec(AbstractTokenizer):
     '''
     classdocs
     '''
