@@ -6,7 +6,11 @@ Created on 17.02.2023
 import pandas as pd
 
 class TokenAttributionStore:
-    def __init__(self):
+    def __init__(self, idColumnName = "id", tokenColumnName = "token", tokenIndexColumnName = "token_index", atrributionColumnName = "attribution"):
+        self.idColumnName = idColumnName
+        self.tokenColumnName = tokenColumnName
+        self.tokenIndexColumnName = tokenIndexColumnName
+        self.atrributionColumnName = atrributionColumnName
         self.data = {}
 
     def add_data(self, id_value, token_indexes, tokens, attributions):
@@ -26,5 +30,5 @@ class TokenAttributionStore:
             token_indexes = value["token_indexes"]
             attributions = value["attributions"]
             for token, token_index, attribution in zip(tokens, token_indexes, attributions):
-                rows.append({"id": id_value, "token": token, "token_index": token_index, "attribution": attribution})
-        return pd.DataFrame(rows, columns=["id", "token_index","token", "attribution"])
+                rows.append({self.idColumnName: id_value, self.tokenColumnName: token,  self.tokenIndexColumnName: token_index, self.atrributionColumnName: attribution})
+        return pd.DataFrame(rows, columns=[self.idColumnName, self.tokenIndexColumnName,self.tokenColumnName,self.atrributionColumnName ])
