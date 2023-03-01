@@ -10,7 +10,7 @@ from nlpvectors.TokenizerTop2Vec import TokenizerTop2Vec
 from tagging.PosDepTagger import PosDepTagger
 
 
-class Test(unittest.TestCase):
+class ClassificationMetricsTest(unittest.TestCase):
     
     tokenizerTop2Vec = TokenizerTop2Vec(DataDirHelper().getDataDir()+ "companyTweets\TokenizerAAPLFirst1000.json")
 
@@ -50,5 +50,5 @@ class Test(unittest.TestCase):
         self.assertEquals([626, 36850],tokenizer.encode("Follow @StockMoney62"))
 
 if __name__ == "__main__":
-    #import sys;sys.argv = ['', 'Test.testName']
+    #import sys;sys.argv = ['', 'ClassificationMetricsTest.testName']
     unittest.main()

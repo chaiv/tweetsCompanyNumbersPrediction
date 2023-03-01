@@ -10,7 +10,7 @@ from nlpvectors.TokenizerTop2Vec import TokenizerTop2Vec
 from tweetpreprocess.DataDirHelper import DataDirHelper
 from classifier.transformer.Predictor import Predictor
 from classifier.PredictionClassMappers import BINARY_0_1
-from featureinterpretation.TokenAttributionStore import TokenAttributionStore
+from featureinterpretation.TokenAttributionStore import ImportantWordStore
 from featureinterpretation.AttributionsCalculator import AttributionsCalculator
 tokenizer = TokenizerTop2Vec(DataDirHelper().getDataDir()+ "companyTweets\TokenizerAmazon.json")
 vocab_size = tokenizer.getVocabularyLength()
@@ -33,7 +33,7 @@ df = pd.DataFrame(
                   columns=["tweet_id","body"]
                   )
 
-tokenAttributionStore = TokenAttributionStore()
+tokenAttributionStore = ImportantWordStore()
 tweet_ids = df["tweet_id"].tolist()
 sentences = df["body"].tolist()
 word_scores = predictor.calculateWordScores(sentences, 1)

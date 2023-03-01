@@ -18,10 +18,11 @@ from tests import TweetDataframeSorterTest
 from tests import FiguresIncreaseDecreaseClassCalculatorTest
 from tests import FeatureDataframeCreatorTest
 from tests import TweetTextFilterTransformerTest
-from tests import TestTokenAttributionStore
-from tests import TestImportantWordsExtractor
 from tests import TestPredictor
 from tests import EqualClassSamplerTest
+from tests import ImportantWordStoreTest
+from tests import ClassificationMetricsTest
+
 
 loader = unittest.TestLoader()
 suite  = unittest.TestSuite()
@@ -41,8 +42,8 @@ suite.addTests(loader.loadTestsFromModule(FiguresIncreaseDecreaseClassCalculator
 suite.addTests(loader.loadTestsFromModule(FeatureDataframeCreatorTest))
 suite.addTests(loader.loadTestsFromModule(EqualClassSamplerTest))
 suite.addTests(loader.loadTestsFromModule(TweetTextFilterTransformerTest))
-suite.addTests(loader.loadTestsFromModule(TestTokenAttributionStore))
-suite.addTests(loader.loadTestsFromModule(TestImportantWordsExtractor))
+suite.addTests(loader.loadTestsFromModule(ImportantWordStoreTest))
+suite.addTests(loader.loadTestsFromModule(ClassificationMetricsTest))
 suite.addTests(loader.loadTestsFromModule(TestPredictor))
 runner = unittest.TextTestRunner(verbosity=3)
 result = runner.run(suite)

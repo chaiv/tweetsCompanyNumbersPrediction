@@ -10,7 +10,7 @@ from nlpvectors.TokenizerTop2Vec import TokenizerTop2Vec
 from tweetpreprocess.DataDirHelper import DataDirHelper
 from classifier.transformer.Predictor import Predictor
 from classifier.PredictionClassMappers import BINARY_0_1
-from featureinterpretation.TokenAttributionStore import TokenAttributionStore
+from featureinterpretation.TokenAttributionStore import ImportantWordStore
 
 tokenizer = TokenizerTop2Vec(DataDirHelper().getDataDir()+ "companyTweets\TokenizerAmazon.json")
 vocab_size = tokenizer.getVocabularyLength()
@@ -20,7 +20,7 @@ checkpoint = torch.load(DataDirHelper().getDataDir()+"companyTweets\\model\\amaz
 model.load_state_dict(checkpoint['state_dict'])
 model.eval()
 predictionClassMapper = BINARY_0_1 
-tokenAttributionStore = TokenAttributionStore()
+tokenAttributionStore = ImportantWordStore()
 predictor = Predictor(model,tokenizer,predictionClassMapper)
 df = pd.read_csv(DataDirHelper().getDataDir()+ 'companyTweets\\amazonTweetsWithNumbers.csv')
 df.fillna('', inplace=True) #nan values in body columns

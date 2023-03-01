@@ -5,12 +5,20 @@ Created on 18.02.2023
 '''
 import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
-class TopicHeaderFinder(object):
+
+
+class AbstractTopicHeaderFinder():
+    def getTopicHeader(self,searchWord):  
+        pass
+
+    
+
+class TopicHeaderCalculator(object):
 
     def __init__(self):
         pass
     
-    def getHeader(self,topicWords,topicWordVectors):
+    def calculateHeader(self,topicWords,topicWordVectors):
         if len(topicWords)==0 or len(topicWordVectors)==0:
             return None
         mean_vector = np.mean(topicWordVectors,axis=0)

@@ -4,12 +4,16 @@ Created on 29.01.2022
 @author: vital
 '''
 from nlpvectors.FeatureVectorMapper import FeatureVectorMapper
+from topicmodelling.TopicHeader import AbstractTopicHeaderFinder,\
+    TopicHeaderCalculator
 
 
-class TopicExtractor(FeatureVectorMapper):
-    '''
-    classdocs
-    '''
+class TopicExtractor(FeatureVectorMapper,AbstractTopicHeaderFinder):
+   
+    def getTopicHeader(self,searchWord):
+        topic_words,word_scores,topic_scores,topic_nums = self.searchTopics([searchWord],1)
+        return topic_nums[0], TopicHeaderCalculator().calculateHeader(topic_words[0],self.getWordVectorsOfWords(topic_words[0]))
+    
 
     def getWordIndexes(self):
         return self.topicModel.word_indexes

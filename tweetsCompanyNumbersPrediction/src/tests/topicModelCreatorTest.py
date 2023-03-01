@@ -7,7 +7,7 @@ import unittest
 import pandas as pd
 from topicmodelling.TopicModelCreator import TopicModelCreator
 
-class Test(unittest.TestCase):
+class ClassificationMetricsTest(unittest.TestCase):
 
 
     def testModelCreateAndSave(self):
@@ -20,5 +20,5 @@ class Test(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    #import sys;sys.argv = ['', 'Test.testModelCreateAndSave']
+    #import sys;sys.argv = ['', 'ClassificationMetricsTest.testModelCreateAndSave']
     unittest.main()
