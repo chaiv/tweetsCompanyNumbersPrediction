@@ -1,44 +1,26 @@
-'''
-Created on 05.02.2023
+def pad_dict_lists(data):
+    # Find largest list size for each key
+    max_sizes = {}
+    for key in data:
+        max_size = 0
+        for value in data[key]:
+            if isinstance(value, list):
+                max_size = max(max_size, len(value))
+        max_sizes[key] = max_size
+    
+    # Pad non-list values to largest list size with element value
+    for i in range(len(data[list(data.keys())[0]])):
+        for key in data:
+            if isinstance(data[key][i], list):
+                continue
+            max_size = max_sizes[key]
+            padded_value = [data[key][i]] * max_size
+            data[key][i] = padded_value
+    
+    return data
 
-@author: vital
-'''
-import torch
-import pandas as pd
-from classifier.transformer.models import Transformer
-from nlpvectors.TokenizerTop2Vec import TokenizerTop2Vec
-from tweetpreprocess.DataDirHelper import DataDirHelper
-from classifier.transformer.Predictor import Predictor
-from classifier.PredictionClassMappers import BINARY_0_1
-from featureinterpretation.TokenAttributionStore import ImportantWordStore
-from featureinterpretation.AttributionsCalculator import AttributionsCalculator
-tokenizer = TokenizerTop2Vec(DataDirHelper().getDataDir()+ "companyTweets\TokenizerAmazon.json")
-vocab_size = tokenizer.getVocabularyLength()
-model = Transformer(lr=1e-4, n_outputs=2, vocab_size=vocab_size+2)
-model = model.to(torch.device("cuda:0"))
-checkpoint = torch.load(DataDirHelper().getDataDir()+"companyTweets\\model\\amazonTweetPredict.ckpt")
-model.load_state_dict(checkpoint['state_dict'])
-model.eval()  
-predictionClassMapper = BINARY_0_1 
-attributionCalculator = AttributionsCalculator(model,model.embeddings.embedding)
-predictor = Predictor(model,tokenizer,predictionClassMapper,attributionCalculator)
-df = pd.DataFrame(
-                  [
-                  ("id1","company next charger will automatically connect to your car"),
-                  ("id2","Bank Of Dummy Just Released A New Auto Report And They Discussed companies: Bank of Dummy"),
-                  ("id3","Electric Vehicle Battery Energy Density - Accelerating the Development Timeline."),
-                  ("id4","Interview: World Needs Hundreds of Gigafactories."),
-                  ("id5","Great meeting you soon")
-                  ],
-                  columns=["tweet_id","body"]
-                  )
 
-tokenAttributionStore = ImportantWordStore()
-tweet_ids = df["tweet_id"].tolist()
-sentences = df["body"].tolist()
-word_scores = predictor.calculateWordScores(sentences, 1)
-tweet_ids_with_word_scores = [(x,) + y for x, y in zip(tweet_ids, word_scores)]
-tokenAttributionStore.add_multiple_data(tweet_ids_with_word_scores)    
-print(tokenAttributionStore.to_dataframe())
-
+data = {'a': [1, 2], 'b': [[10, 11], [12, 13, 14]], 'c': [15, 16, 17]}
+print(pad_dict_lists(data))
+ 
 

@@ -37,25 +37,24 @@ class TestImportantWordStore(unittest.TestCase):
     def test_to_dataframe(self):
         store = ImportantWordStore({
                 "id" : [1,2],
-                "token_index" : [[0, 1, 2, 3, 4, 5],[0, 1, 2, 3, 4, 5]],
-                "token" : [["the", "cat", "is", "on", "the", "mat"],["the", "dog", "is", "in", "the", "yard"]],
-                "attribution" : [[0.1, -0.2, 0.3, 0.05, -0.1, 0.15],[-0.05, 0.15, 0.2, 0.1, -0.1, 0.1]]
+                "token_index" : [[0, 1, 2, 3, 4, 5],[0, 1, 2, 3]],
+                "token" : [["the", "cat", "is", "on", "the", "mat"],["the", "dog", "is", "outside"]],
+                "attribution" : [[0.1, -0.2, 0.3, 0.05, -0.1, 0.15],[-0.05, 0.15, 0.2, 0.1]],
+                "prediction" : [0,1]
                 })        
         df = store.to_dataframe()
-        self.assertEqual(list(df.columns), ['id', 'token_index','token', 'attribution'])
+        self.assertEqual(list(df.columns), ['id', 'token_index','token', 'attribution',"prediction"])
         expected_data = [
-            (1, 0,"the", 0.1),
-            (1, 1,"cat", -0.2),
-            (1, 2,"is", 0.3),
-            (1, 3,"on", 0.05),
-            (1, 4,"the", -0.1),
-            (1, 5, "mat", 0.15),
-            (2, 0,"the", -0.05),
-            (2, 1,"dog", 0.15),
-            (2, 2,"is", 0.2),
-            (2, 3,"in", 0.1),
-            (2, 4,"the", -0.1),
-            (2, 5, "yard", 0.1)
+            (1, 0,"the", 0.1,0),
+            (1, 1,"cat", -0.2,0),
+            (1, 2,"is", 0.3,0),
+            (1, 3,"on", 0.05,0),
+            (1, 4,"the", -0.1,0),
+            (1, 5, "mat", 0.15,0),
+            (2, 0,"the", -0.05,1),
+            (2, 1,"dog", 0.15,1),
+            (2, 2,"is", 0.2,1),
+            (2, 3,"outside", 0.1,1)
         ]
         for row, expected_row in zip(df.itertuples(index=False), expected_data):
             self.assertEqual(tuple(row), expected_row)

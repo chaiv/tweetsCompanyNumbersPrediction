@@ -8,8 +8,9 @@ from captum.attr import LayerIntegratedGradients
 
 class AttributionsCalculator(object):
   
-    def __init__(self, model, embeddings):
-        self.lig = LayerIntegratedGradients(model, embeddings)
+    def __init__(self, model):
+        self.lig = LayerIntegratedGradients(model,
+            model.embeddings.embedding)
 
     def attribute(self, x, ref, n_steps, observed_class, internal_batch_size):
         attributions_ig, delta = self.lig.attribute(

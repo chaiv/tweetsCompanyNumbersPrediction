@@ -73,9 +73,23 @@ class Predictor(object):
         for i in range(0, len(sentences), chunkSize):
             chunk = sentences[i:i + chunkSize]
             chunkPredictions = self.predictMultiple(chunk)
-            predictions += chunkPredictions.tolist()
+            predictions += chunkPredictions
             print(len(predictions))
         return predictions
+    
+    def calculateWordScoresInChunks(self, sentences: list, observed_class, chunk_size, n_steps=500, internal_batch_size=10):
+        token_indexes_lists = []
+        token_lists = []
+        attributions_lists = []
+        for i in range(0, len(sentences), chunk_size):
+            chunk = sentences[i:i + chunk_size]
+            chunk_token_indexes, chunk_token_lists, chunk_attributions = self.calculateWordScores(chunk, observed_class, n_steps, internal_batch_size)
+            token_indexes_lists +=  chunk_token_indexes
+            token_lists += chunk_token_lists
+            attributions_lists += chunk_attributions
+            print(len(token_indexes_lists))
+        return token_indexes_lists, token_lists, attributions_lists
+    
     
     
     def calculateWordScores(self, sentences : list, observed_class,n_steps=500,internal_batch_size = 10):
@@ -92,12 +106,11 @@ class Predictor(object):
             ref_tokens, dtype=torch.long
             ).to(self.deviceToUse)            
         attributions_ig = self.attributionsCalculator.attribute(x, ref, n_steps, observed_class, internal_batch_size)
-        scores = []
-        for i in range(len(sentences)):
-            indexes = indexes_lists[i]
-            tokens = token_lists[i]
-            attributions_ig_list = attributions_ig[i].tolist()
-            scores.append((indexes, tokens, attributions_ig_list))
-        return scores
+        attributions_ig_trimmed = []
+        for i, attributions in enumerate(attributions_ig):
+            num_tokens = len(token_lists[i])
+            attributions_trimmed = attributions[:num_tokens]
+            attributions_ig_trimmed.append(attributions_trimmed.tolist())
+        return indexes_lists, token_lists, attributions_ig_trimmed
         
             

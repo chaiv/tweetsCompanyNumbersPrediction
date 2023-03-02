@@ -10,7 +10,8 @@ from nlpvectors.TokenizerTop2Vec import TokenizerTop2Vec
 from tweetpreprocess.DataDirHelper import DataDirHelper
 from classifier.transformer.Predictor import Predictor
 from classifier.PredictionClassMappers import BINARY_0_1
-from featureinterpretation.TokenAttributionStore import ImportantWordStore
+from featureinterpretation.ImportantWordsStore import ImportantWordStore
+from featureinterpretation.AttributionsCalculator import AttributionsCalculator
 
 tokenizer = TokenizerTop2Vec(DataDirHelper().getDataDir()+ "companyTweets\TokenizerAmazon.json")
 vocab_size = tokenizer.getVocabularyLength()
@@ -20,20 +21,29 @@ checkpoint = torch.load(DataDirHelper().getDataDir()+"companyTweets\\model\\amaz
 model.load_state_dict(checkpoint['state_dict'])
 model.eval()
 predictionClassMapper = BINARY_0_1 
-tokenAttributionStore = ImportantWordStore()
-predictor = Predictor(model,tokenizer,predictionClassMapper)
+predictor = Predictor(model,tokenizer,predictionClassMapper,AttributionsCalculator(model))
 df = pd.read_csv(DataDirHelper().getDataDir()+ 'companyTweets\\amazonTweetsWithNumbers.csv')
+df = df.head(2)
 df.fillna('', inplace=True) #nan values in body columns
+sentence_ids = df["tweet_id"].tolist()
 sentences = df["body"].tolist()
 predictions = predictor.predictMultipleInChunks(sentences,chunkSize=10000)
-df['predicted_class'] = predictions
-correctly_predicted_df = df.loc[df['class'] == df['predicted_class']]
-for index, row in correctly_predicted_df.iterrows():
-    print(index)
-    tweet_id = row["tweet_id"]
-    tokens, attributions = predictor.calculateWordScoresOne(row["body"], predictionClassMapper.class_to_index(row['predicted_class']))
-    tokenAttributionStore.add_data(tweet_id, tokens, attributions)
-tokenAttributionsDf = tokenAttributionStore.to_dataframe()
+observed_class = 1
+token_indexes, tokens, attributions =  predictor.calculateWordScoresInChunks(sentences, observed_class, chunk_size=200, n_steps=10, internal_batch_size=200)
+importantWordsDf = ImportantWordStore(
+                {
+                "id" : sentence_ids,
+                "token_index" : token_indexes,
+                "token" : tokens,
+                "attribution" : attributions,
+                "prediction" : predictions
+                }
+                ).to_dataframe()
+importantWordsDf.to_csv(DataDirHelper().getDataDir()+"companyTweets\\importantWordsClass1Amazon.csv")
+
+
+
+
 
 
 
