@@ -4,17 +4,20 @@ Created on 29.01.2022
 @author: vital
 '''
 from nlpvectors.FeatureVectorMapper import FeatureVectorMapper
-from topicmodelling.TopicHeader import AbstractTopicHeaderFinder,\
-    TopicHeaderCalculator
+from topicmodelling.TopicHeader import AbstractTopicHeaderFinder,TopicHeaderCalculator
 
 
 class TopicExtractor(FeatureVectorMapper,AbstractTopicHeaderFinder):
    
-    def getTopicHeader(self,searchWord):
+    def getTopicHeaderByWord(self,searchWord):
         topic_words,word_scores,topic_scores,topic_nums = self.searchTopics([searchWord],1)
         return topic_nums[0], TopicHeaderCalculator().calculateHeader(topic_words[0],self.getWordVectorsOfWords(topic_words[0]))
     
-
+    def getTopicHeaderByIds(self,documentIds):
+        doc_topics, doc_dist, topic_words, topic_word_scores = self.get_documents_topics(documentIds)
+        topicHeaders = [TopicHeaderCalculator().calculateHeader(words,self.getWordVectorsOfWords(words)) for words in topic_words]
+        return doc_topics, topicHeaders
+            
     def getWordIndexes(self):
         return self.topicModel.word_indexes
 
@@ -44,6 +47,11 @@ class TopicExtractor(FeatureVectorMapper,AbstractTopicHeaderFinder):
     def searchTopics(self,keywords, num_topics):
         topic_words,word_scores,topic_scores,topic_nums  = self.topicModel.search_topics(keywords, num_topics)
         return topic_words,word_scores,topic_scores,topic_nums 
+    
+    def get_documents_topics(self, doc_ids):
+        doc_topics, doc_dist, topic_words, topic_word_scores = self.topicModel.get_documents_topics(doc_ids)
+        return doc_topics, doc_dist, topic_words, topic_word_scores
+    
     
     def search_documents_by_topic(self,topic_num, num_docs):
         documents, document_scores, document_ids = self.topicModel.search_documents_by_topic(topic_num, num_docs)

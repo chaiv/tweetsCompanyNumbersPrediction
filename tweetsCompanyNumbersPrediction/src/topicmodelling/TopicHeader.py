@@ -8,9 +8,10 @@ from sklearn.metrics.pairwise import cosine_similarity
 
 
 class AbstractTopicHeaderFinder():
-    def getTopicHeader(self,searchWord):  
+    def getTopicHeaderByWord(self,searchWord):  
         pass
-
+    def getTopicHeaderByIds(self,documentIds):
+        pass
     
 
 class TopicHeaderCalculator(object):

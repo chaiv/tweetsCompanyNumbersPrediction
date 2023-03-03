@@ -7,13 +7,16 @@ from topicmodelling.TopicHeader import AbstractTopicHeaderFinder
 
 class TopicHeaderAddToDataframe(object):
 
-    def __init__(self, topicHeaderFinder: AbstractTopicHeaderFinder, wordColumnName = "token",topicIdColumnName = "topicId",topicHeaderColumnName = "topicHeader"):
+    def __init__(self, topicHeaderFinder: AbstractTopicHeaderFinder, tweetIdColumnName = "tweet_id",topicIdColumnName = "topicId",topicHeaderColumnName = "topicHeader"):
         self.topicHeaderFinder = topicHeaderFinder
-        self.wordColumnName = wordColumnName
+        self.tweetIdColumnName = tweetIdColumnName
         self.topicIdColumnName = topicIdColumnName
         self.topicHeaderColumnName = topicHeaderColumnName
      
      
-    def addTopicHeadersToWordsDataframe(self, wordsDf):    
-        wordsDf[self.topicIdColumnName], wordsDf[self.topicHeaderColumnName] = zip(*wordsDf[self.wordColumnName].apply(self.topicHeaderFinder.getTopicHeader))
+    def addTopicHeadersToWordsDataframe(self, wordsDf):   
+        topic_nums, topic_headers = self.topicHeaderFinder.getTopicHeaderByIds(wordsDf[self.tweetIdColumnName].tolist())
+        wordsDf[self.topicIdColumnName] = topic_nums
+        wordsDf[self.topicHeaderColumnName] = topic_headers
+
         

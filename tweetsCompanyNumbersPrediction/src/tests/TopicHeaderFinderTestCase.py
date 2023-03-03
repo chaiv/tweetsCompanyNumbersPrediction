@@ -43,4 +43,15 @@ class TopicHeaderFinderTestCase(unittest.TestCase):
         topic_words, word_scores, topic_nums = topicExtractor.get_topics()
         observedTopicWords = topic_words[0]
         self.assertEqual("writer",self.topic_header_finder.calculateHeader(observedTopicWords, topicExtractor.getWordVectorsOfWords(topic_words[0])))
-        self.assertEqual("writer", topicExtractor.getTopicHeader("financialnews")[1]);
+        self.assertEqual("writer", topicExtractor.getTopicHeaderByWord("financialnews")[1]);
+    
+    def test_with_topic_model_get_by_id(self):
+        modelpath =  DataDirHelper().getDataDir()+ "companyTweets\TopicModelAAPLFirst1000"
+        topicExtractor = TopicExtractor(TopicModelCreator().load(modelpath)) 
+        topic_nums, topic_header = topicExtractor.getTopicHeaderByIds([550441509175443456,550441672312512512])
+        self.assertEqual(2, len(topic_nums))
+        self.assertEqual(2, len(topic_header))
+        self.assertEqual(0,topic_nums[0])
+        self.assertEqual("writer",topic_header[0])
+        
+        

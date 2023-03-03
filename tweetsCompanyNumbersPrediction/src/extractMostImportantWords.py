@@ -23,7 +23,7 @@ model.eval()
 predictionClassMapper = BINARY_0_1 
 predictor = Predictor(model,tokenizer,predictionClassMapper,AttributionsCalculator(model))
 df = pd.read_csv(DataDirHelper().getDataDir()+ 'companyTweets\\amazonTweetsWithNumbers.csv')
-df = df.head(2)
+df = df.head(10000)
 df.fillna('', inplace=True) #nan values in body columns
 sentence_ids = df["tweet_id"].tolist()
 sentences = df["body"].tolist()
@@ -39,7 +39,7 @@ importantWordsDf = ImportantWordStore(
                 "prediction" : predictions
                 }
                 ).to_dataframe()
-importantWordsDf.to_csv(DataDirHelper().getDataDir()+"companyTweets\\importantWordsClass1Amazon.csv")
+importantWordsDf.to_csv(DataDirHelper().getDataDir()+"companyTweets\\importantWordsClass"+str(observed_class)+"Amazon.csv")
 
 
 

@@ -4,25 +4,23 @@ Created on 17.02.2023
 @author: vital
 '''
 import pandas as pd
-import itertools
+import copy
 
         
 def pad_dict_lists(data):
-    transformedData = {}
-    transformedData.update(data)
     max_sizes = {}
-    for i in range(len(transformedData[list(transformedData.keys())[0]])):
+    for i in range(len(data[list(data.keys())[0]])):
         max_size = 0
-        for key in transformedData:
-            value = transformedData[key][i]
+        for key in data:
+            value = data[key][i]
             if isinstance(value, list):
                 max_size = max(max_size, len(value))
-        for key in transformedData:
+        for key in data:
             max_sizes[key] = max_sizes.get(key, 0)
-            if isinstance(transformedData[key][i], list):
+            if isinstance(data[key][i], list):
                 continue
-            transformedData[key][i] = [transformedData[key][i]] * max_size
-    return transformedData
+            data[key][i] = [data[key][i]] * max_size
+    return data
 
 def flatten_dict_lists(data):
     flat_data = {}
@@ -41,7 +39,8 @@ class ImportantWordStore:
         self.data_dict = data_dict
 
     def to_dataframe(self):
-        transformedDict = flatten_dict_lists(pad_dict_lists(self.data_dict))
+        transformedDict = copy.deepcopy(self.data_dict)
+        transformedDict = flatten_dict_lists(pad_dict_lists(transformedDict))
         return pd.DataFrame(transformedDict)
     
     def toDfWithFirstNSortedByAttribution(self,n,attributionColumnName = "attribution", ascending = True):
