@@ -5,22 +5,14 @@ Created on 24.02.2023
 '''
 
 class AbstractTokenizer(object):
-    '''
-    classdocs
-    '''
-
-
-    def getVocabularyLength(self):
-        pass
-
-    def getPADTokenID(self):
-        pass
     
+
     def tokenize(self,text):
         pass
     
     def tokenizeWithIndex(self,text):
-        pass
-        
-    def encode(self,text):
+        """
+        Here not only the tokens but also the positional indexes of tokens in original text are returned. 
+        This is helpful for further data analysis of important words for prediction in context of original text
+        """
         pass

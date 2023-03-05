@@ -6,13 +6,13 @@ Created on 03.02.2023
 import unittest
 from classifier.transformer.nlp_utils import tokenize
 from tweetpreprocess.DataDirHelper import DataDirHelper
-from nlpvectors.TokenizerTop2Vec import TokenizerTop2Vec
+from nlpvectors.TokenizerTop2Vec import TokenizerEncoder
 from tagging.PosDepTagger import PosDepTagger
 
 
 class ClassificationMetricsTest(unittest.TestCase):
     
-    tokenizerTop2Vec = TokenizerTop2Vec(DataDirHelper().getDataDir()+ "companyTweets\TokenizerAAPLFirst1000.json")
+    tokenizerTop2Vec = TokenizerEncoder(DataDirHelper().getDataDir()+ "companyTweets\TokenizerAAPLFirst1000.json")
 
 
     def testTokenizedWithIndex(self):
@@ -46,7 +46,7 @@ class ClassificationMetricsTest(unittest.TestCase):
         pass
 
     def testGetWords(self):
-        tokenizer = TokenizerTop2Vec(DataDirHelper().getDataDir()+ "companyTweets\TokenizerAmazon.json")
+        tokenizer = TokenizerEncoder(DataDirHelper().getDataDir()+ "companyTweets\TokenizerAmazon.json")
         self.assertEquals([626, 36850],tokenizer.encode("Follow @StockMoney62"))
 
 if __name__ == "__main__":

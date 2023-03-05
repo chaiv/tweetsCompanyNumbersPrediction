@@ -6,11 +6,11 @@ Created on 08.02.2023
 import pandas as pd
 import torch
 from classifier.transformer.models import Transformer
-from nlpvectors.TokenizerTop2Vec import TokenizerTop2Vec
+from nlpvectors.TokenizerTop2Vec import TokenizerEncoder
 from tweetpreprocess.DataDirHelper import DataDirHelper
 from classifier.transformer.Predictor import Predictor
 if  __name__ == "__main__":
-    tokenizer = TokenizerTop2Vec(DataDirHelper().getDataDir()+ "companyTweets\TokenizerAmazon.json")
+    tokenizer = TokenizerEncoder(DataDirHelper().getDataDir()+ "companyTweets\TokenizerAmazon.json")
     vocab_size = tokenizer.getVocabularyLength()
     model = Transformer(lr=1e-4, n_outputs=2, vocab_size=vocab_size+2)
     checkpoint = torch.load(DataDirHelper().getDataDir()+"companyTweets\\model\\amazonTweetPredict.ckpt")
@@ -18,4 +18,4 @@ if  __name__ == "__main__":
     df = pd.read_csv(DataDirHelper().getDataDir()+ 'companyTweets\\amazonTweetsWithNumbers.csv')
     df = df[df["class"]==1.0]
     print(df)
-    Predictor(model,tokenizer).test(df)
+    Predictor(model,textEncoder).test(df)

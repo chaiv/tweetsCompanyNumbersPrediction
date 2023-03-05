@@ -11,6 +11,7 @@ import torch
 from functools import partial
 from classifier.PredictionClassMapper import PredictionClassMapper
 from featureinterpretation.AttributionsCalculator import AttributionsCalculator
+from nlpvectors.AbstractEncoder import AbstractEncoder
 from nlpvectors.AbstractTokenizer import AbstractTokenizer
 
 
@@ -19,25 +20,27 @@ class Predictor(object):
 
     def __init__(self, 
                  model: Transformer, 
-                 tokenizer : AbstractTokenizer,
+                 tokenizer: AbstractTokenizer,
+                 textEncoder : AbstractEncoder,
                  predictionClassMapper: PredictionClassMapper,
                  attributionsCalculator:  AttributionsCalculator,
                  deviceToUse = torch.device("cuda:0") 
                  ):
         self.model = model
         self.tokenizer = tokenizer
+        self.textEncoder = textEncoder
         self.attributionsCalculator = attributionsCalculator
         self.deviceToUse = deviceToUse
         self.predictionClassMapper = predictionClassMapper
     
     def test(self, dataframe, batch_size = 1024, num_workers=16):
-        test_data = Dataset(dataframe=dataframe,tokenizer = self.tokenizer)
+        test_data = Dataset(dataframe=dataframe,tokenizer = self.textEncoder)
         test_loader = DataLoader(
             test_data,
             batch_size=batch_size,
             num_workers=num_workers,
             shuffle=False,
-            collate_fn=partial(generate_batch, pad_idx=self.tokenizer.getPADTokenID()),
+            collate_fn=partial(generate_batch, pad_idx=self.textEncoder.getPADTokenID()),
         )
         trainer = pl.Trainer(
             max_epochs=10,
@@ -48,20 +51,12 @@ class Predictor(object):
         )
         trainer.test(self.model, dataloaders=test_loader)
         
-    def predictOne(self, sentence):
-        x_Tokenids = self.tokenizer.encode(sentence)
-        x = torch.tensor([x_Tokenids], dtype=torch.long).to(self.deviceToUse)
-        with torch.no_grad():
-            y_hat = self.model(x)
-            _,predicted = torch.max(y_hat, 1)
-            predicted_class = predicted.item()
-        return self.predictionClassMapper.index_to_class(predicted_class)
     
-    
+
     def predictMultiple(self, sentences):
-        x_Tokenids = [self.tokenizer.encode(sentence) for sentence in sentences]
+        x_Tokenids = [self.textEncoder.encodeTokens(self.tokenizer.tokenize(sentence)) for sentence in sentences]
         x_Tokenids = [torch.tensor(x, dtype=torch.long).to(self.deviceToUse) for x in x_Tokenids]
-        x = torch.nn.utils.rnn.pad_sequence(x_Tokenids, batch_first=True, padding_value=0)
+        x = torch.nn.utils.rnn.pad_sequence(x_Tokenids, batch_first=True, padding_value=self.textEncoder.getPADTokenID())
         with torch.no_grad():
             y_hat = self.model(x)
             _, predicted = torch.max(y_hat, 1)
@@ -95,13 +90,13 @@ class Predictor(object):
     def calculateWordScores(self, sentences : list, observed_class,n_steps=500,internal_batch_size = 10):
         index_token_lists = [self.tokenizer.tokenizeWithIndex(sentence) for sentence in sentences]
         indexes_lists, token_lists = zip(*index_token_lists)
-        tokens_idxs = [self.tokenizer.encode(sentence) for sentence in sentences]
+        tokens_idxs = [self.textEncoder.encodeTokens(tokens) for tokens in token_lists]
         padded_tokens_idxs = []
         for tokens_idx in tokens_idxs:
-            tokens_idx += [self.tokenizer.getPADTokenID()] * (256 - len(tokens_idx))
+            tokens_idx += [self.textEncoder.getPADTokenID()] * (self.textEncoder.getMaxWordsAmount() - len(tokens_idx))
             padded_tokens_idxs.append(tokens_idx)
         x = torch.tensor(padded_tokens_idxs, dtype=torch.long).to(self.deviceToUse)
-        ref_tokens = [[self.tokenizer.getPADTokenID()] * 256] * len(sentences)
+        ref_tokens = [[self.textEncoder.getPADTokenID()] * self.textEncoder.getMaxWordsAmount()] * len(sentences)
         ref = torch.tensor(
             ref_tokens, dtype=torch.long
             ).to(self.deviceToUse)            

@@ -17,7 +17,7 @@ from torch.utils.data import Dataset
 
 from classifier.transformer.models import Transformer
 from tweetpreprocess.DataDirHelper import DataDirHelper
-from nlpvectors.TokenizerTop2Vec import TokenizerTop2Vec
+from nlpvectors.TokenizerTop2Vec import TokenizerEncoder
 from tweetpreprocess.EqualClassSampler import EqualClassSampler
 from exploredata.TweetDataframeExplore import TweetDataframeExplore
 
@@ -28,7 +28,7 @@ class Dataset(Dataset):
         self.dataframe = dataframe
         self.textColumnName = textColumnName
         self.classColumnName = classColumnName
-        self.tokenizer = tokenizer
+        self.textEncoder = tokenizer
 
     def __len__(self):
         return self.dataframe.shape[0]
@@ -37,7 +37,7 @@ class Dataset(Dataset):
         text = str(self.dataframe[self.textColumnName].iloc[idx])
         label = self.dataframe[self.classColumnName].iloc[idx]
 
-        x = self.tokenizer.encode(text)
+        x = self.textEncoder.encode(text)
         y = label
 
         x = torch.tensor(x, dtype=torch.long)
@@ -63,7 +63,7 @@ if  __name__ == "__main__":
     df = pd.read_csv(DataDirHelper().getDataDir()+ 'companyTweets\\amazonTweetsWithNumbers.csv')    
     df = EqualClassSampler().getDfWithEqualNumberOfClassSamples(df)
     
-    tokenizer = TokenizerTop2Vec(DataDirHelper().getDataDir()+ "companyTweets\TokenizerAmazon.json")
+    tokenizer = TokenizerEncoder(DataDirHelper().getDataDir()+ "companyTweets\TokenizerAmazon.json")
     pad_token_idx = tokenizer.getPADTokenID()
     vocab_size = tokenizer.getVocabularyLength()
 

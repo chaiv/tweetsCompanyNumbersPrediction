@@ -19,7 +19,7 @@ class TopicExtractor(FeatureVectorMapper,AbstractTopicHeaderFinder):
         return doc_topics, topicHeaders
             
     def getWordIndexes(self):
-        return self.topicModel.word_indexes
+        return self.topicModel.vocabulary_ids
 
 
     def __init__(self, topicModel):
