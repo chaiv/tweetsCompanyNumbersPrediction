@@ -43,7 +43,8 @@ class TestDefaultWordFilter(unittest.TestCase):
         self.assertEqual(self.filter.simple_preprocess("l2"), "")
         self.assertEqual(self.filter.simple_preprocess("tooooooooooooloooooong"), "")
     
-
+    def testFilter(self):
+        print(self.filter.filter("-Check"))
 
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']

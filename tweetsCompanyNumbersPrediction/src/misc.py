@@ -1,26 +1,11 @@
-def pad_dict_lists(data):
-    # Find largest list size for each key
-    max_sizes = {}
-    for key in data:
-        max_size = 0
-        for value in data[key]:
-            if isinstance(value, list):
-                max_size = max(max_size, len(value))
-        max_sizes[key] = max_size
-    
-    # Pad non-list values to largest list size with element value
-    for i in range(len(data[list(data.keys())[0]])):
-        for key in data:
-            if isinstance(data[key][i], list):
-                continue
-            max_size = max_sizes[key]
-            padded_value = [data[key][i]] * max_size
-            data[key][i] = padded_value
-    
-    return data
 
 
-data = {'a': [1, 2], 'b': [[10, 11], [12, 13, 14]], 'c': [15, 16, 17]}
-print(pad_dict_lists(data))
- 
-
+from tweetpreprocess.DataDirHelper import DataDirHelper
+from topicmodelling.TopicExtractor import TopicExtractor
+from topicmodelling.TopicModelCreator import TopicModelCreator
+from nlpvectors.TweetTokenizer import TweetTokenizer
+from tweetpreprocess.wordfiltering.DefaultWordFilter import DefaultWordFilter
+modelpath =  DataDirHelper().getDataDir()+ "companyTweets\\amazonTopicModelV2"
+topicExtractor = TopicExtractor(TopicModelCreator().load(modelpath))
+topic_words, word_scores, topic_nums = topicExtractor.searchTopics(TweetTokenizer(DefaultWordFilter()).tokenize("refugee"), 2)
+print(topic_words)

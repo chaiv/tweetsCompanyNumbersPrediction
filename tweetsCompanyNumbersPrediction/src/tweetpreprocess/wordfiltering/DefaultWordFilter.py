@@ -9,6 +9,7 @@ from gensim.parsing.preprocessing import remove_stopwords
 from gensim.parsing.porter import PorterStemmer
 from gensim.utils import simple_preprocess
 from gensim.parsing.preprocessing import strip_tags
+from attr.validators import min_len, max_len
 
 class DefaultWordFilter(AbstractTextFilter):
    
@@ -53,7 +54,7 @@ class DefaultWordFilter(AbstractTextFilter):
         return self.stemmer.stem(word)
         
     def simple_preprocess(self,word):    
-        if(len(simple_preprocess(strip_tags(word), deacc=True))>0):
+        if(len(simple_preprocess(strip_tags(word),min_len= 3, deacc=True))>0):
             return word
         else:
             return ''

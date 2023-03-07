@@ -21,8 +21,9 @@ class TweetTokenizer(AbstractTokenizer):
         tokens = []
         splits = text.split()
         for index in range(len(splits)): 
-            if(len(self.wordFilter.filter(splits[index]))>0):
+            filteredWord = self.wordFilter.filter(splits[index])
+            if(len(filteredWord)>0):
                 indexes.append(index) 
-                tokens.append(splits[index])
+                tokens.append(filteredWord)
         return indexes, tokens           
         

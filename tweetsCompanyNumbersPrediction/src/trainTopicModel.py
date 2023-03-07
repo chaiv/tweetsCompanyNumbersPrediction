@@ -10,11 +10,17 @@ from tweetpreprocess.wordfiltering.DefaultWordFilter import DefaultWordFilter
 from nlpvectors.TweetTokenizer import TweetTokenizer
 
 
-tweets = pd.read_csv (DataDirHelper().getDataDir()+ "companyTweets\\amazonTweetsWithNumbers.csv")  
+
+#tweetsFile = "CompanyTweetsAAPLFirst1000.csv"
+#topicModelFile = "TopicModelAAPLFirst1000V2"
+
+tweetsFile = "amazonTweetsWithNumbers.csv"
+topicModelFile = "amazonTopicModelV2"
+tweets = pd.read_csv (DataDirHelper().getDataDir()+ "companyTweets\\"+tweetsFile)  
 tokenizer = TweetTokenizer(DefaultWordFilter())
 documents = []
 for index, row in tweets.iterrows():
     documents.append(str(row["body"]))
 model = TopicModelCreator().createModel(documents, tweets["tweet_id"].tolist(),tokenizer= tokenizer.tokenize)
-model.save(DataDirHelper().getDataDir()+ "companyTweets\\amazonTopicModelV2")
+model.save(DataDirHelper().getDataDir()+ "companyTweets\\"+topicModelFile)
 
