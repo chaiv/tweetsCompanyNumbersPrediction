@@ -4,7 +4,7 @@ Created on 08.02.2023
 @author: vital
 '''
 from classifier.transformer.models import Transformer
-from trainTransformerModel import Dataset, generate_batch
+from classifier.transformer.DatasetUtils import Dataset, generate_batch
 from torch.utils.data.dataloader import DataLoader
 import pytorch_lightning as pl
 import torch

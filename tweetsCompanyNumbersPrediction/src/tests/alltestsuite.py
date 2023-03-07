@@ -4,7 +4,8 @@ Created on 27.01.2022
 @author: vital
 '''
 import unittest
-from tests import tweetnumbersconnectortest
+from tests import tweetnumbersconnectortest, TestTopicHeaderAddToDataframe,\
+    TweetDataframeExploreTest
 from tests import nlpvectorstest
 from tests import FiguresDiscretizerTest
 from tests import HyperlinkRemoverTest
@@ -45,5 +46,7 @@ suite.addTests(loader.loadTestsFromModule(TweetTextFilterTransformerTest))
 suite.addTests(loader.loadTestsFromModule(ImportantWordStoreTest))
 suite.addTests(loader.loadTestsFromModule(ClassificationMetricsTest))
 suite.addTests(loader.loadTestsFromModule(TestPredictor))
+suite.addTests(loader.loadTestsFromModule(TestTopicHeaderAddToDataframe))
+suite.addTests(loader.loadTestsFromModule(TweetDataframeExploreTest))
 runner = unittest.TextTestRunner(verbosity=3)
 result = runner.run(suite)

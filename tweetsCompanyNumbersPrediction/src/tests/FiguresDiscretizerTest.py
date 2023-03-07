@@ -24,7 +24,17 @@ class FiguresDiscretizerTest(unittest.TestCase):
                   )
         discretizer = FiguresDiscretizer(figures ,4,'value')
         figuresWithClasses = discretizer.getFiguresWithClasses()
-        print(figuresWithClasses)
+        expected_output = pd.DataFrame(
+                            [
+                                (1.20, 3.0),
+                                (1.05, 3.0),
+                                (0.87, 2.0),
+                                (1.11, 3.0),
+                                (0.50, 0.0)
+                            ],
+                            columns=["value", "class"]
+                        )
+        assert expected_output.equals(figuresWithClasses)
 
 
     def testFiguresDiscretizerOnFloat(self):

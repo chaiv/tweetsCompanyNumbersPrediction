@@ -13,7 +13,7 @@ class MockTopicHeaderFinder(AbstractTopicHeaderFinder):
         return [0,1],["topic1","topic2"]
         
         
-class Test(unittest.TestCase):
+class TopicHeaderAddToDataframeTest(unittest.TestCase):
 
 
     def test_addTopicHeadersToWordsDataframe(self):
@@ -30,5 +30,5 @@ class Test(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    #import sys;sys.argv = ['', 'Test.testName']
+    #import sys;sys.argv = ['', 'TopicHeaderAddToDataframeTest.testName']
     unittest.main()
