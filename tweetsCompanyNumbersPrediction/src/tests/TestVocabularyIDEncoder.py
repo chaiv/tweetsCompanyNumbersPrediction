@@ -8,13 +8,14 @@ import tempfile
 import json
 import os
 from nlpvectors.VocabularyIDEncoder import VocabularyIDEncoder
+from nlpvectors.VocabularyCreator import PAD_TOKEN, UNK_TOKEN
 
 class TestVocabularyIDEncoder(unittest.TestCase):
 
     def setUp(self):
         # Create a temporary file in the same directory as the test
         self.temp_file = tempfile.NamedTemporaryFile(delete=False)
-        self.temp_file.write(json.dumps({"hello": 1, "world": 2}).encode())
+        self.temp_file.write(json.dumps({PAD_TOKEN: 0, UNK_TOKEN: 1,"hello": 2, "world": 3}).encode())
         self.temp_file.close()
 
         # Create the encoder object using the temporary file
@@ -28,14 +29,14 @@ class TestVocabularyIDEncoder(unittest.TestCase):
         self.assertEqual(self.encoder.getMaxWordsAmount(), 80)
 
     def test_getVocabularyLength(self):
-        self.assertEqual(self.encoder.getVocabularyLength(), 2)
+        self.assertEqual(self.encoder.getVocabularyLength(), 4)
 
     def test_getPADTokenID(self):
-        self.assertEqual(self.encoder.getPADTokenID(), 3)
+        self.assertEqual(self.encoder.getPADTokenID(), 0)
 
     def test_encodeTokens(self):
-        tokens = ["hello", "world"]
-        expected_output = [1, 2]
+        tokens = ["hello", "world","unknown"]
+        expected_output = [2, 3, 1]
         self.assertEqual(self.encoder.encodeTokens(tokens), expected_output)
 
 

@@ -10,7 +10,7 @@ class TopicModelCreator(object):
     '''
     classdocs
     '''
-    def __init__(self,minVocabWordCount=None):
+    def __init__(self,minVocabWordCount=None,):
         if(minVocabWordCount is None):
             self.minVocabWordCount = 1
         else:

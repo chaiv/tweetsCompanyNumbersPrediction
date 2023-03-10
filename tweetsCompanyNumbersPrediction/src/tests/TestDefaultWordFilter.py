@@ -13,6 +13,9 @@ class TestDefaultWordFilter(unittest.TestCase):
     def setUp(self):
         self.filter = DefaultWordFilter()
         
+    def test_remove_underscore(self):
+        self.assertEqual(self.filter.remove_underscore("_Ab_C_"), "AbC")   
+        
     def test_convert_to_lowercase(self):
         self.assertEqual(self.filter.convert_to_lowercase("AbC"), "abc")
         
@@ -20,10 +23,10 @@ class TestDefaultWordFilter(unittest.TestCase):
         self.assertEqual(self.filter.remove_urls("http://example.com"), "")
         
     def test_remove_mentions(self):
-        self.assertEqual(self.filter.remove_mentions("@example"), "")
+        self.assertEqual(self.filter.remove_mentions("@example"), "example")
         
     def test_remove_hashtags(self):
-        self.assertEqual(self.filter.remove_hashtags("#example"), "")
+        self.assertEqual(self.filter.remove_hashtags("#example"), "example")
         
     def test_remove_stopwords(self):
         self.assertEqual(self.filter.remove_stopwords("is"), "")

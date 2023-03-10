@@ -5,6 +5,7 @@ Created on 05.03.2023
 '''
 import json
 from nlpvectors.AbstractEncoder import AbstractEncoder
+from nlpvectors.VocabularyCreator import PAD_TOKEN, UNK_TOKEN
 
 class VocabularyIDEncoder(AbstractEncoder):
    
@@ -22,8 +23,8 @@ class VocabularyIDEncoder(AbstractEncoder):
         return len(self.vocabulary_ids)
 
     def getPADTokenID(self):
-        return self.getVocabularyLength()+1   
+        return self.vocabulary_ids[PAD_TOKEN] 
     
     def encodeTokens(self,tokens):
-        return [self.vocabulary_ids[token] for token in tokens]
+        return [self.vocabulary_ids.get(token, self.vocabulary_ids[UNK_TOKEN]) for token in tokens]
         

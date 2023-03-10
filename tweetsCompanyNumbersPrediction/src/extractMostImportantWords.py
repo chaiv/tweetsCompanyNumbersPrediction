@@ -16,8 +16,7 @@ from tweetpreprocess.wordfiltering.DefaultWordFilter import DefaultWordFilter
 from nlpvectors.TweetTokenizer import TweetTokenizer
 
 encoder = VocabularyIDEncoder(DataDirHelper().getDataDir()+ "companyTweets\TokenizerAmazon.json")
-vocab_size = encoder.getVocabularyLength()
-model = Transformer(lr=1e-4, n_outputs=2, vocab_size=vocab_size+2)
+model = Transformer(lr=1e-4, n_outputs=2, vocab_size=encoder.getVocabularyLength())
 model = model.to(torch.device("cuda:0"))
 checkpoint = torch.load(DataDirHelper().getDataDir()+"companyTweets\\model\\amazonTweetPredict.ckpt")
 model.load_state_dict(checkpoint['state_dict'])
@@ -25,7 +24,6 @@ model.eval()
 predictionClassMapper = BINARY_0_1 
 predictor = Predictor(model,TweetTokenizer(DefaultWordFilter()),encoder,predictionClassMapper,AttributionsCalculator(model))
 df = pd.read_csv(DataDirHelper().getDataDir()+ 'companyTweets\\amazonTweetsWithNumbers.csv')
-df = df.head(10000)
 df.fillna('', inplace=True) #nan values in body columns
 sentence_ids = df["tweet_id"].tolist()
 sentences = df["body"].tolist()
