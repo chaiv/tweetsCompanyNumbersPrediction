@@ -12,29 +12,34 @@ from pytorch_lightning.loggers import TensorBoardLogger
 from sklearn.model_selection import train_test_split
 from torch.utils.data import DataLoader
 
+from gensim.models import KeyedVectors
 from classifier.transformer.models import Transformer
 from tweetpreprocess.DataDirHelper import DataDirHelper
 from tweetpreprocess.EqualClassSampler import EqualClassSampler
-from nlpvectors.VocabularyIDEncoder import VocabularyIDEncoder
 from classifier.transformer.DatasetUtils import generate_batch, Dataset
 from nlpvectors.TweetTokenizer import TweetTokenizer
 from tweetpreprocess.wordfiltering.DefaultWordFilter import DefaultWordFilter
 from exploredata.TweetDataframeExplore import TweetDataframeExplore
+from nlpvectors.WordVectorsIDEncoder import WordVectorsIDEncoder
+from classifier.transformer.Word2VecTokenEmbedding import Word2VecTokenEmbedding
 
 torch.set_float32_matmul_precision('medium')
 
 if  __name__ == "__main__":
     #batch_size = 2048
     batch_size = 256
-    epochs = 100
+    epochs = 10
     num_workers = 8
+    emb_size = 300
+     
+    df = pd.read_csv(DataDirHelper().getDataDir()+"companyTweets\\amazonTweetsWithNumbers.csv") 
+    word_vectors = KeyedVectors.load_word2vec_format(DataDirHelper().getDataDir()+ "companyTweets\\WordVectorsAmazonV2.txt", binary=False)
+    textEncoder = WordVectorsIDEncoder(word_vectors)
+    embeddings = Word2VecTokenEmbedding(word_vectors =  torch.tensor(word_vectors.vectors), emb_size=emb_size,pad_token_id = textEncoder.getPADTokenID())
     
-
-    df = pd.read_csv(DataDirHelper().getDataDir()+"companyTweets\CompanyTweetsTeslaWithCarSales.csv")    
     df = EqualClassSampler().getDfWithEqualNumberOfClassSamples(df)
     
     tokenizer = TweetTokenizer(DefaultWordFilter())
-    textEncoder = VocabularyIDEncoder(DataDirHelper().getDataDir()+ "companyTweets\VocabularyTesla.json")
     pad_token_idx = textEncoder.getPADTokenID()
     vocab_size = textEncoder.getVocabularyLength()
 
@@ -73,7 +78,10 @@ if  __name__ == "__main__":
         collate_fn=partial(generate_batch, pad_idx=pad_token_idx),
     )
 
-    model = Transformer(lr=1e-4, n_outputs=2, vocab_size=vocab_size) #https://discuss.pytorch.org/t/solved-assertion-srcindex-srcselectdimsize-failed-on-gpu-for-torch-cat/1804/13
+    model = Transformer(
+        embeddings= embeddings,
+        lr=1e-4, n_outputs=2, vocab_size=vocab_size,channels= 300
+        ) #https://discuss.pytorch.org/t/solved-assertion-srcindex-srcselectdimsize-failed-on-gpu-for-torch-cat/1804/13
 
     logger = TensorBoardLogger(
         save_dir=DataDirHelper().getDataDir()+ 'companyTweets\\modellogs',

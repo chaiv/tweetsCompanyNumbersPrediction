@@ -51,7 +51,7 @@ class TopicExtractorTest(unittest.TestCase):
         pass
     
     def testGetDocumentVectorSize(self):
-        self.assertEquals(300,self.topicExtractor.getFeatureVectorSize())  
+        self.assertEquals(300,self.topicExtractor.getDocumentVectorSize())  
         pass
 
 
@@ -68,7 +68,13 @@ class TopicExtractorTest(unittest.TestCase):
         self.assertEquals(300,len(self.topicExtractor.getWordVectorsOfWords(["apple","interesting"])[0]))
         self.assertEquals(2,len(self.topicExtractor.getWordVectorsOfWords(["apple","interesting"])))
         
-    
+    def testWordVectorsDict(self):
+        self.assertEquals(
+            len(self.topicExtractor.getWordIndexes()),
+            
+            len(self.topicExtractor.getWordVectorsArray()
+                
+                ))
     
     
         

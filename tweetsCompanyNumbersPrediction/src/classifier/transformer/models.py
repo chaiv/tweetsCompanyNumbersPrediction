@@ -33,22 +33,11 @@ class PositionalEncoding(nn.Module):
 
         return self.dropout(x)
 
-
-class TokenEmbedding(nn.Module):
-    #  https://pytorch.org/tutorials/beginner/translation_transformer.html
-    def __init__(self, vocab_size: int, emb_size):
-        super(TokenEmbedding, self).__init__()
-        self.embedding = nn.Embedding(vocab_size, emb_size)
-        self.emb_size = emb_size
-
-    def forward(self, tokens: torch.Tensor):
-        return self.embedding(tokens.long()) * math.sqrt(self.emb_size)
-
-
 class Transformer(pl.LightningModule):
     def __init__(
         self,
         vocab_size,
+        embeddings,
         channels=256,
         dropout=0.3,
         n_outputs=3,
@@ -61,7 +50,8 @@ class Transformer(pl.LightningModule):
         self.vocab_size = vocab_size
         self.n_outputs = n_outputs
 
-        self.embeddings = TokenEmbedding(vocab_size=self.vocab_size, emb_size=channels)
+        self.embeddings = embeddings
+        #self.embeddings = TokenEmbedding(vocab_size=self.vocab_size, emb_size=channels)
 
         self.pos_encoder = PositionalEncoding(d_model=channels, dropout=dropout)
 

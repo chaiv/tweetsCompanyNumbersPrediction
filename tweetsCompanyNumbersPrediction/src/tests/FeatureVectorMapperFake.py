@@ -20,5 +20,5 @@ class FeatureVectorMapperFake(FeatureVectorMapper):
     def getDocumentVectorsAsArray(self):
         return self.vectorsToReturn  
     
-    def getFeatureVectorSize(self):
+    def getDocumentVectorSize(self):
         return 3   

@@ -16,18 +16,18 @@ class DefaultWordFilter(AbstractTextFilter):
     def __init__(self):
         self.stemmer = PorterStemmer()
     
-    def filter(self, word):
-        word = self.remove_underscore(word)
-        word = self.convert_to_lowercase(word)
-        word = self.remove_urls(word)
-        word = self.remove_mentions(word)
-        word = self.remove_hashtags(word)
-        word = self.remove_stopwords(word)
-        word = self.remove_punctuation(word)
-        word = self.remove_digits(word)
-        word = self.stem(word)
-        word = self.simple_preprocess(word)
-        return word
+    def filter(self, token):
+        token = self.remove_underscore(token)
+        token = self.convert_to_lowercase(token)
+        token = self.remove_urls(token)
+        token = self.remove_mentions(token)
+        token = self.remove_hashtags(token)
+        token = self.remove_stopwords(token)
+        token = self.remove_punctuation(token)
+        token = self.remove_digits(token)
+        token = self.stem(token)
+        token = self.simple_preprocess(token)
+        return token
 
     def convert_to_lowercase(self, word):
         return word.lower()

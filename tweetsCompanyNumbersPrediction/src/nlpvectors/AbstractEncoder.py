@@ -17,6 +17,9 @@ class AbstractEncoder(object):
 
     def getPADTokenID(self):
         pass
+    
+    def getUNKTokenID(self):
+        pass
 
     def encodeTokens(self,tokens):
         pass

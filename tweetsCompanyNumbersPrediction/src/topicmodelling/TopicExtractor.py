@@ -34,7 +34,7 @@ class TopicExtractor(FeatureVectorMapper,AbstractTopicHeaderFinder):
     def getDocumentVectorsAsArray(self):
         return self.topicModel.model.dv.vectors
     
-    def getFeatureVectorSize(self):
+    def getDocumentVectorSize(self):
         return self.topicModel.model.docvecs.vector_size
     
     def getNumTopics(self): 
@@ -59,6 +59,9 @@ class TopicExtractor(FeatureVectorMapper,AbstractTopicHeaderFinder):
     
     def getWordVectorsOfWords(self,words):
         return self.topicModel._words2word_vectors(words)
+    
+    def getWordVectorsArray(self):
+        return self.topicModel.word_vectors
     
     
     

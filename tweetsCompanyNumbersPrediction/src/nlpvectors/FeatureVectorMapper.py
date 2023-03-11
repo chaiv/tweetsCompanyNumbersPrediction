@@ -7,6 +7,13 @@ Created on 12.01.2023
 class FeatureVectorMapper(object):
     '''
     '''
+    
+    def getWordVectorsOfWords(self,words):
+        pass
+    
+    def getWordVectorsArray(self):
+        pass
+    
     def getDocumentVectorByTweetIndex(self, index):
         pass 
     
@@ -16,5 +23,5 @@ class FeatureVectorMapper(object):
     def getDocumentVectorsAsArray(self):
         pass 
     
-    def getFeatureVectorSize(self):
+    def getDocumentVectorSize(self):
         pass 
