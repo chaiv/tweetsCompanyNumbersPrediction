@@ -21,7 +21,9 @@ from nlpvectors.TweetTokenizer import TweetTokenizer
 from tweetpreprocess.wordfiltering.DefaultWordFilter import DefaultWordFilter
 from exploredata.TweetDataframeExplore import TweetDataframeExplore
 from nlpvectors.WordVectorsIDEncoder import WordVectorsIDEncoder
-from classifier.transformer.Word2VecTokenEmbedding import Word2VecTokenEmbedding
+from classifier.transformer.Word2VecTransformerEmbedding import Word2VecTransformerEmbedding
+from classifier.FeedForwardNN import FeedForwardNN
+from classifier.LSTMNN import LSTMNN
 
 torch.set_float32_matmul_precision('medium')
 
@@ -35,7 +37,6 @@ if  __name__ == "__main__":
     df = pd.read_csv(DataDirHelper().getDataDir()+"companyTweets\\amazonTweetsWithNumbers.csv") 
     word_vectors = KeyedVectors.load_word2vec_format(DataDirHelper().getDataDir()+ "companyTweets\\WordVectorsAmazonV2.txt", binary=False)
     textEncoder = WordVectorsIDEncoder(word_vectors)
-    embeddings = Word2VecTokenEmbedding(word_vectors =  torch.tensor(word_vectors.vectors), emb_size=emb_size,pad_token_id = textEncoder.getPADTokenID())
     
     df = EqualClassSampler().getDfWithEqualNumberOfClassSamples(df)
     
@@ -60,7 +61,7 @@ if  __name__ == "__main__":
         train_data,
         batch_size=batch_size,
         num_workers=num_workers,
-        shuffle=True,
+        shuffle=False,
         collate_fn=partial(generate_batch, pad_idx=pad_token_idx),
     )
     val_loader = DataLoader(
@@ -74,14 +75,16 @@ if  __name__ == "__main__":
         test_data,
         batch_size=batch_size,
         num_workers=num_workers,
-        shuffle=True,
+        shuffle=False,
         collate_fn=partial(generate_batch, pad_idx=pad_token_idx),
     )
+    
+    model =LSTMNN(emb_size,word_vectors)
 
-    model = Transformer(
-        embeddings= embeddings,
-        lr=1e-4, n_outputs=2, vocab_size=vocab_size,channels= 300
-        ) #https://discuss.pytorch.org/t/solved-assertion-srcindex-srcselectdimsize-failed-on-gpu-for-torch-cat/1804/13
+    # model = Transformer(
+    #     embeddings= Word2VecTransformerEmbedding(word_vectors =  torch.tensor(word_vectors.vectors), emb_size=emb_size,pad_token_id = textEncoder.getPADTokenID()),
+    #     lr=1e-4, n_outputs=2, vocab_size=vocab_size,channels= 300
+    #     ) #https://discuss.pytorch.org/t/solved-assertion-srcindex-srcselectdimsize-failed-on-gpu-for-torch-cat/1804/13
 
     logger = TensorBoardLogger(
         save_dir=DataDirHelper().getDataDir()+ 'companyTweets\\modellogs',

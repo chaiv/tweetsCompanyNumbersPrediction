@@ -6,11 +6,11 @@ Created on 11.03.2023
 import math
 import torch
 import torch.nn as nn
-class VocabIDTokenEmbedding(nn.Module):
+class VocabIDTransformerEmbedding(nn.Module):
     
     
     def __init__(self, vocab_size: int, emb_size):
-        super(VocabIDTokenEmbedding, self).__init__()
+        super(VocabIDTransformerEmbedding, self).__init__()
         self.embedding = nn.Embedding(vocab_size, emb_size)
         self.emb_size = emb_size
 

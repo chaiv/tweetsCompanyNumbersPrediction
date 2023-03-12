@@ -3,7 +3,7 @@ Created on 01.03.2023
 
 @author: vital
 '''
-from sklearn.metrics import precision_recall_fscore_support, accuracy_score
+from sklearn.metrics import precision_recall_fscore_support, accuracy_score, classification_report
 
 class ClassificationMetrics(object):
 
@@ -13,3 +13,7 @@ class ClassificationMetrics(object):
         )
         accuracy = accuracy_score(y_true,y_pred)
         return precision, recall, f1_score, support,accuracy 
+    
+    def classification_report(self, y_true, y_pred):
+        report = classification_report(y_true, y_pred)
+        return report

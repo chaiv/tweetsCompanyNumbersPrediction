@@ -16,21 +16,24 @@ from nlpvectors.TweetTokenizer import TweetTokenizer
 from classifier.ClassificationMetrics import ClassificationMetrics
 from gensim.models import KeyedVectors
 from nlpvectors.WordVectorsIDEncoder import WordVectorsIDEncoder
-from classifier.transformer.Word2VecTokenEmbedding import Word2VecTokenEmbedding
+from classifier.transformer.Word2VecTransformerEmbedding import Word2VecTransformerEmbedding
+from classifier.FeedForwardNN import FeedForwardNN
+from classifier.LSTMNN import LSTMNN
 
 word_vectors = KeyedVectors.load_word2vec_format(DataDirHelper().getDataDir()+ "companyTweets\\WordVectorsAmazonV2.txt", binary=False)
 encoder = WordVectorsIDEncoder(word_vectors)
-embeddings = Word2VecTokenEmbedding(word_vectors =  torch.tensor(word_vectors.vectors), emb_size=300,pad_token_id = encoder.getPADTokenID())
-model = Transformer(
-        embeddings= embeddings,
-        lr=1e-4, n_outputs=2, vocab_size=encoder.getVocabularyLength(),channels= 300
-        )
+checkpointName = "lstmAmazonTweetPredict.ckpt"
+model = LSTMNN(300,word_vectors)
+# model = Transformer(
+#         embeddings= Word2VecTransformerEmbedding(word_vectors =  torch.tensor(word_vectors.vectors), emb_size=300,pad_token_id = encoder.getPADTokenID()),
+#         lr=1e-4, n_outputs=2, vocab_size=encoder.getVocabularyLength(),channels= 300
+#         )
 model = model.to(torch.device("cuda:0"))
-checkpoint = torch.load(DataDirHelper().getDataDir()+"companyTweets\\model\\amazonTweetPredictV2.ckpt")
+checkpoint = torch.load(DataDirHelper().getDataDir()+"companyTweets\\model\\"+checkpointName)
 model.load_state_dict(checkpoint['state_dict'])
 model.eval()
 predictionClassMapper = BINARY_0_1 
-predictor = Predictor(model,TweetTokenizer(DefaultWordFilter()),encoder,predictionClassMapper,AttributionsCalculator(model))
+predictor = Predictor(model,TweetTokenizer(DefaultWordFilter()),encoder,predictionClassMapper,None)
 df = pd.read_csv(DataDirHelper().getDataDir()+ 'companyTweets\\amazonTweetsWithNumbers.csv')
 df.fillna('', inplace=True) #nan values in body columns
 df = df.sample(n=10000)
@@ -38,7 +41,6 @@ sentences = df["body"].tolist()
 true_classes = df["class"].tolist()
 predictions = predictor.predictMultipleInChunks(sentences,chunkSize=1000)
 metrics = ClassificationMetrics() 
-print(metrics.calculate_metrics(true_classes, predictions, 0))
-print(metrics.calculate_metrics(true_classes, predictions, 1))
+print(metrics.classification_report(true_classes, predictions))
 
 
