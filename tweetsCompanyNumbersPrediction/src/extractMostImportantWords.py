@@ -14,16 +14,22 @@ from featureinterpretation.AttributionsCalculator import AttributionsCalculator
 from nlpvectors.VocabularyIDEncoder import VocabularyIDEncoder
 from tweetpreprocess.wordfiltering.DefaultWordFilter import DefaultWordFilter
 from nlpvectors.TweetTokenizer import TweetTokenizer
+from gensim.models.keyedvectors import KeyedVectors
+from nlpvectors.WordVectorsIDEncoder import WordVectorsIDEncoder
+from classifier.LSTMNN import LSTMNN
 
-encoder = VocabularyIDEncoder(DataDirHelper().getDataDir()+ "companyTweets\TokenizerAmazon.json")
-model = Transformer(lr=1e-4, n_outputs=2, vocab_size=encoder.getVocabularyLength())
+word_vectors = KeyedVectors.load_word2vec_format(DataDirHelper().getDataDir()+ "companyTweets\\WordVectorsAmazonV2.txt", binary=False)
+encoder = WordVectorsIDEncoder(word_vectors)
+checkpointName = "lstmAmazonTweetPredict.ckpt"
+model = LSTMNN(300,word_vectors)
 model = model.to(torch.device("cuda:0"))
-checkpoint = torch.load(DataDirHelper().getDataDir()+"companyTweets\\model\\amazonTweetPredict.ckpt")
+checkpoint = torch.load(DataDirHelper().getDataDir()+"companyTweets\\model\\"+checkpointName)
 model.load_state_dict(checkpoint['state_dict'])
-model.eval()
+model.train()
 predictionClassMapper = BINARY_0_1 
-predictor = Predictor(model,TweetTokenizer(DefaultWordFilter()),encoder,predictionClassMapper,AttributionsCalculator(model))
+predictor = Predictor(model,TweetTokenizer(DefaultWordFilter()),encoder,predictionClassMapper,AttributionsCalculator(model,model.embedding))
 df = pd.read_csv(DataDirHelper().getDataDir()+ 'companyTweets\\amazonTweetsWithNumbers.csv')
+df = df.head(10000)
 df.fillna('', inplace=True) #nan values in body columns
 sentence_ids = df["tweet_id"].tolist()
 sentences = df["body"].tolist()

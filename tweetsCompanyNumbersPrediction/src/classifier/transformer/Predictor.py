@@ -69,7 +69,7 @@ class Predictor(object):
             chunk = sentences[i:i + chunkSize]
             chunkPredictions = self.predictMultiple(chunk)
             predictions += chunkPredictions
-            print(len(predictions))
+            print("Chunks processed",len(predictions))
         return predictions
     
     def calculateWordScoresInChunks(self, sentences: list, observed_class, chunk_size, n_steps=500, internal_batch_size=10):
@@ -82,7 +82,7 @@ class Predictor(object):
             token_indexes_lists +=  chunk_token_indexes
             token_lists += chunk_token_lists
             attributions_lists += chunk_attributions
-            print(len(token_indexes_lists))
+            print("Chunks processed",len(token_indexes_lists))
         return token_indexes_lists, token_lists, attributions_lists
     
     

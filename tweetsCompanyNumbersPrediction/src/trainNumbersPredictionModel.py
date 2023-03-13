@@ -29,7 +29,7 @@ torch.set_float32_matmul_precision('medium')
 
 if  __name__ == "__main__":
     #batch_size = 2048
-    batch_size = 256
+    batch_size = 2048
     epochs = 10
     num_workers = 8
     emb_size = 300
@@ -38,16 +38,18 @@ if  __name__ == "__main__":
     word_vectors = KeyedVectors.load_word2vec_format(DataDirHelper().getDataDir()+ "companyTweets\\WordVectorsAmazonV2.txt", binary=False)
     textEncoder = WordVectorsIDEncoder(word_vectors)
     
-    df = EqualClassSampler().getDfWithEqualNumberOfClassSamples(df)
+    #df = EqualClassSampler().getDfWithEqualNumberOfClassSamples(df)
     
     tokenizer = TweetTokenizer(DefaultWordFilter())
     pad_token_idx = textEncoder.getPADTokenID()
     vocab_size = textEncoder.getVocabularyLength()
-
+    
     train_val, test = train_test_split(df, random_state=1337, test_size=0.3)
     train, val = train_test_split(train_val, random_state=1337, test_size=0.3)
     
-    print(TweetDataframeExplore(train).getClassDistribution())
+    print("Train classes",TweetDataframeExplore(train).getClassDistribution())
+    print("Val classes",TweetDataframeExplore(val).getClassDistribution())
+    print("Test classes",TweetDataframeExplore(test).getClassDistribution())
     
     train_data = Dataset(dataframe=train,tokenizer = tokenizer, textEncoder = textEncoder)
     val_data = Dataset(dataframe=val,tokenizer = tokenizer,textEncoder =textEncoder)

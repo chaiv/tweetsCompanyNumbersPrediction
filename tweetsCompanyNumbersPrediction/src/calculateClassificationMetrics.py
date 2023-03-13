@@ -36,7 +36,7 @@ predictionClassMapper = BINARY_0_1
 predictor = Predictor(model,TweetTokenizer(DefaultWordFilter()),encoder,predictionClassMapper,None)
 df = pd.read_csv(DataDirHelper().getDataDir()+ 'companyTweets\\amazonTweetsWithNumbers.csv')
 df.fillna('', inplace=True) #nan values in body columns
-df = df.sample(n=10000)
+df = df.sample(n=100000)
 sentences = df["body"].tolist()
 true_classes = df["class"].tolist()
 predictions = predictor.predictMultipleInChunks(sentences,chunkSize=1000)
