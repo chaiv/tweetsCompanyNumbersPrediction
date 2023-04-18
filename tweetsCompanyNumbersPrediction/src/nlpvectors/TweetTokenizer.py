@@ -13,7 +13,7 @@ class TweetTokenizer(AbstractTokenizer):
         
 
     def tokenize(self,text):
-        indexes, tokens  = self.tokenizeWithIndex(text)
+        _, tokens  = self.tokenizeWithIndex(text)
         return tokens
     
     def tokenizeWithIndex(self,text):
