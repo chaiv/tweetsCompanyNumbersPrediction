@@ -8,6 +8,8 @@ from torch.utils.data import Dataset
 from torch.nn.utils.rnn import pad_sequence
 from nlpvectors.AbstractTokenizer import AbstractTokenizer
 from nlpvectors.AbstractEncoder import AbstractEncoder
+from torch.utils.data import DataLoader
+from functools import partial
 
 class Dataset(Dataset):
     def __init__(self, dataframe,tokenizer:AbstractTokenizer,textEncoder:AbstractEncoder, textColumnName = "body" , classColumnName = "class"):
@@ -40,3 +42,12 @@ def generate_batch(data_batch, pad_idx):
     x_input = pad_sequence(x_input, padding_value=pad_idx, batch_first=True)
     y_output = torch.tensor(y_output, dtype=torch.long)
     return x_input, y_output
+
+def createDataloader(data,batch_size, num_workers, pad_token_idx):
+    return DataLoader(
+        data, 
+        batch_size=batch_size, 
+        num_workers=num_workers, 
+        shuffle=False, 
+        collate_fn=partial(generate_batch, pad_idx=pad_token_idx)
+        )
