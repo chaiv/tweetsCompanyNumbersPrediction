@@ -8,6 +8,7 @@ from nlpvectors.AbstractTokenizer import AbstractTokenizer
 
 PAD_TOKEN = '<PAD>'
 UNK_TOKEN = '<UNK>'
+SEP_TOKEN = '<SEP>'
 
 
 class VocabularyCreator(object):
@@ -19,9 +20,11 @@ class VocabularyCreator(object):
         tokenized_sentences = [self.tokenizer.tokenize(sentence) for sentence in sentences]
         tokens = [token for sentence in tokenized_sentences for token in sentence]
         token_counts = Counter(tokens)
-        vocab = {token: i+2 for i, (token, _) in enumerate(token_counts.most_common())}
-        vocab['<PAD>'] = 0
-        vocab['<UNK>'] = 1
+        vocab = {token: i for i, (token, _) in enumerate(token_counts.most_common())}
+        specialTokens = [PAD_TOKEN,UNK_TOKEN,SEP_TOKEN]
+        for token in specialTokens:
+            if token not in vocab:
+                vocab[token] = len(vocab)
         return vocab
     
         
