@@ -20,6 +20,9 @@ class AbstractEncoder(object):
     
     def getUNKTokenID(self):
         pass
+    
+    def getSEPTokenID(self):
+        pass
 
     def encodeTokens(self,tokens):
         pass

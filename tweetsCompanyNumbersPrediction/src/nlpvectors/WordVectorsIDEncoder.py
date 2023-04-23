@@ -5,6 +5,7 @@ Created on 11.03.2023
 '''
 from gensim.models import KeyedVectors
 from nlpvectors.AbstractEncoder import AbstractEncoder
+from nlpvectors.VocabularyCreator import PAD_TOKEN, UNK_TOKEN, SEP_TOKEN
 
 class WordVectorsIDEncoder(AbstractEncoder):
     
@@ -18,10 +19,13 @@ class WordVectorsIDEncoder(AbstractEncoder):
         return len(self.word_vectors)
 
     def getPADTokenID(self):
-        return self.word_vectors.key_to_index["PAD"]
+        return self.word_vectors.key_to_index[PAD_TOKEN]
     
     def getUNKTokenID(self):
-        return self.word_vectors.key_to_index["UNK"]
+        return self.word_vectors.key_to_index[UNK_TOKEN]
+    
+    def getSEPTokenID(self):
+        return self.word_vectors.key_to_index[SEP_TOKEN]
     
     def encodeTokens(self,tokens):
         indexes = [self.word_vectors.key_to_index[token] if token in self.word_vectors.key_to_index else self.getUNKTokenID() for token in tokens]

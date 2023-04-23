@@ -25,6 +25,9 @@ from classifier.FeedForwardNN import FeedForwardNN
 from classifier.LSTMNN import LSTMNN
 from classifier.Trainer import Trainer
 
+
+#TODO recreate Word vector file because of SEP_TOKEN!
+
 torch.set_float32_matmul_precision('medium') #needed for quicker cuda 
 
 if  __name__ == "__main__":
