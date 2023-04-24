@@ -3,7 +3,6 @@ Created on 22.04.2023
 
 @author: vital
 '''
-from nlpvectors.VocabularyCreator import SEP_TOKEN
 from nlpvectors.AbstractTokenizer import AbstractTokenizer
 from nlpvectors.AbstractEncoder import AbstractEncoder
 
