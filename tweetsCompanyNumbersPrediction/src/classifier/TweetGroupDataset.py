@@ -19,7 +19,7 @@ class TweetGroupDataset(Dataset):
         self.classColumnName = classColumnName
         self.textEncoder = textEncoder
         self.tokenizer = tokenizer
-        self.samples = DataframeSplitter().splitDfByNSamplesForClass(self, dataframe,n_tweets_as_sample, classColumnName)
+        self.samples = DataframeSplitter().splitDfByNSamplesForClass(dataframe,n_tweets_as_sample, classColumnName)
         
 
     def __len__(self):
