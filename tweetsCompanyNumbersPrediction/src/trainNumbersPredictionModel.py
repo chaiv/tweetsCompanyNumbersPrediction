@@ -24,6 +24,9 @@ from classifier.transformer.Word2VecTransformerEmbedding import Word2VecTransfor
 from classifier.FeedForwardNN import FeedForwardNN
 from classifier.LSTMNN import LSTMNN
 from classifier.Trainer import Trainer
+from classifier.transformer.Predictor import Predictor
+from classifier.PredictionClassMappers import BINARY_0_1
+from classifier.ClassificationMetrics import ClassificationMetrics
 
 
 #TODO recreate Word vector file because of SEP_TOKEN!
@@ -86,4 +89,11 @@ if  __name__ == "__main__":
             checkpointPath= DataDirHelper().getDataDir() + 'companyTweets\\model', 
             checkpointName = f"tweetpredict_fold{fold}"
             )
+        
+        predictionClassMapper = BINARY_0_1 
+        predictor = Predictor(model,tokenizer,textEncoder,predictionClassMapper,None)
+        predictions = predictor.predictMultipleInChunks(test_df["body"].tolist(),chunkSize=1000)
+        true_classes = test_df["class"].tolist()
+        metrics = ClassificationMetrics() 
+        print(metrics.classification_report(true_classes, predictions))
 
