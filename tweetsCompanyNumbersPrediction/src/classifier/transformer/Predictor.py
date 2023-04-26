@@ -4,11 +4,7 @@ Created on 08.02.2023
 @author: vital
 '''
 from classifier.transformer.models import Transformer
-from classifier.transformer.DatasetUtils import Dataset, generate_batch
-from torch.utils.data.dataloader import DataLoader
-import pytorch_lightning as pl
 import torch
-from functools import partial
 from classifier.PredictionClassMapper import PredictionClassMapper
 from featureinterpretation.AttributionsCalculator import AttributionsCalculator
 from nlpvectors.AbstractEncoder import AbstractEncoder
@@ -32,25 +28,24 @@ class Predictor(object):
         self.attributionsCalculator = attributionsCalculator
         self.deviceToUse = deviceToUse
         self.predictionClassMapper = predictionClassMapper
-    
-    def test(self, dataframe, batch_size = 1024, num_workers=16):
-        test_data = Dataset(dataframe=dataframe,tokenizer = self.textEncoder)
-        test_loader = DataLoader(
-            test_data,
-            batch_size=batch_size,
-            num_workers=num_workers,
-            shuffle=False,
-            collate_fn=partial(generate_batch, pad_idx=self.textEncoder.getPADTokenID()),
-        )
-        trainer = pl.Trainer(
-            max_epochs=10,
-            accelerator='gpu',
-            devices=1,
-            logger=False,
-            accumulate_grad_batches=1,
-        )
-        trainer.test(self.model, dataloaders=test_loader)
         
+    def predictMultipleAsWrapper(self,sentenceWrappers):
+        x = [torch.tensor(sentenceWrapper.getFeatureVector(), dtype=torch.long).to(self.deviceToUse) for sentenceWrapper in sentenceWrappers]
+        x = torch.nn.utils.rnn.pad_sequence(x, batch_first=True, padding_value=self.textEncoder.getPADTokenID())
+        with torch.no_grad():
+            y_hat = self.model(x)
+            _, predicted = torch.max(y_hat, 1)
+            predicted_classes = predicted.tolist()
+        return [self.predictionClassMapper.index_to_class(pred) for pred in predicted_classes]
+    
+    def predictMultipleAsWrappersInChunks(self,sentenceWrappers, chunkSize):
+        predictions = []
+        for i in range(0, len(sentenceWrappers), chunkSize):
+            chunk = sentenceWrappers[i:i + chunkSize]
+            chunkPredictions = self.predictMultipleAsWrapper(chunk)
+            predictions += chunkPredictions
+            print("Chunks processed",len(predictions))
+        return predictions
     
 
     def predictMultiple(self, sentences):
@@ -84,6 +79,16 @@ class Predictor(object):
             attributions_lists += chunk_attributions
             print("Chunks processed",len(token_indexes_lists))
         return token_indexes_lists, token_lists, attributions_lists
+    
+    
+    def calculateWordScoresForWrappers(self, sentenceWrappers : list, observed_class,n_steps=500,internal_batch_size = 10):
+        x = [torch.tensor(sentenceWrapper.getFeatureVector(), dtype=torch.long).to(self.deviceToUse) for sentenceWrapper in sentenceWrappers]
+        x = torch.nn.utils.rnn.pad_sequence(x, batch_first=True, padding_value=self.textEncoder.getPADTokenID())
+        ref_tokens = [[self.textEncoder.getPADTokenID()] * len(x[0])] * len(sentenceWrappers)
+        ref = torch.tensor(ref_tokens, dtype=torch.long).to(self.deviceToUse)   
+        attributions_ig = self.attributionsCalculator.attribute(x, ref, n_steps, observed_class, internal_batch_size)
+        pass
+        
     
     
     
