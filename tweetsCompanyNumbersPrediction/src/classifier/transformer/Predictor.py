@@ -87,6 +87,24 @@ class Predictor(object):
         ref_tokens = [[self.textEncoder.getPADTokenID()] * len(x[0])] * len(sentenceWrappers)
         ref = torch.tensor(ref_tokens, dtype=torch.long).to(self.deviceToUse)   
         attributions_ig = self.attributionsCalculator.attribute(x, ref, n_steps, observed_class, internal_batch_size)
+        
+        total_token_indexes_lists = []
+        total_token_lists = []
+        total_attribution_lists = []
+        
+        for i in range(len(sentenceWrappers)):
+            sentenceWrapper = sentenceWrappers[i]
+            attributionsForSentenceWrapper = attributions_ig[i]
+            attributionsForSentenceWrapperSplitted = #split  attributionsForSentenceWrapper on values of sentenceWrapper.getSeparatorIndexesInFeatureVector
+            total_token_indexes_lists  = total_token_indexes_lists + sentenceWrapper.getTokenIndexesLists()
+            total_token_lists = total_token_lists + sentenceWrapper.getTokenLists()
+            for token_list in sentenceWrapper.getTokenLists():
+                #num_tokens = len(sentenceWrapper.getTokenLists())
+                #attributions for token
+            total_attribution_lists =  #
+            
+        
+        
         pass
         
     
