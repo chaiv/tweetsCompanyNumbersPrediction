@@ -9,6 +9,7 @@ from classifier.PredictionClassMapper import PredictionClassMapper
 from featureinterpretation.AttributionsCalculator import AttributionsCalculator
 from nlpvectors.AbstractEncoder import AbstractEncoder
 from nlpvectors.AbstractTokenizer import AbstractTokenizer
+from featureinterpretation.WordScoresWrapper import WordScoresWrapper
 
 
 
@@ -81,31 +82,54 @@ class Predictor(object):
         return token_indexes_lists, token_lists, attributions_lists
     
     
+    def split_list_on_indices(self,lst, indices):
+        if not indices:
+            return lst
+        
+        splitted_list = []
+        start_idx = 0
+        for idx in indices:
+            sublist = lst[start_idx:idx]
+            if sublist:
+                splitted_list.append(sublist)
+            start_idx = idx + 1
+        sublist = lst[start_idx:]
+        if sublist:
+            splitted_list.append(sublist)
+    
+        return splitted_list
+    
+    def calculateAttributionsOfSentenceWrapper(self,attributionsForSentenceWrapper,sentenceWrapper):
+        separator_indexes = sentenceWrapper.getSeparatorIndexesInFeatureVector()
+        attributionsForSentenceWrapperSplitted = self.split_list_on_indices(attributionsForSentenceWrapper.tolist(),separator_indexes)
+        attribution_lists_for_sentences_of_wrapper = []
+        for attribution_index in range(len(attributionsForSentenceWrapperSplitted)):
+            numTokensOfSentence = len(sentenceWrapper.getTokens()[attribution_index])
+            attributionsForSentence = attributionsForSentenceWrapperSplitted[attribution_index][:numTokensOfSentence]
+            attribution_lists_for_sentences_of_wrapper.append(attributionsForSentence)
+        return attribution_lists_for_sentences_of_wrapper
+    
     def calculateWordScoresForWrappers(self, sentenceWrappers : list, observed_class,n_steps=500,internal_batch_size = 10):
         x = [torch.tensor(sentenceWrapper.getFeatureVector(), dtype=torch.long).to(self.deviceToUse) for sentenceWrapper in sentenceWrappers]
         x = torch.nn.utils.rnn.pad_sequence(x, batch_first=True, padding_value=self.textEncoder.getPADTokenID())
         ref_tokens = [[self.textEncoder.getPADTokenID()] * len(x[0])] * len(sentenceWrappers)
         ref = torch.tensor(ref_tokens, dtype=torch.long).to(self.deviceToUse)   
-        attributions_ig = self.attributionsCalculator.attribute(x, ref, n_steps, observed_class, internal_batch_size)
+        attributionsOfAllSentenceWrappers = self.attributionsCalculator.attribute(x, ref, n_steps, observed_class, internal_batch_size)
         
-        total_token_indexes_lists = []
-        total_token_lists = []
-        total_attribution_lists = []
+        total_sentence_ids = []
+        total_token_indexes = []
+        total_tokens = []
+        total_attributions = []
         
         for i in range(len(sentenceWrappers)):
-            sentenceWrapper = sentenceWrappers[i]
-            attributionsForSentenceWrapper = attributions_ig[i]
-            attributionsForSentenceWrapperSplitted = #split  attributionsForSentenceWrapper on values of sentenceWrapper.getSeparatorIndexesInFeatureVector
-            total_token_indexes_lists  = total_token_indexes_lists + sentenceWrapper.getTokenIndexesLists()
-            total_token_lists = total_token_lists + sentenceWrapper.getTokenLists()
-            for token_list in sentenceWrapper.getTokenLists():
-                #num_tokens = len(sentenceWrapper.getTokenLists())
-                #attributions for token
-            total_attribution_lists =  #
+            attribution_lists = self.calculateAttributionsOfSentenceWrapper(attributionsOfAllSentenceWrappers[i],sentenceWrappers[i])
             
+            total_sentence_ids.append(sentenceWrapper.getSentenceIds())
+            total_token_indexes.append(sentenceWrapper.getTokenIndexes())
+            total_tokens.append(sentenceWrapper.getTokens())
+            total_attributions.append(attribution_lists)
         
-        
-        pass
+        return WordScoresWrapper(total_sentence_ids,total_token_indexes, total_tokens, total_attributions)
         
     
     

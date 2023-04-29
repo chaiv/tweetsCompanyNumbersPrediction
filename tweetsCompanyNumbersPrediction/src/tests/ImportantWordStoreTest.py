@@ -33,6 +33,19 @@ class TestImportantWordStore(unittest.TestCase):
         actual_data = store.toDfWithFirstNSortedByAttribution(5, ascending = False).to_records(index=False)
         actual_data = [tuple(record) for record in actual_data]
         self.assertListEqual(list(actual_data), expected_data)
+        
+        
+    def testDoubleNestedLists(self):
+        store = ImportantWordStore({
+                "id" : [1,2],
+                "token_index" : [[[0, 1],[0, 1]],[[2, 3],[2, 3]]],
+                "token" : [[["a", "b"],["a", "b"]],[["c", "d"],["c", "d"]]],
+                "attribution" : [[[0.1, -0.2],[0.1, -0.2]],[[-0.05, 0.15],[-0.05, 0.15]]],
+                "prediction" : [0,1]
+                })  
+        df = store.to_dataframe()
+        print(df)
+           
     
     def test_to_dataframe(self):
         store = ImportantWordStore({

@@ -51,10 +51,13 @@ class SentencesWrapper(object):
     def getSeparatorIndexesInFeatureVector(self):
         return self.separatorIndexesInFeatureVector
     
-    def getTokenLists(self):
+    def getSentenceIds(self):
+        return self.sentenceIds
+    
+    def getTokens(self):
         return self.totalTokens
     
-    def getTokenIndexesLists(self):
+    def getTokenIndexes(self):
         return self.totalTokenIndexes 
         
     

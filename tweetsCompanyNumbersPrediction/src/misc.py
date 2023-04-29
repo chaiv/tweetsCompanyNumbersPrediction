@@ -10,17 +10,25 @@
 # topic_words,word_scores,topic_scores,topic_nums = topicExtractor.searchTopics(TweetTokenizer(DefaultWordFilter()).tokenize('Greek debt crisis'), 2)
 # print(topic_words)
 
-from gensim.models import KeyedVectors
-from tweetpreprocess.DataDirHelper import DataDirHelper
+def split_list_on_indices(lst, indices):
+    if not indices:
+        return lst
+    
+    splitted_list = []
+    start_idx = 0
+    for idx in indices:
+        sublist = lst[start_idx:idx]
+        if sublist:
+            splitted_list.append(sublist)
+        start_idx = idx + 1
+    sublist = lst[start_idx:]
+    if sublist:
+        splitted_list.append(sublist)
 
-# Load pre-trained token embeddings
-word_vectors = KeyedVectors.load_word2vec_format(DataDirHelper().getDataDir()+ "companyTweets\WordVectorsAAPLFirst1000V2.txt", binary=False)
+    return splitted_list
 
-# List of tokens
-tokens = ['aapl', 'banana', 'orange', 'pear', 'kiwi']
-
-
-# List of indexes
-indexes = [word_vectors.key_to_index[token] if token in word_vectors.key_to_index else -1 for token in tokens]
-
-print(f"The indexes of {tokens} are {indexes}")
+# Example usage:
+lst = [0.1, 0.1, 0.0, 0.2, 0.2, 0.0]
+indices = [2, 5]
+splitted_list = split_list_on_indices(lst, indices)
+print(splitted_list)  # Output: [[0.1, 0.1], [0.2, 0.2]]
