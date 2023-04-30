@@ -122,7 +122,8 @@ class Predictor(object):
         total_attributions = []
         
         for i in range(len(sentenceWrappers)):
-            attribution_lists = self.calculateAttributionsOfSentenceWrapper(attributionsOfAllSentenceWrappers[i],sentenceWrappers[i])
+            sentenceWrapper = sentenceWrappers[i]
+            attribution_lists = self.calculateAttributionsOfSentenceWrapper(attributionsOfAllSentenceWrappers[i],sentenceWrapper)
             
             total_sentence_ids.append(sentenceWrapper.getSentenceIds())
             total_token_indexes.append(sentenceWrapper.getTokenIndexes())

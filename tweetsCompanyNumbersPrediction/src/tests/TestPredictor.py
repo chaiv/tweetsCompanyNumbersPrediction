@@ -9,7 +9,7 @@ from unittest.mock import MagicMock
 from classifier.transformer.Predictor import Predictor
 
 
-class DummySentenceWrapper:
+class SentenceWrapperFakeWithTwoSentences:
     def getSeparatorIndexesInFeatureVector(self):
         return [2, 5]
  
@@ -18,6 +18,15 @@ class DummySentenceWrapper:
              ["First", "tweet"],
              ["Second", "tweet"]
          ]
+        
+    def getTokenIndexes(self):
+        return [
+             [0,1],
+             [3,4]
+         ]
+        
+    def getSentenceIds(self): 
+        return [0,1]
         
     def getFeatureVector(self):
         return [[0,0,0],[1,1,1],[2,2,2,],[0,0,0],[1,1,1],[2,2,2,]]
@@ -57,29 +66,35 @@ class TestPredictor(unittest.TestCase):
         
     def test_calculateWordScores_of_sentence_wrapper(self):
         sentenceWrappers = [
-            DummySentenceWrapper(),
-            DummySentenceWrapper()
+            SentenceWrapperFakeWithTwoSentences(),
+            SentenceWrapperFakeWithTwoSentences()
             ]
         self.encoder_mock.getPADTokenID = MagicMock(return_value=0)
-        self.attributions_calculator_mock.attribute = MagicMock(return_value=[
-            torch.tensor([0.1,0.1,0.0,0.2,0.2,0.0])
-            ])
+        self.attributions_calculator_mock.attribute = MagicMock(return_value=
+            torch.tensor(
+                [
+                    [1,1,0,2,2,0],
+                    [1,1,0,2,2,0]
+                ]
+                )
+            )
         result = self.predictor.calculateWordScoresForWrappers(sentenceWrappers, observed_class=None, n_steps=None, internal_batch_size=None)
-        self.assertIsNone(result)
+        self.assertEquals([[0,1],[0,1]],result.getSentenceIds())
+        self.assertEquals([[[1, 1], [2, 2]], [[1, 1], [2, 2]]],result.getAttributions())
         
         
             
     def test_calculate_attributions_of_sentence_wrapper(self):
 
-        attributions_for_sentence_wrapper = [0.1,0.1,0.0,0.2,0.2,0.0]
+        attributions_for_sentence_wrapper = torch.tensor([1,1,0,2,2,0])
 
-        sentence_wrapper = DummySentenceWrapper()
+        sentence_wrapper = SentenceWrapperFakeWithTwoSentences()
 
         calculated_attributions = self.predictor.calculateAttributionsOfSentenceWrapper(attributions_for_sentence_wrapper, sentence_wrapper)
 
         expected_attributions = [
-            [0.1, 0.1],
-            [0.2, 0.2]
+            [1, 1],
+            [2, 2]
         ]
 
         self.assertEqual(calculated_attributions, expected_attributions)    
