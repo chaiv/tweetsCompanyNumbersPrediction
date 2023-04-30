@@ -99,7 +99,7 @@ class Predictor(object):
     
         return splitted_list
     
-    def calculateAttributionsOfSentenceWrapper(self,attributionsForSentenceWrapper,sentenceWrapper):
+    def calculateWordScoresOfSentenceWrapper(self,attributionsForSentenceWrapper,sentenceWrapper):
         separator_indexes = sentenceWrapper.getSeparatorIndexesInFeatureVector()
         attributionsForSentenceWrapperSplitted = self.split_list_on_indices(attributionsForSentenceWrapper.tolist(),separator_indexes)
         attribution_lists_for_sentences_of_wrapper = []
@@ -107,7 +107,7 @@ class Predictor(object):
             numTokensOfSentence = len(sentenceWrapper.getTokens()[attribution_index])
             attributionsForSentence = attributionsForSentenceWrapperSplitted[attribution_index][:numTokensOfSentence]
             attribution_lists_for_sentences_of_wrapper.append(attributionsForSentence)
-        return attribution_lists_for_sentences_of_wrapper
+        return WordScoresWrapper(sentenceWrapper, attribution_lists_for_sentences_of_wrapper)
     
     def calculateWordScoresForWrappers(self, sentenceWrappers : list, observed_class,n_steps=500,internal_batch_size = 10):
         x = [torch.tensor(sentenceWrapper.getFeatureVector(), dtype=torch.long).to(self.deviceToUse) for sentenceWrapper in sentenceWrappers]
@@ -116,21 +116,13 @@ class Predictor(object):
         ref = torch.tensor(ref_tokens, dtype=torch.long).to(self.deviceToUse)   
         attributionsOfAllSentenceWrappers = self.attributionsCalculator.attribute(x, ref, n_steps, observed_class, internal_batch_size)
         
-        total_sentence_ids = []
-        total_token_indexes = []
-        total_tokens = []
-        total_attributions = []
+        wordScoresWrappers = []
         
         for i in range(len(sentenceWrappers)):
             sentenceWrapper = sentenceWrappers[i]
-            attribution_lists = self.calculateAttributionsOfSentenceWrapper(attributionsOfAllSentenceWrappers[i],sentenceWrapper)
-            
-            total_sentence_ids.append(sentenceWrapper.getSentenceIds())
-            total_token_indexes.append(sentenceWrapper.getTokenIndexes())
-            total_tokens.append(sentenceWrapper.getTokens())
-            total_attributions.append(attribution_lists)
+            wordScoresWrappers.append(self.calculateWordScoresOfSentenceWrapper(attributionsOfAllSentenceWrappers[i],sentenceWrapper))
         
-        return WordScoresWrapper(total_sentence_ids,total_token_indexes, total_tokens, total_attributions)
+        return wordScoresWrappers
         
     
     

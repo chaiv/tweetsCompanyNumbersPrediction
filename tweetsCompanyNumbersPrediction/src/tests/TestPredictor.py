@@ -79,8 +79,9 @@ class TestPredictor(unittest.TestCase):
                 )
             )
         result = self.predictor.calculateWordScoresForWrappers(sentenceWrappers, observed_class=None, n_steps=None, internal_batch_size=None)
-        self.assertEquals([[0,1],[0,1]],result.getSentenceIds())
-        self.assertEquals([[[1, 1], [2, 2]], [[1, 1], [2, 2]]],result.getAttributions())
+        self.assertEquals(2,len(result))
+        self.assertEquals([0,1],result[0].getSentenceIds())
+        self.assertEquals([[1, 1], [2, 2]],result[0].getAttributions())
         
         
             
@@ -90,14 +91,14 @@ class TestPredictor(unittest.TestCase):
 
         sentence_wrapper = SentenceWrapperFakeWithTwoSentences()
 
-        calculated_attributions = self.predictor.calculateAttributionsOfSentenceWrapper(attributions_for_sentence_wrapper, sentence_wrapper)
+        wordScoresWrapper = self.predictor.calculateWordScoresOfSentenceWrapper(attributions_for_sentence_wrapper, sentence_wrapper)
 
         expected_attributions = [
             [1, 1],
             [2, 2]
         ]
 
-        self.assertEqual(calculated_attributions, expected_attributions)    
+        self.assertEqual(wordScoresWrapper.getAttributions(), expected_attributions)    
         
 
 if __name__ == '__main__':

@@ -3,23 +3,24 @@ Created on 29.04.2023
 
 @author: vital
 '''
+from nlpvectors.SentenceWrapper import SentencesWrapper
 
 class WordScoresWrapper(object):
 
-    def __init__(self, total_sentence_ids,total_token_indexes, total_tokens, total_attributions):
-        self.total_sentence_ids = total_sentence_ids
-        self.total_token_indexes = total_token_indexes
-        self.total_token_lists = total_tokens
+    def __init__(self, sentencesWrapper : SentencesWrapper, total_attributions):
+        self.sentencesWrapper = sentencesWrapper
         self.total_attributions = total_attributions
+        
+
     
     def getSentenceIds(self):
-        return self.total_sentence_ids    
+        return self.sentencesWrapper.getSentenceIds()
     
     def getTokenIndexes(self):
-        return self.total_token_indexes
+        return self.sentencesWrapper.getTokenIndexes()
     
     def getTokens(self):
-        return self.total_token_lists
+        return self.sentencesWrapper.getTokens()
     
     def getAttributions(self):
         return self.total_attributions

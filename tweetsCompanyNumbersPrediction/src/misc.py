@@ -1,34 +1,27 @@
-
-
-# from tweetpreprocess.DataDirHelper import DataDirHelper
-# from topicmodelling.TopicExtractor import TopicExtractor
-# from topicmodelling.TopicModelCreator import TopicModelCreator
-# from nlpvectors.TweetTokenizer import TweetTokenizer
-# from tweetpreprocess.wordfiltering.DefaultWordFilter import DefaultWordFilter
-# modelpath =  DataDirHelper().getDataDir()+ "companyTweets\\amazonTopicModelV2"
-# topicExtractor = TopicExtractor(TopicModelCreator().load(modelpath))
-# topic_words,word_scores,topic_scores,topic_nums = topicExtractor.searchTopics(TweetTokenizer(DefaultWordFilter()).tokenize('Greek debt crisis'), 2)
-# print(topic_words)
-
-def split_list_on_indices(lst, indices):
-    if not indices:
-        return lst
+def transform_nested_list(input_list):
+    output_list = []
     
-    splitted_list = []
-    start_idx = 0
-    for idx in indices:
-        sublist = lst[start_idx:idx]
-        if sublist:
-            splitted_list.append(sublist)
-        start_idx = idx + 1
-    sublist = lst[start_idx:]
-    if sublist:
-        splitted_list.append(sublist)
+    for item in input_list:
+        if isinstance(item, list):
+            flattened_item = [x for sublist in item for x in sublist]
+        else:
+            flattened_item = [item]
+        
+        repeated_item = []
+        repeat_count = 5 // len(flattened_item)
+        for elem in flattened_item:
+            repeated_item.extend([elem] * repeat_count)
+        
+        remaining = 5 - len(repeated_item)
+        if remaining > 0:
+            repeated_item.extend([flattened_item[-1]] * remaining)
+        
+        output_list.append(repeated_item[:5])
+    
+    return output_list
 
-    return splitted_list
+# Test the function
+input_list = [['a1', 'a2'], [['b1', 'b2'], ['b3', 'b4', 'b5']], 'c1']
+output_list = transform_nested_list(input_list)
 
-# Example usage:
-lst = [0.1, 0.1, 0.0, 0.2, 0.2, 0.0]
-indices = [2, 5]
-splitted_list = split_list_on_indices(lst, indices)
-print(splitted_list)  # Output: [[0.1, 0.1], [0.2, 0.2]]
+print(output_list)
