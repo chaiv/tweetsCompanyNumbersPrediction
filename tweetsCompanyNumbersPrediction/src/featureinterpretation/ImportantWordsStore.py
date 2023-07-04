@@ -19,6 +19,9 @@ def pad_dict_lists(data):
                 value = dataForKey[i]
                 if isinstance(value, list):
                     sublist_sizes[i] = len(value)
+                    
+    if not sublist_sizes:
+        return data
     
     #pad all other elements to lists of max value                                 
     for key in data:

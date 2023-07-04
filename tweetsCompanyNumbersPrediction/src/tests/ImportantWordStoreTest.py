@@ -6,7 +6,7 @@ Created on 17.02.2023
 import pandas as pd
 import unittest
 from featureinterpretation.ImportantWordsStore import ImportantWordStore,\
-    createImportantWordStore
+    createImportantWordStore, flatten_dict_lists, pad_dict_lists
 from featureinterpretation.WordScoresWrapper import WordScoresWrapper
 
 
@@ -80,11 +80,25 @@ class TestImportantWordStore(unittest.TestCase):
     #         self.assertEqual(tuple(row), expected_row)
     #
 
+    def testTransformDict(self):
+        data = {"id":[0,1],"class":[2,3]}
+        transformed_data = pad_dict_lists(data)
+        transformed_data = flatten_dict_lists(data)
+        self.assertEqual([0,1],transformed_data["id"])
+        self.assertEqual([2,3],transformed_data["class"])
+
+
     def testOneWordScoreWrapper(self):
         wordscoreWrappers =[WordScoresWrapperFake()]
         predictions = [1]
         result = createImportantWordStore(wordscoreWrappers,predictions)
-        print(result.to_dataframe())
-        
+        df = result.to_dataframe()
+        self.assertEqual(5,len(df))
+        self.assertEqual(0,df["id"].iloc[0])
+        self.assertEqual(1,df["token_index"].iloc[0])
+        self.assertEqual("first",df["token"].iloc[0])
+        self.assertEqual(0.1,df["attribution"].iloc[0])
+        self.assertEqual(1,df["prediction"].iloc[0])
+
            
     

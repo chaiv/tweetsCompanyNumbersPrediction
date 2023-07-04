@@ -52,11 +52,20 @@ class TestTweetGroupDataset(unittest.TestCase):
     def test_len(self):
         self.assertEqual(len(self.dataset), 3)
 
-    def test_getitem(self):
+    def test_getitem_multiple_tweets(self):
         x, y = self.dataset[0]
         self.assertIsInstance(x, torch.Tensor)
         self.assertTrue(x.dtype == torch.long)
-        expected_x = torch.tensor([1,1,2,1,1,2])
+        expected_x = torch.tensor([1,1,2,1,1])
+        expected_y = 0
+        self.assertTrue(torch.equal(x, expected_x))
+        self.assertEqual(y, expected_y)
+        
+    def test_getitem_remaining_tweet(self):
+        x, y = self.dataset[1] # 1 and not 2, because it is sorted by class labels and the last remaining sentence with class 0 is put as own sample after the first two with class 0. 
+        self.assertIsInstance(x, torch.Tensor)
+        self.assertTrue(x.dtype == torch.long)
+        expected_x = torch.tensor([1,1])
         expected_y = 0
         self.assertTrue(torch.equal(x, expected_x))
         self.assertEqual(y, expected_y)

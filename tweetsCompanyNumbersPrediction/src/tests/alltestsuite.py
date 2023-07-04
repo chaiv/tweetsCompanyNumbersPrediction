@@ -23,6 +23,10 @@ from tests import TestPredictor
 from tests import EqualClassSamplerTest
 from tests import ImportantWordStoreTest
 from tests import ClassificationMetricsTest
+from tests.TestCreateSentencesWrapper import TestCreateSentencesWrapper
+from tests.TestTweetGroupDataset import TestTweetGroupDataset
+from tests.TestDataframeSplitter import TestDataframeSplitter
+from tests.TestKFold import TestKFold
 
 
 loader = unittest.TestLoader()
@@ -49,5 +53,9 @@ suite.addTests(loader.loadTestsFromModule(TestPredictor))
 suite.addTests(loader.loadTestsFromModule(TestTopicHeaderAddToDataframe))
 suite.addTests(loader.loadTestsFromModule(TweetDataframeExploreTest))
 suite.addTests(loader.loadTestsFromModule(TestManualTopicAnalyzer))
+suite.addTests(loader.loadTestsFromModule(TestCreateSentencesWrapper))
+suite.addTests(loader.loadTestsFromModule(TestTweetGroupDataset))
+suite.addTests(loader.loadTestsFromModule(TestDataframeSplitter))
+suite.addTests(loader.loadTestsFromModule(TestKFold))
 runner = unittest.TextTestRunner(verbosity=3)
 result = runner.run(suite)

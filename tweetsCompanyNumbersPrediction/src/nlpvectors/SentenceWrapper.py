@@ -11,7 +11,7 @@ from itertools import chain
 
 def createSentencesWrapper(tokenizer: AbstractTokenizer,textEncoder : AbstractEncoder, sentences,sentenceIds):
     
-    if not sentences: 
+    if len(sentences)==0: 
         return SentencesWrapper()
     
     totalTokenIndexes = []
