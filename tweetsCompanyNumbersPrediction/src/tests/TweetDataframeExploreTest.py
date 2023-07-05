@@ -40,9 +40,21 @@ class TweetDataframeExploreTest(unittest.TestCase):
         self.assertEqual([2,1,1],list(value_counts))
         pass
     
-  
+    def testTweetsPerDay(self):
+        df = pd.DataFrame(
+                  [
+                  (1483230660),
+                  (1451607900),
+                  (1420070457),
+                  (1483230660),
+                  (1420070457)
+                  ],
+                  columns=["post_date"]
+                  )
     
-    
+        tweetsPerDay,_,_,_ = TweetDataframeExplore(df).getTweetsPerDayValues()
+        self.assertEqual(732,len(tweetsPerDay))
+        self.assertEqual(2,tweetsPerDay.iloc[0])
 
 
 if __name__ == "__main__":
