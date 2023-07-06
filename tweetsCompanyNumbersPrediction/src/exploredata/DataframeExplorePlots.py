@@ -35,13 +35,22 @@ class DataframeExplorePlots(object):
         plt.title('Number of Tweets Per Day')
         plt.show()
         
+    def createNumberOfWordsPlot(self):
+        word_counts, min_val,max_val,average = self.dataframeExplore.getNumberOfWordsValues()
+        plt.hist(word_counts, bins=20, color='c', edgecolor='black')
+        plt.axvline(min_val, color='red', linestyle='dashed', linewidth=2)
+        plt.axvline(average, color='green', linestyle='dashed', linewidth=2)
+        plt.axvline(max_val, color='blue', linestyle='dashed', linewidth=2)
+        plt.legend({'Min':min_val, 'Average':average, 'Max':max_val})
+        plt.show()
+        
         
         
 # df = pd.DataFrame(
 #                   [
-#                   (1420070457,"a","AAPL"),
-#                   (1483230660,"b","AAPL"),
-#                   (1483230660,"c","TSLA")
+#                   (1420070457,"First tweet","AAPL"),
+#                   (1483230660,"Second tweet 2","AAPL"),
+#                   (1483230660,"Third tweet 3 3","TSLA")
 #                   ],
 #                   columns=["post_date","body","ticker_symbol"]
 #                   )
@@ -51,4 +60,5 @@ df =  pd.read_csv(DataDirHelper().getDataDir()+ 'companyTweets\\CompanyTweets.cs
 plots = DataframeExplorePlots(TweetDataframeExplore(df))
 
 #plots.createCompanyTweetNumbersPlot()
-plots.createTweetsPerDayPlot()
+#plots.createTweetsPerDayPlot()
+plots.createNumberOfWordsPlot()

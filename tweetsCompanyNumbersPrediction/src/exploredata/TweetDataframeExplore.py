@@ -4,6 +4,9 @@ Created on 07.02.2023
 @author: vital
 '''
 import pandas as pd
+import spacy
+from collections import Counter
+
 class TweetDataframeExplore(object):
 
 
@@ -40,4 +43,23 @@ class TweetDataframeExplore(object):
         max_val = daily_counts.max()
         min_val = daily_counts.min()
         return  daily_counts,min_val,max_val,average
+    
+    def getNumberOfWordsValues(self):
+        self.dataframe['word_count'] = self.dataframe[self.bodyColumnName].apply(lambda x: len(str(x).split()))
+        summary = self.dataframe['word_count'].describe()
+        word_counts = self.dataframe['word_count']
+        min_val = summary['min']
+        max_val = summary['max']
+        average = summary['mean']
+        return word_counts, min_val,max_val,average
+    
+    def getMostFrequentWordsNamedEntities(self,firstN):
+        nlp = spacy.load('en_core_web_sm')
+        entity_freq = Counter()
+        for batch in spacy.util.minibatch(self.dataframe[self.bodyColumnName], size=100):
+            for doc in nlp.pipe(batch):
+                entity_freq.update([entity.text for entity in doc.ents])
+        return entity_freq.most_common(firstN)
+    
+    
         

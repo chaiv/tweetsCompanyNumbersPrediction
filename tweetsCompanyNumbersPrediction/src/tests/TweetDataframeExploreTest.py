@@ -55,7 +55,36 @@ class TweetDataframeExploreTest(unittest.TestCase):
         tweetsPerDay,_,_,_ = TweetDataframeExplore(df).getTweetsPerDayValues()
         self.assertEqual(732,len(tweetsPerDay))
         self.assertEqual(2,tweetsPerDay.iloc[0])
-
+        
+    def testNumberOfWordsValues(self):
+        df = pd.DataFrame(
+                  [
+                  ("I like python"),
+                  ("Pandas is really great"),
+                  ("Matplotlib makes plots very easy")
+                  ],
+                  columns=["body"]
+                  )
+        word_counts, min_val,max_val,average = TweetDataframeExplore(df).getNumberOfWordsValues()
+        self.assertEqual(3,word_counts.iloc[0])
+        self.assertEqual(3,min_val)
+        self.assertEqual(5,max_val)
+        self.assertEqual(4,average)
+        
+    def testMostFrequentNamedEntities(self):
+        df = pd.DataFrame(
+                  [
+                  ("I like Apple"),
+                  ("Pandas is really great and Apple not"),
+                  ("Matplotlib makes plots very easy")
+                  ],
+                  columns=["body"]
+                  )
+        frNE = TweetDataframeExplore(df).getMostFrequentWordsNamedEntities(3)
+        self.assertEqual(3,len(frNE))
+        self.assertEqual(('Apple', 2),frNE[0])
+        self.assertEqual(('Pandas', 1),frNE[1])
+        self.assertEqual(('Matplotlib', 1),frNE[2])
 
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']
