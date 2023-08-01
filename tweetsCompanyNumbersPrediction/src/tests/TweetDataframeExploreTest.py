@@ -53,7 +53,7 @@ class TweetDataframeExploreTest(unittest.TestCase):
                   )
     
         tweetsPerDay,_,_,_ = TweetDataframeExplore(df).getTweetsPerDayValues()
-        self.assertEqual(732,len(tweetsPerDay))
+        self.assertEqual(732,len(tweetsPerDay)) #732 for every day
         self.assertEqual(2,tweetsPerDay.iloc[0])
         
     def testNumberOfWordsValues(self):
@@ -71,7 +71,7 @@ class TweetDataframeExploreTest(unittest.TestCase):
         self.assertEqual(5,max_val)
         self.assertEqual(4,average)
         
-    def testMostFrequentNamedEntities(self):
+    def testFrequentNamedEntities(self):
         df = pd.DataFrame(
                   [
                   ("I like Apple"),
@@ -80,12 +80,29 @@ class TweetDataframeExploreTest(unittest.TestCase):
                   ],
                   columns=["body"]
                   )
-        frNE = TweetDataframeExplore(df).getMostFrequentWordsNamedEntities(3)
-        self.assertEqual(3,len(frNE))
-        self.assertEqual(('Apple', 2),frNE[0])
-        self.assertEqual(('Pandas', 1),frNE[1])
-        self.assertEqual(('Matplotlib', 1),frNE[2])
-
+        mfrNE = TweetDataframeExplore(df).getMostFrequentWordsNamedEntities(3)
+        lfrNE = TweetDataframeExplore(df).getLeastFrequentWordNamedEntities(3)
+        self.assertEqual(3,len(mfrNE))
+        self.assertEqual(('Apple', 2),mfrNE[0])
+        self.assertEqual(('Pandas', 1),mfrNE[1])
+        self.assertEqual(('Matplotlib', 1),mfrNE[2])
+        self.assertEqual(('Matplotlib', 1),lfrNE[0])
+        
+    def testCardinalNumbersPerDayValues(self):
+        df = pd.DataFrame(
+                  [
+                  (1483230660,"I have two apples and 2 oranges"),
+                  (1483230660,"9.87 ways to go")
+                  ],
+                  columns=["post_date","body"]
+                  )
+        counts, min_val,max_val,average = TweetDataframeExplore(df).getCardinalNumbersPerDayValues()
+        self.assertEqual(2,len(counts))
+        self.assertEqual(2,counts[0])
+        self.assertEqual(1,counts[1])
+        self.assertEqual(1,min_val)
+        self.assertEqual(2,max_val)
+        self.assertEqual(1.5,average)
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']
     unittest.main()

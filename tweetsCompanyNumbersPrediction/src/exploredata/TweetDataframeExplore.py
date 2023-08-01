@@ -6,6 +6,7 @@ Created on 07.02.2023
 import pandas as pd
 import spacy
 from collections import Counter
+from spacy.util import minibatch
 
 class TweetDataframeExplore(object):
 
@@ -53,13 +54,45 @@ class TweetDataframeExplore(object):
         average = summary['mean']
         return word_counts, min_val,max_val,average
     
-    def getMostFrequentWordsNamedEntities(self,firstN):
+    
+    def getNamedEntities(self,documents):  
+        nlp = spacy.load('en_core_web_sm')  
+        docs_entities =[] 
+        for doc in nlp.pipe(documents):
+            docs_entities.append(doc.ents)
+        return docs_entities        
+        
+    
+
+    def getNamedEntitiesFrequences(self):
         nlp = spacy.load('en_core_web_sm')
         entity_freq = Counter()
-        for batch in spacy.util.minibatch(self.dataframe[self.bodyColumnName], size=100):
-            for doc in nlp.pipe(batch):
-                entity_freq.update([entity.text for entity in doc.ents])
+        for batch in minibatch(self.dataframe[self.bodyColumnName], size=100):
+            for doc_entities in self.getNamedEntities(batch):
+                entity_freq.update([entity.text for entity in doc_entities])
+        return entity_freq
+
+    def getMostFrequentWordsNamedEntities(self,firstN):
+        entity_freq = self.getNamedEntitiesFrequences()        
         return entity_freq.most_common(firstN)
     
+    def getLeastFrequentWordNamedEntities(self,firstN):
+        entity_freq = self.getNamedEntitiesFrequences()  
+        return entity_freq.most_common()[:-firstN-1:-1]
     
-        
+    def count_numbers(self,documents):
+        counts = []
+        for doc_entities in self.getNamedEntities(documents):
+            count = sum(1 for ent in doc_entities if ent.label_ == "CARDINAL")
+            counts.append(count)
+        return counts
+    
+    def getCardinalNumbersPerDayValues(self):
+        num_count = []
+        for batch in minibatch(self.dataframe[self.bodyColumnName], size=100):
+            num_count.extend(self.count_numbers(batch))   
+            self.dataframe['number_count'] = num_count   
+        min_val = min(num_count)
+        max_val = max(num_count)
+        average = sum(num_count) / len(num_count)
+        return num_count,min_val,max_val,average
