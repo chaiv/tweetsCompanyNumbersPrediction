@@ -96,7 +96,7 @@ class TweetDataframeExploreTest(unittest.TestCase):
                   ],
                   columns=["post_date","body"]
                   )
-        counts, min_val,max_val,average = TweetDataframeExplore(df).getCardinalNumbersPerDayValues()
+        counts, min_val,max_val,average = TweetDataframeExplore(df).getCardinalNumbersPerTweetValues()
         self.assertEqual(2,len(counts))
         self.assertEqual(2,counts[0])
         self.assertEqual(1,counts[1])

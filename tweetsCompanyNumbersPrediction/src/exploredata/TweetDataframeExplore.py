@@ -56,18 +56,15 @@ class TweetDataframeExplore(object):
     
     
     def getNamedEntities(self,documents):  
-        nlp = spacy.load('en_core_web_sm')  
+        nlp = spacy.load('en_core_web_sm', disable=['parser'])  
         docs_entities =[] 
         for doc in nlp.pipe(documents):
             docs_entities.append(doc.ents)
         return docs_entities        
         
-    
-
     def getNamedEntitiesFrequences(self):
-        nlp = spacy.load('en_core_web_sm')
         entity_freq = Counter()
-        for batch in minibatch(self.dataframe[self.bodyColumnName], size=100):
+        for batch in minibatch(self.dataframe[self.bodyColumnName], size=50000):
             for doc_entities in self.getNamedEntities(batch):
                 entity_freq.update([entity.text for entity in doc_entities])
         return entity_freq
@@ -81,17 +78,13 @@ class TweetDataframeExplore(object):
         return entity_freq.most_common()[:-firstN-1:-1]
     
     def count_numbers(self,documents):
-        counts = []
-        for doc_entities in self.getNamedEntities(documents):
-            count = sum(1 for ent in doc_entities if ent.label_ == "CARDINAL")
-            counts.append(count)
-        return counts
+        docs_entities = self.getNamedEntities(documents)
+        print("ner done!")
+        return [sum(1 for ent in doc_entities if ent.label_ == "CARDINAL") for doc_entities in docs_entities]
     
-    def getCardinalNumbersPerDayValues(self):
-        num_count = []
-        for batch in minibatch(self.dataframe[self.bodyColumnName], size=100):
-            num_count.extend(self.count_numbers(batch))   
-            self.dataframe['number_count'] = num_count   
+    def getCardinalNumbersPerTweetValues(self):
+        num_count = self.count_numbers(self.dataframe[self.bodyColumnName])
+        self.dataframe['number_count'] = num_count   
         min_val = min(num_count)
         max_val = max(num_count)
         average = sum(num_count) / len(num_count)
