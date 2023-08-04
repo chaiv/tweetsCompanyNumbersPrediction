@@ -54,7 +54,15 @@ class DataframeExplorePlots(object):
         plt.title('Cardinal numbers per tweet')
         plt.show()    
     
-        
+    def createURLPerTweetsPlot(self):
+        url_counts, min_val,max_val,average = self.dataframeExplore.getURLPerTweetValues()
+        plt.hist(url_counts, bins=20, color='c', edgecolor='black')
+        plt.axvline(min_val, color='red', linestyle='dashed', linewidth=2)
+        plt.axvline(average, color='green', linestyle='dashed', linewidth=2)
+        plt.axvline(max_val, color='blue', linestyle='dashed', linewidth=2)
+        plt.legend({'Min':min_val, 'Average':average, 'Max':max_val})
+        plt.title('URLs per tweet')
+        plt.show()      
         
         
 # df = pd.DataFrame(
@@ -69,9 +77,12 @@ class DataframeExplorePlots(object):
 df =  pd.read_csv(DataDirHelper().getDataDir()+ 'companyTweets\\CompanyTweets.csv')
 #df =  pd.read_csv(DataDirHelper().getDataDir()+ 'companyTweets\\CompanyTweetsAAPLFirst1000.csv')
 
+
 plots = DataframeExplorePlots(TweetDataframeExplore(df))
 
 #plots.createCompanyTweetNumbersPlot()
 #plots.createTweetsPerDayPlot()
 #plots.createNumberOfWordsPlot()
-plots.createCardinalNumbersPlot()
+#plots.createCardinalNumbersPlot()
+#print(TweetDataframeExplore(df).getMostFrequentWordsNamedEntities(10))
+plots.createURLPerTweetsPlot()

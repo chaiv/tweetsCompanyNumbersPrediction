@@ -6,7 +6,7 @@ Created on 07.02.2023
 import pandas as pd
 import spacy
 from collections import Counter
-from spacy.util import minibatch
+import re
 
 class TweetDataframeExplore(object):
 
@@ -63,10 +63,12 @@ class TweetDataframeExplore(object):
         return docs_entities        
         
     def getNamedEntitiesFrequences(self):
+        nlp = spacy.load('en_core_web_sm', disable=['parser']) 
         entity_freq = Counter()
-        for batch in minibatch(self.dataframe[self.bodyColumnName], size=50000):
-            for doc_entities in self.getNamedEntities(batch):
-                entity_freq.update([entity.text for entity in doc_entities])
+        i = 0 
+        for doc in nlp.pipe(self.dataframe[self.bodyColumnName]):
+            print(i := i + 1)
+            entity_freq.update([entity.text for entity in doc.ents])
         return entity_freq
 
     def getMostFrequentWordsNamedEntities(self,firstN):
@@ -78,9 +80,13 @@ class TweetDataframeExplore(object):
         return entity_freq.most_common()[:-firstN-1:-1]
     
     def count_numbers(self,documents):
-        docs_entities = self.getNamedEntities(documents)
-        print("ner done!")
-        return [sum(1 for ent in doc_entities if ent.label_ == "CARDINAL") for doc_entities in docs_entities]
+        nlp = spacy.load('en_core_web_sm', disable=['parser']) 
+        i = 0 
+        counts = []
+        for doc in nlp.pipe(documents):
+            print(i := i + 1)
+            counts.append(sum(1 for ent in doc.ents if ent.label_ == "CARDINAL"))
+        return counts
     
     def getCardinalNumbersPerTweetValues(self):
         num_count = self.count_numbers(self.dataframe[self.bodyColumnName])
@@ -89,3 +95,16 @@ class TweetDataframeExplore(object):
         max_val = max(num_count)
         average = sum(num_count) / len(num_count)
         return num_count,min_val,max_val,average
+    
+    def count_urls_in_text(self,text):
+        url_regex = r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\\(\\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+'
+        urls = re.findall(url_regex, text)
+        return len(urls)
+    
+    def getURLPerTweetValues(self):
+        self.dataframe['url_count'] = self.dataframe[self.bodyColumnName].apply(self.count_urls_in_text)
+        min_val = self.dataframe['url_count'].min()
+        max_val = self.dataframe['url_count'].max()
+        average = self.dataframe['url_count'].mean()
+        return self.dataframe['url_count'], min_val, max_val, average
+        
