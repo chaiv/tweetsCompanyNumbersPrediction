@@ -88,7 +88,7 @@ class TweetDataframeExploreTest(unittest.TestCase):
         self.assertEqual(('Matplotlib', 1),mfrNE[2])
         self.assertEqual(('Matplotlib', 1),lfrNE[0])
         
-    def testCardinalNumbersPerDayValues(self):
+    def testCardinalNumbersPerTweetValues(self):
         df = pd.DataFrame(
                   [
                   (1483230660,"I have two apples and 2 oranges"),
@@ -103,6 +103,21 @@ class TweetDataframeExploreTest(unittest.TestCase):
         self.assertEqual(1,min_val)
         self.assertEqual(2,max_val)
         self.assertEqual(1.5,average)
+        
+    def testURLsPerTweetValues(self):
+        df = pd.DataFrame(
+                  [
+                    ("I have two apples and 2 oranges at https://google.com"),
+                    ("9.87 ways to go")
+                  ],
+                  columns=["body"]
+                  )   
+        counts, min_val,max_val,average = TweetDataframeExplore(df).getURLPerTweetValues()
+        self.assertEqual(1,counts[0])
+        self.assertEqual(0,counts[1])
+        self.assertEqual(1,max_val)
+        self.assertEqual(0,min_val)
+        self.assertEqual(0.5,average)
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']
     unittest.main()
