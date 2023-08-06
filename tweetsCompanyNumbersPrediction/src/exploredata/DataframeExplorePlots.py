@@ -7,6 +7,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from tweetpreprocess.DataDirHelper import DataDirHelper
 from exploredata.TweetDataframeExplore import TweetDataframeExplore
+from tweetpreprocess.TweetDataframeQuery import TweetDataframeQuery
+from tweetpreprocess.TweetQueryParams import TweetQueryParams
 
 
 class DataframeExplorePlots(object):
@@ -62,7 +64,16 @@ class DataframeExplorePlots(object):
         plt.axvline(max_val, color='blue', linestyle='dashed', linewidth=2)
         plt.legend({'Min':min_val, 'Average':average, 'Max':max_val})
         plt.title('URLs per tweet')
-        plt.show()      
+        plt.show()    
+        
+    def createNearDuplicatesPlot(self):
+        plt.figure(figsize=(8, 8))
+        total_tweets, near_duplicate_tweets = self.dataframeExplore.getNearDuplicateValues()
+        plt.pie([total_tweets, near_duplicate_tweets], labels=["Total","Near duplicates"], autopct='%1.1f%%', startangle=140)
+        plt.axis('equal') 
+        plt.title('Near Duplicate Tweets Percentage')
+        plt.show()   
+          
         
         
 # df = pd.DataFrame(
@@ -76,13 +87,13 @@ class DataframeExplorePlots(object):
 
 df =  pd.read_csv(DataDirHelper().getDataDir()+ 'companyTweets\\CompanyTweets.csv')
 #df =  pd.read_csv(DataDirHelper().getDataDir()+ 'companyTweets\\CompanyTweetsAAPLFirst1000.csv')
-
-
+df = TweetDataframeQuery().query(df,TweetQueryParams(companyName ="AMZN"))
 plots = DataframeExplorePlots(TweetDataframeExplore(df))
-
+print(len(df))
 #plots.createCompanyTweetNumbersPlot()
 #plots.createTweetsPerDayPlot()
 #plots.createNumberOfWordsPlot()
 #plots.createCardinalNumbersPlot()
-#print(TweetDataframeExplore(df).getMostFrequentWordsNamedEntities(10))
-plots.createURLPerTweetsPlot()
+#print(TweetDataframeExplore(df).getMostFrequentWordsNamedEntities(100))
+#plots.createURLPerTweetsPlot()
+plots.createNearDuplicatesPlot()

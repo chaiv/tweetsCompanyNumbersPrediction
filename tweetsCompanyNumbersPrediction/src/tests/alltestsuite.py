@@ -5,7 +5,8 @@ Created on 27.01.2022
 '''
 import unittest
 from tests import tweetnumbersconnectortest, TestTopicHeaderAddToDataframe,\
-    TweetDataframeExploreTest, TestManualTopicAnalyzer
+    TweetDataframeExploreTest, TestManualTopicAnalyzer,\
+    TestNearDuplicateDetector
 from tests import nlpvectorstest
 from tests import FiguresDiscretizerTest
 from tests import HyperlinkRemoverTest
@@ -57,5 +58,6 @@ suite.addTests(loader.loadTestsFromModule(TestCreateSentencesWrapper))
 suite.addTests(loader.loadTestsFromModule(TestTweetGroupDataset))
 suite.addTests(loader.loadTestsFromModule(TestDataframeSplitter))
 suite.addTests(loader.loadTestsFromModule(TestKFold))
+suite.addTests(loader.loadTestsFromModule(TestNearDuplicateDetector))
 runner = unittest.TextTestRunner(verbosity=3)
 result = runner.run(suite)

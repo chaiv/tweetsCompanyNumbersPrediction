@@ -7,6 +7,7 @@ import pandas as pd
 import spacy
 from collections import Counter
 import re
+from tweetpreprocess.nearduplicates.NearDuplicateDetector import NearDuplicateDetector
 
 class TweetDataframeExplore(object):
 
@@ -107,4 +108,12 @@ class TweetDataframeExplore(object):
         max_val = self.dataframe['url_count'].max()
         average = self.dataframe['url_count'].mean()
         return self.dataframe['url_count'], min_val, max_val, average
+    
+    def getNearDuplicateValues(self):
+        nearDuplicates = NearDuplicateDetector(self.dataframe,self.bodyColumnName).geDuplicateRowIndexes()
+        totalTweetsNumber = len(self.dataframe)
+        nearDuplicateTweetsNumber = len(nearDuplicates)
+        return totalTweetsNumber,nearDuplicateTweetsNumber
+        
+    
         
