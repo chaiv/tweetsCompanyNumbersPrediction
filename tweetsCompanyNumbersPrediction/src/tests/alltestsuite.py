@@ -28,6 +28,7 @@ from tests.TestCreateSentencesWrapper import TestCreateSentencesWrapper
 from tests.TestTweetGroupDataset import TestTweetGroupDataset
 from tests.TestDataframeSplitter import TestDataframeSplitter
 from tests.TestKFold import TestKFold
+from tests.TestDuplicateDetector import TestDuplicateDetector
 
 
 loader = unittest.TestLoader()
@@ -59,5 +60,6 @@ suite.addTests(loader.loadTestsFromModule(TestTweetGroupDataset))
 suite.addTests(loader.loadTestsFromModule(TestDataframeSplitter))
 suite.addTests(loader.loadTestsFromModule(TestKFold))
 suite.addTests(loader.loadTestsFromModule(TestNearDuplicateDetector))
+suite.addTests(loader.loadTestsFromModule(TestDuplicateDetector))
 runner = unittest.TextTestRunner(verbosity=3)
 result = runner.run(suite)

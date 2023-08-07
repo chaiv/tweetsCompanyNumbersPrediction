@@ -13,6 +13,7 @@ class NearDuplicateDetector(object):
                  bodyColumnName = "body"):
         self.dataframe = dataframe
         self.bodyColumnName = bodyColumnName
+        self.rowCounter = 0 
         self.chunkCounter = 0 
         
         
@@ -20,6 +21,8 @@ class NearDuplicateDetector(object):
         minhash = MinHash(num_perm=128)
         for d in row:
             minhash.update(d.encode('utf8'))
+        self.rowCounter+=1
+        print("Row",self.rowCounter) 
         return minhash
 
     def compute_minhash_batch(self,chunk):
@@ -47,8 +50,7 @@ class NearDuplicateDetector(object):
                     allDuplicateRowsIndexes.add(item)  
         return allDuplicateRowsIndexes
     
-    def getDuplicateRowIndexesWithChunksParallel(self,similarityThreshold=0.75): 
-        self.chunkCounter = 0       
+    def getDuplicateRowIndexesWithChunksParallel(self,similarityThreshold=0.75):      
         self.dataframe.fillna('', inplace=True) #nan values in body columns    
         input_list = self.dataframe[self.bodyColumnName].tolist()
         print("Rows",len(input_list))
@@ -89,5 +91,7 @@ class NearDuplicateDetector(object):
     
         
     def geDuplicateRowIndexes(self,similarityThreshold=0.75): 
-        #return self.getDuplicateRowIndexesDefault(similarityThreshold)
-        return self.getDuplicateRowIndexesWithChunksParallel(similarityThreshold)
+        self.chunkCounter = 0  
+        self.rowCounter = 0 
+        return self.getDuplicateRowIndexesDefault(similarityThreshold)
+        #return self.getDuplicateRowIndexesWithChunksParallel(similarityThreshold)
