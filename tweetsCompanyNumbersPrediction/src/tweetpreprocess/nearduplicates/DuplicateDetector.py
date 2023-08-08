@@ -13,9 +13,14 @@ class DuplicateDetector(object):
         self.dataframe = dataframe
         self.bodyColumnName = bodyColumnName
 
-    def getDuplicatesDataframe(self):
+    def getDuplicatesDataframe(self):  
+        return self.getDuplicatesDfWithOriginalRows().drop_duplicates(subset=self.bodyColumnName, keep='first')  
+    
+    def getDuplicatesDfWithOriginalRows(self):
         exact_duplicates_mask = self.dataframe.duplicated(self.bodyColumnName, keep=False)    
         exact_duplicates_df = self.dataframe[exact_duplicates_mask]
         return exact_duplicates_df
-    
         
+    
+    def getDataframeWithoutDuplicates(self):
+        return  self.dataframe.drop_duplicates(subset=self.bodyColumnName, keep='first')     

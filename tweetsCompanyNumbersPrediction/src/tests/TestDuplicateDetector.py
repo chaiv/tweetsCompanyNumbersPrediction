@@ -10,7 +10,7 @@ from tweetpreprocess.nearduplicates.DuplicateDetector import DuplicateDetector
 class TestDuplicateDetector(unittest.TestCase):
 
 
-    def testDetector(self):
+    def testGetDuplicatesDf(self):
         df = pd.DataFrame(
                   [
                     ("I have two apples and 2 oranges at https://google.com"),
@@ -22,7 +22,21 @@ class TestDuplicateDetector(unittest.TestCase):
                   columns=["body"]
                   ) 
         duplicates = DuplicateDetector(df).getDuplicatesDataframe()
-        self.assertEqual(2, len(duplicates))
+        self.assertEqual(1, len(duplicates))
+        
+    def testGetDfWithoutDuplicates(self):
+        df = pd.DataFrame(
+                  [
+                    ("I have two apples and 2 oranges at https://google.com"),
+                    ("I have two apples and 2 oranges at https://google.com"),
+                    ("I have two apples and 2 oranges at"),
+                    ("Completely different tweet"),
+                    ("have two apples and 2 oranges https://google.com")
+                  ],
+                  columns=["body"]
+                  ) 
+        dfWithoutDuplicates = DuplicateDetector(df).getDataframeWithoutDuplicates()
+        self.assertEqual(4, len(dfWithoutDuplicates))
     
 
 

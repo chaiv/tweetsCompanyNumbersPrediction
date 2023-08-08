@@ -8,6 +8,7 @@ import spacy
 from collections import Counter
 import re
 from tweetpreprocess.nearduplicates.NearDuplicateDetector import NearDuplicateDetector
+from tweetpreprocess.nearduplicates.DuplicateDetector import DuplicateDetector
 
 class TweetDataframeExplore(object):
 
@@ -114,6 +115,12 @@ class TweetDataframeExplore(object):
         totalTweetsNumber = len(self.dataframe)
         nearDuplicateTweetsNumber = len(nearDuplicates)
         return totalTweetsNumber,nearDuplicateTweetsNumber
+    
+    def getExactDuplicateValues(self):
+        duplicatesDf = DuplicateDetector(self.dataframe,self.bodyColumnName).getDuplicatesDataframe()
+        totalTweetsNumber = len(self.dataframe)
+        exactDuplicatesTweetNumber= len(duplicatesDf)
+        return totalTweetsNumber,exactDuplicatesTweetNumber
         
     
         
