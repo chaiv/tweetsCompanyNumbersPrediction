@@ -39,7 +39,11 @@ class TestNearDuplicateDetector(unittest.TestCase):
         self.assertEqual(5, len(indexes))
         self.assertEqual([0,1,4], indexes[0])
         self.assertEqual([3], indexes[3])
-        print(NearDuplicateDetector(df).getOriginalAndDuplicateRowsText())
+        originalAndduplicateTexts = NearDuplicateDetector(df).getOriginalAndDuplicateRowsText()
+        self.assertEqual(1, len(originalAndduplicateTexts))
+        self.assertEqual(df["body"].iloc[0], originalAndduplicateTexts[0][0])
+        self.assertEqual(df["body"].iloc[1], originalAndduplicateTexts[0][1])
+        self.assertEqual(df["body"].iloc[4], originalAndduplicateTexts[0][2])
 
 
 if __name__ == "__main__":

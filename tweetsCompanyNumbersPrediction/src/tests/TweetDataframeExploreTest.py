@@ -118,6 +118,25 @@ class TweetDataframeExploreTest(unittest.TestCase):
         self.assertEqual(1,max_val)
         self.assertEqual(0,min_val)
         self.assertEqual(0.5,average)
+        
+    def testGetOriginalAndDuplicateIndexes(self):
+        df = pd.DataFrame(
+                  [
+                    ("I have two apples and 2 oranges at https://google.com"),
+                    ("I have two apples and 2 oranges at https://google.com"),
+                    ("I have two apples and 2 oranges at"),
+                    ("Completely different tweet"),
+                    ("have two apples and 2 oranges https://google.com")
+                  ],
+                  columns=["body"]
+                  ) 
+        originalAndDuplicateTexts = TweetDataframeExplore(df).getOriginalAndNearDuplicateRowsText()
+        self.assertEqual(1,len(originalAndDuplicateTexts))
+        self.assertEqual(df["body"].iloc[0],originalAndDuplicateTexts[0][0])
+        self.assertEqual(df["body"].iloc[4],originalAndDuplicateTexts[0][1]) 
+        
+        
+        
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']
     unittest.main()

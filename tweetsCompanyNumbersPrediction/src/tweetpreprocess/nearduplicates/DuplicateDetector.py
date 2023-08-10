@@ -23,4 +23,6 @@ class DuplicateDetector(object):
         
     
     def getDataframeWithoutDuplicates(self):
-        return  self.dataframe.drop_duplicates(subset=self.bodyColumnName, keep='first')     
+        df = self.dataframe.drop_duplicates(subset=self.bodyColumnName, keep='first') 
+        df_reset_index = df.reset_index(drop=True)
+        return  df_reset_index    

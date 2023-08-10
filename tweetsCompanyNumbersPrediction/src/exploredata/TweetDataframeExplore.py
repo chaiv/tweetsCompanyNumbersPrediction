@@ -116,6 +116,18 @@ class TweetDataframeExplore(object):
         nearDuplicateTweetsNumber = len(nearDuplicates)
         return totalTweetsNumber,nearDuplicateTweetsNumber
     
+    def getOriginalAndNearDuplicateRowsText(self):
+        dfWithoutExactDuplicates = DuplicateDetector(self.dataframe,self.bodyColumnName).getDataframeWithoutDuplicates()
+        return NearDuplicateDetector(dfWithoutExactDuplicates,self.bodyColumnName).getOriginalAndDuplicateRowsText()
+    
+    def printOriginalAndNearDuplicateRowsText(self):
+        result = self.getOriginalAndNearDuplicateRowsText()
+        for text_list in result:
+            for text in text_list:
+                print(text)
+                print("")
+            print("---")
+    
     def getExactDuplicateValues(self):
         duplicatesDf = DuplicateDetector(self.dataframe,self.bodyColumnName).getDuplicatesDataframe()
         totalTweetsNumber = len(self.dataframe)
