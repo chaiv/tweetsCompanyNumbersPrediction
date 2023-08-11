@@ -110,7 +110,7 @@ class TweetDataframeExplore(object):
         average = self.dataframe['url_count'].mean()
         return self.dataframe['url_count'], min_val, max_val, average
     
-    def getNearDuplicateValues(self):
+    def getExactAndNearDuplicateValues(self):
         nearDuplicates = NearDuplicateDetector(self.dataframe,self.bodyColumnName).geDuplicateRowIndexes()
         totalTweetsNumber = len(self.dataframe)
         nearDuplicateTweetsNumber = len(nearDuplicates)

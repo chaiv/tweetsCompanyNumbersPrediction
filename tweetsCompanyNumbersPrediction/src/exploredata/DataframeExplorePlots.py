@@ -66,12 +66,12 @@ class DataframeExplorePlots(object):
         plt.title('URLs per tweet')
         plt.show()    
         
-    def createNearDuplicatesPlot(self):
+    def createExactAndNearDuplicatesPlot(self):
         plt.figure(figsize=(8, 8))
-        total_tweets, near_duplicate_tweets = self.dataframeExplore.getNearDuplicateValues()
+        total_tweets, near_duplicate_tweets = self.dataframeExplore.getExactAndNearDuplicateValues()
         plt.pie([total_tweets, near_duplicate_tweets], labels=["Total","Near duplicates"], autopct='%1.1f%%', startangle=140)
         plt.axis('equal') 
-        plt.title('Near Duplicate Tweets Percentage')
+        plt.title('Exact and Near Duplicate Tweets Percentage')
         plt.show() 
         
     def createExactDuplicatesPlot(self):
@@ -95,7 +95,7 @@ class DataframeExplorePlots(object):
 
 df =  pd.read_csv(DataDirHelper().getDataDir()+ 'companyTweets\\CompanyTweets.csv')
 #df =  pd.read_csv(DataDirHelper().getDataDir()+ 'companyTweets\\CompanyTweetsAAPLFirst1000.csv')
-df = TweetDataframeQuery().query(df,TweetQueryParams(companyName ="AMZN")).head(100000)
+df = TweetDataframeQuery().query(df,TweetQueryParams(companyName ="AMZN")).head(10000).reset_index(drop=True)
 plots = DataframeExplorePlots(TweetDataframeExplore(df))
 print(len(df))
 #plots.createCompanyTweetNumbersPlot()
@@ -104,6 +104,6 @@ print(len(df))
 #plots.createCardinalNumbersPlot()
 #print(TweetDataframeExplore(df).getMostFrequentWordsNamedEntities(100))
 #plots.createURLPerTweetsPlot()
-plots.createNearDuplicatesPlot()
+plots.createExactAndNearDuplicatesPlot()
 #plots.createExactDuplicatesPlot()
 print(TweetDataframeExplore(df).printOriginalAndNearDuplicateRowsText())

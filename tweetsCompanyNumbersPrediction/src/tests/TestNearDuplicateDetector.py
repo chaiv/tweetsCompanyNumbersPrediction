@@ -24,6 +24,18 @@ class TestNearDuplicateDetector(unittest.TestCase):
         nearDuplicates = NearDuplicateDetector(df).geDuplicateRowIndexes()
         self.assertEqual({1,4}, nearDuplicates)
         
+    def testWrongDuplicates(self):
+        df = pd.DataFrame(
+                  [
+                    ("$AMZN closed my puts for breakeven avg, volcrush from earlier in the week got me. scratched trade."),
+                    ("Not with $AMZN 's much superior margins. Analysts need to upgrade on this. And on flufflky toy sales, as well."),
+                  ],
+                  columns=["body"]
+                  ) 
+        nearDuplicates = NearDuplicateDetector(df).geDuplicateRowIndexes()
+        self.assertEqual(0, len(nearDuplicates))    
+    
+        
     def testGetOriginalAndDuplicateIndexes(self):
         df = pd.DataFrame(
                   [
