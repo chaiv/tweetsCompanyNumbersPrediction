@@ -7,11 +7,13 @@ Created on 06.08.2023
 from datasketch import MinHash, MinHashLSH
 import concurrent.futures
 from datasketch.hashfunc import sha1_hash64
+from nlpvectors.TweetTokenizer import TweetTokenizer
+from tweetpreprocess.wordfiltering.DefaultWordFilter import DefaultWordFilter
 
 class NearDuplicateDetector(object):
     
     def __init__(self, dataframe, 
-                 bodyColumnName = "body",similarityThreshold=0.95, num_perm=128):
+                 bodyColumnName = "body",similarityThreshold=0.75, num_perm=128):
         self.dataframe = dataframe
         self.bodyColumnName = bodyColumnName
         self.rowCounter = 0 

@@ -7,6 +7,7 @@ import unittest
 import pandas as pd
 from tweetpreprocess.nearduplicates.NearDuplicateDetector import NearDuplicateDetector
 
+
 class TestNearDuplicateDetector(unittest.TestCase):
 
 
@@ -32,8 +33,11 @@ class TestNearDuplicateDetector(unittest.TestCase):
                   ],
                   columns=["body"]
                   ) 
+        
+        
         nearDuplicates = NearDuplicateDetector(df).geDuplicateRowIndexes()
-        self.assertEqual(0, len(nearDuplicates))    
+        self.assertEqual(0, len(nearDuplicates))
+            
     
         
     def testGetOriginalAndDuplicateIndexes(self):
