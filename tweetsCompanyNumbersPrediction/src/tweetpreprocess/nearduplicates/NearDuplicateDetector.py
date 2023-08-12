@@ -3,33 +3,17 @@ Created on 06.08.2023
 
 @author: vital
 '''
-
-from datasketch import MinHash, MinHashLSH
-import concurrent.futures
-from datasketch.hashfunc import sha1_hash64
-from nlpvectors.TweetTokenizer import TweetTokenizer
-from tweetpreprocess.wordfiltering.DefaultWordFilter import DefaultWordFilter
+import re
+from simhash import Simhash, SimhashIndex
 
 class NearDuplicateDetector(object):
     
     def __init__(self, dataframe, 
-                 bodyColumnName = "body",similarityThreshold=0.75, num_perm=128):
+                 bodyColumnName = "body"):
         self.dataframe = dataframe
         self.bodyColumnName = bodyColumnName
-        self.rowCounter = 0 
-        self.chunkCounter = 0 
-        self.similarityThreshold = similarityThreshold
-        self.num_perm = num_perm
-        
-        
-    def compute_minhash_row(self,row):
-        minhash = MinHash(num_perm=self.num_perm)
-        for d in row:
-            minhash.update(d.encode('utf8'))
-        self.rowCounter+=1
-        print("Row",self.rowCounter) 
-        return minhash
 
+            
     
     def getOriginalAndDuplicateRowsText(self):
         indexes_list = self.getOriginalRowsWithDuplicateRowIndexesDefault()
@@ -44,32 +28,35 @@ class NearDuplicateDetector(object):
             texts_lists.append(text_list)     
         return texts_lists
     
+    def get_features(self,s):
+        width = 3
+        s = s.lower()
+        s = re.sub(r'[^\w]+', '', s)
+        return [s[i:i + width] for i in range(max(len(s) - width + 1, 1))]    
+    
     def getOriginalRowsWithDuplicateRowIndexesDefault(self):
-        self.dataframe['minhash'] = self.dataframe[self.bodyColumnName].apply(self.compute_minhash_row)
-        minhashes = self.dataframe['minhash'].to_dict()
-        # Create LSH index
-        lsh = MinHashLSH(threshold=self.similarityThreshold, num_perm=self.num_perm)
-        for i, minhash in minhashes.items():
-            lsh.insert(i, minhash)
-            
+        tweet_texts = self.dataframe[self.bodyColumnName].tolist()
+        simhashes = []
+        for i in range(len(tweet_texts)):
+            tweet_text = tweet_texts[i]
+            val = (i,Simhash(self.get_features(tweet_text)))
+            simhashes.append(val)
+            print("Row "+str(i))
+        index = SimhashIndex(simhashes, k=3)
         allResults = []
         for i in range(len(self.dataframe)): 
-            result = lsh.query(minhashes[i])
+            result = index.get_near_dups(simhashes[i][1])
+            result = [int(item) for item in result]
+            result = sorted(result)
             allResults.append(result)
         return allResults
-    
-    def getDuplicateRowIndexesDefault(self): 
+        
+        
+    def geDuplicateRowIndexes(self): 
         allDuplicateRowsIndexes = set()
-        # Find near duplicates
         for result in self.getOriginalRowsWithDuplicateRowIndexesDefault():
             if(len(result)>1 and result[0] not in allDuplicateRowsIndexes):
                 result.remove(result[0])
                 for item in result:
                     allDuplicateRowsIndexes.add(item)  
         return allDuplicateRowsIndexes
-    
-        
-    def geDuplicateRowIndexes(self): 
-        self.chunkCounter = 0  
-        self.rowCounter = 0 
-        return self.getDuplicateRowIndexesDefault()

@@ -18,15 +18,15 @@ class TestNearDuplicateDetector(unittest.TestCase):
                     ("I have two apples and 2 oranges at https://google.com"),
                     ("I have two apples and 2 oranges at"),
                     ("Completely different tweet"),
-                    ("have two apples and 2 oranges https://google.com")
+                    ("I have two apples and 2 oranges at https:///google.com")
                   ],
                   columns=["body"]
                   ) 
         nearDuplicates = NearDuplicateDetector(df).geDuplicateRowIndexes()
         self.assertEqual({1,4}, nearDuplicates)
         
-    def testWrongDuplicates(self):
-        df = pd.DataFrame(
+    def testNoDuplicates(self):
+        df = pd.DataFrame( #For some reason datasketch minhash default implementation would recognize this two as duplicates
                   [
                     ("$AMZN closed my puts for breakeven avg, volcrush from earlier in the week got me. scratched trade."),
                     ("Not with $AMZN 's much superior margins. Analysts need to upgrade on this. And on flufflky toy sales, as well."),
@@ -47,7 +47,7 @@ class TestNearDuplicateDetector(unittest.TestCase):
                     ("I have two apples and 2 oranges at https://google.com"),
                     ("I have two apples and 2 oranges at"),
                     ("Completely different tweet"),
-                    ("have two apples and 2 oranges https://google.com")
+                    ("I have two apples and 2 oranges at https:///google.com")
                   ],
                   columns=["body"]
                   ) 

@@ -69,7 +69,7 @@ class DataframeExplorePlots(object):
     def createExactAndNearDuplicatesPlot(self):
         plt.figure(figsize=(8, 8))
         total_tweets, near_duplicate_tweets = self.dataframeExplore.getExactAndNearDuplicateValues()
-        plt.pie([total_tweets, near_duplicate_tweets], labels=["Total","Near duplicates"], autopct='%1.1f%%', startangle=140)
+        plt.pie([total_tweets, near_duplicate_tweets], labels=["Total","Duplicates"], autopct='%1.1f%%', startangle=140)
         plt.axis('equal') 
         plt.title('Exact and Near Duplicate Tweets Percentage')
         plt.show() 
@@ -77,7 +77,7 @@ class DataframeExplorePlots(object):
     def createExactDuplicatesPlot(self):
         plt.figure(figsize=(8, 8))
         total_tweets, near_duplicate_tweets = self.dataframeExplore.getExactDuplicateValues()
-        plt.pie([total_tweets, near_duplicate_tweets], labels=["Total","Exact duplicates"], autopct='%1.1f%%', startangle=140)
+        plt.pie([total_tweets, near_duplicate_tweets], labels=["Total","Duplicates"], autopct='%1.1f%%', startangle=140)
         plt.axis('equal') 
         plt.title('Exact Duplicate Tweets Percentage')
         plt.show()    
@@ -95,7 +95,7 @@ class DataframeExplorePlots(object):
 
 df =  pd.read_csv(DataDirHelper().getDataDir()+ 'companyTweets\\CompanyTweets.csv')
 #df =  pd.read_csv(DataDirHelper().getDataDir()+ 'companyTweets\\CompanyTweetsAAPLFirst1000.csv')
-df = TweetDataframeQuery().query(df,TweetQueryParams(companyName ="AMZN")).head(10000).reset_index(drop=True)
+df = TweetDataframeQuery().query(df,TweetQueryParams(companyName ="AMZN")).head(100000).reset_index(drop=True)
 plots = DataframeExplorePlots(TweetDataframeExplore(df))
 print(len(df))
 #plots.createCompanyTweetNumbersPlot()
@@ -106,4 +106,4 @@ print(len(df))
 #plots.createURLPerTweetsPlot()
 #plots.createExactAndNearDuplicatesPlot()
 #plots.createExactDuplicatesPlot()
-print(TweetDataframeExplore(df).printOriginalAndNearDuplicateRowsText())
+#print(TweetDataframeExplore(df).printOriginalAndNearDuplicateRowsText())
