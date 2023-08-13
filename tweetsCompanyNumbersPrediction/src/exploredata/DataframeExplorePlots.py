@@ -81,18 +81,33 @@ class DataframeExplorePlots(object):
         plt.axis('equal') 
         plt.title('Exact Duplicate Tweets Percentage')
         plt.show()    
+        
+        
+    def createValPerTweetDatePlot(self,dateColumnDf, valColumnDf,min_val,max_val,average,xLabel,yLabel,title):
+        plt.figure(figsize=(10, 6))
+        plt.plot(dateColumnDf, valColumnDf, marker='o')
+        plt.axhline(y=min_val, color='r', linestyle='--', label='Min Comment')
+        plt.axhline(y=max_val, color='g', linestyle='--', label='Max Comment')
+        plt.axhline(y=average, color='b', linestyle='--', label='Avg Comment')
+        plt.xlabel(xLabel)
+        plt.ylabel(yLabel)
+        plt.title(title)
+        plt.show() 
+            
           
+    def createCommentsPerTweetDatePlot(self):
+        dateColumnDf, valColumnDf,min_val,max_val,average = self.dataframeExplore.getCommentValuesPerTweet()
+        return self.createValPerTweetDatePlot(dateColumnDf, valColumnDf,min_val,max_val,average,'Tweet Date','Comment Number','Comment Number over Time')
+    
+    def createLikesPerTweetDatePlot(self):
+        dateColumnDf, valColumnDf,min_val,max_val,average = self.dataframeExplore.getLikeValuesPerTweet()
+        return self.createValPerTweetDatePlot(dateColumnDf, valColumnDf,min_val,max_val,average,'Tweet Date','Like Number','Like Number over Time')
+    
+    def createRetweetsPerTweetDatePlot(self):
+        dateColumnDf, valColumnDf,min_val,max_val,average = self.dataframeExplore.getRetweetValuesPerTweet()
+        return self.createValPerTweetDatePlot(dateColumnDf, valColumnDf,min_val,max_val,average,'Tweet Date','Retweet Number','Retweet Number over Time')
+     
         
-        
-# df = pd.DataFrame(
-#                   [
-#                   (1420070457,"First tweet","AAPL"),
-#                   (1483230660,"Second tweet 2","AAPL"),
-#                   (1483230660,"Third tweet 3 3","TSLA")
-#                   ],
-#                   columns=["post_date","body","ticker_symbol"]
-#                   )
-
 df =  pd.read_csv(DataDirHelper().getDataDir()+ 'companyTweets\\CompanyTweets.csv')
 #df =  pd.read_csv(DataDirHelper().getDataDir()+ 'companyTweets\\CompanyTweetsAAPLFirst1000.csv')
 df = TweetDataframeQuery().query(df,TweetQueryParams(companyName ="AMZN")).head(100000).reset_index(drop=True)
@@ -107,3 +122,6 @@ print(len(df))
 #plots.createExactAndNearDuplicatesPlot()
 #plots.createExactDuplicatesPlot()
 #print(TweetDataframeExplore(df).printOriginalAndNearDuplicateRowsText())
+#plots.createCommentsPerTweetDatePlot()
+#plots.createLikesPerTweetDatePlot()
+#plots.createRetweetsPerTweetDatePlot()

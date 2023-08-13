@@ -18,13 +18,19 @@ class TweetDataframeExplore(object):
                  bodyColumnName = "body",
                  classColumnName = "class",
                  companyNameColumn = "ticker_symbol",
-                 postTSPColumn = "post_date"
+                 postTSPColumn = "post_date",
+                 commentNumberColumn = "comment_num",
+                 likeNumberColumn = "like_num",
+                 retweetNumberColumn = "retweet_num"
                  ):
         self.dataframe = dataframe
         self.classColumnName = classColumnName
         self.bodyColumnName = bodyColumnName
         self.companyNameColumn = companyNameColumn
         self.postTSPColumn = postTSPColumn
+        self.commentNumberColumn = commentNumberColumn
+        self.likeNumberColumn = likeNumberColumn
+        self.retweetNumberColumn = retweetNumberColumn
         
     def getValueCounts(self,columnName):
         return  self.dataframe[columnName].value_counts()
@@ -133,6 +139,21 @@ class TweetDataframeExplore(object):
         totalTweetsNumber = len(self.dataframe)
         exactDuplicatesTweetNumber= len(duplicatesDf)
         return totalTweetsNumber,exactDuplicatesTweetNumber
-        
     
+    def getColumnValuesPerTweet(self,column):
+        dateColumnDf = pd.to_datetime(self.dataframe[self.postTSPColumn], unit='s')
+        valColumnDf = self.dataframe[column]
+        min_val = min(valColumnDf)
+        max_val = max(valColumnDf)
+        average = sum(valColumnDf) / len(valColumnDf)
+        return dateColumnDf,valColumnDf, min_val,max_val,average
+        
+    def getCommentValuesPerTweet(self):
+        return self.getColumnValuesPerTweet(self.commentNumberColumn)
+    
+    def getLikeValuesPerTweet(self):
+        return self.getColumnValuesPerTweet(self.likeNumberColumn)
+    
+    def getRetweetValuesPerTweet(self):
+        return self.getColumnValuesPerTweet(self.retweetNumberColumn)
         
