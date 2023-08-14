@@ -106,6 +106,18 @@ class DataframeExplorePlots(object):
     def createRetweetsPerTweetDatePlot(self):
         dateColumnDf, valColumnDf,min_val,max_val,average = self.dataframeExplore.getRetweetValuesPerTweet()
         return self.createValPerTweetDatePlot(dateColumnDf, valColumnDf,min_val,max_val,average,'Tweet Date','Retweet Number','Retweet Number over Time')
+    
+    def createTweetsPerWriterPlot(self):
+        writer_counts, min_val,max_val,average = self.dataframeExplore.getTweetWritersCounts()
+        plt.hist(writer_counts, bins=20, color='c', edgecolor='black')
+        plt.axvline(min_val, color='red', linestyle='dashed', linewidth=2)
+        plt.axvline(average, color='green', linestyle='dashed', linewidth=2)
+        plt.axvline(max_val, color='blue', linestyle='dashed', linewidth=2)
+        plt.legend({'Min':min_val, 'Average':average, 'Max':max_val})
+        plt.title('Tweets per Writer')
+        plt.xlabel("Number of tweets")
+        plt.ylabel("Number of writers")
+        plt.show() 
      
         
 df =  pd.read_csv(DataDirHelper().getDataDir()+ 'companyTweets\\CompanyTweets.csv')
@@ -125,3 +137,5 @@ print(len(df))
 #plots.createCommentsPerTweetDatePlot()
 #plots.createLikesPerTweetDatePlot()
 #plots.createRetweetsPerTweetDatePlot()
+print(TweetDataframeExplore(df).getMostFrequentWriters(100))
+plots.createTweetsPerWriterPlot()

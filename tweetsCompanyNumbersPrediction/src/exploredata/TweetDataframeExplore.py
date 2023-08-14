@@ -21,7 +21,8 @@ class TweetDataframeExplore(object):
                  postTSPColumn = "post_date",
                  commentNumberColumn = "comment_num",
                  likeNumberColumn = "like_num",
-                 retweetNumberColumn = "retweet_num"
+                 retweetNumberColumn = "retweet_num",
+                 writerColumn = "writer"
                  ):
         self.dataframe = dataframe
         self.classColumnName = classColumnName
@@ -31,7 +32,8 @@ class TweetDataframeExplore(object):
         self.commentNumberColumn = commentNumberColumn
         self.likeNumberColumn = likeNumberColumn
         self.retweetNumberColumn = retweetNumberColumn
-        
+        self.writerColumn = writerColumn
+                
     def getValueCounts(self,columnName):
         return  self.dataframe[columnName].value_counts()
     
@@ -43,6 +45,17 @@ class TweetDataframeExplore(object):
     
     def getCompanyTweetNumbers(self):
         return self.getValueCounts(self.companyNameColumn)
+    
+    def getTweetWritersCounts(self):
+        writerCounts = self.getValueCounts(self.writerColumn)
+        average = writerCounts.mean()
+        max_val = writerCounts.max()
+        min_val = writerCounts.min()
+        return  writerCounts,min_val,max_val,average
+    
+    def getMostFrequentWriters(self,firstN):
+        writerCounts,_,_,_ = self.getTweetWritersCounts()
+        return writerCounts.head(firstN)
     
     def getTweetsPerDayValues(self):
         self.dataframe['date'] = pd.to_datetime(self.dataframe[self.postTSPColumn], unit='s')
