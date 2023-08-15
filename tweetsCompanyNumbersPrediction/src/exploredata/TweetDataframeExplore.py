@@ -169,4 +169,16 @@ class TweetDataframeExplore(object):
     
     def getRetweetValuesPerTweet(self):
         return self.getColumnValuesPerTweet(self.retweetNumberColumn)
+    
+    def getPOSCounts(self):
+        nlp = spacy.load('en_core_web_sm') 
+        pos_counts = {}
+        for doc in nlp.pipe(self.dataframe[self.bodyColumnName]):
+            for token in doc:
+                pos_type = token.pos_
+                if pos_type in pos_counts:
+                    pos_counts[pos_type] += 1
+                else:
+                    pos_counts[pos_type] = 1
+        return pos_counts
         

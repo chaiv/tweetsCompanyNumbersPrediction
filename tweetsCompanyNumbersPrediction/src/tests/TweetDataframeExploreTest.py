@@ -126,7 +126,7 @@ class TweetDataframeExploreTest(unittest.TestCase):
                     ("I have two apples and 2 oranges at https://google.com"),
                     ("I have two apples and 2 oranges at"),
                     ("Completely different tweet"),
-                    ("have two apples and 2 oranges https://google.com")
+                    ("I have two apples and 2 oranges at https:///google.com")
                   ],
                   columns=["body"]
                   ) 
@@ -135,6 +135,17 @@ class TweetDataframeExploreTest(unittest.TestCase):
         self.assertEqual(df["body"].iloc[0],originalAndDuplicateTexts[0][0])
         self.assertEqual(df["body"].iloc[4],originalAndDuplicateTexts[0][1]) 
         
+    def testPOSValues(self):
+        df = pd.DataFrame(
+                  [
+                    ("I have two apples and 2 oranges at https://google.com"),
+                    ("Completely different tweet")
+                  ],
+                  columns=["body"]
+                  )
+        pos_counts = TweetDataframeExplore(df).getPOSCounts()
+        self.assertEqual(9,len(pos_counts))
+        self.assertEqual(3,pos_counts['NOUN'])
         
         
 if __name__ == "__main__":
