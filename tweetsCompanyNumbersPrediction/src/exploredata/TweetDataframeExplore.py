@@ -9,6 +9,7 @@ from collections import Counter
 import re
 from tweetpreprocess.nearduplicates.NearDuplicateDetector import NearDuplicateDetector
 from tweetpreprocess.nearduplicates.DuplicateDetector import DuplicateDetector
+from sentiment.TweetSentimentAnalysis import TweetSentimentAnalysis
 
 class TweetDataframeExplore(object):
 
@@ -169,6 +170,11 @@ class TweetDataframeExplore(object):
     
     def getRetweetValuesPerTweet(self):
         return self.getColumnValuesPerTweet(self.retweetNumberColumn)
+    
+    def getSentimentLabelsCounts(self):
+        sentimentLabelColumnName_="sentiment_label"
+        dfWithSentiment = TweetSentimentAnalysis(self.dataframe,bodyColumnName =self.bodyColumnName,sentimentPolarityColumnName="sentiment_polarity",sentimentLabelColumnName = sentimentLabelColumnName_ ).getDfWithSentiment()
+        return   dfWithSentiment[sentimentLabelColumnName_].value_counts()
     
     def getPOSCounts(self):
         nlp = spacy.load('en_core_web_sm') 

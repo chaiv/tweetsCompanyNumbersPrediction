@@ -118,11 +118,17 @@ class DataframeExplorePlots(object):
         plt.xlabel("Number of tweets")
         plt.ylabel("Number of writers")
         plt.show() 
+        
+    def createSentimentLabelNumbersPlot(self):
+        _, ax = plt.subplots()
+        self.dataframeExplore.getSentimentLabelsCounts().plot(kind='pie', ax=ax, autopct='%1.1f%%')
+        ax.set_ylabel('') 
+        plt.show()
      
         
 df =  pd.read_csv(DataDirHelper().getDataDir()+ 'companyTweets\\CompanyTweets.csv')
 #df =  pd.read_csv(DataDirHelper().getDataDir()+ 'companyTweets\\CompanyTweetsAAPLFirst1000.csv')
-df = TweetDataframeQuery().query(df,TweetQueryParams(companyName ="AMZN")).head(100000).reset_index(drop=True)
+#df = TweetDataframeQuery().query(df,TweetQueryParams(companyName ="AMZN")).head(100000).reset_index(drop=True)
 plots = DataframeExplorePlots(TweetDataframeExplore(df))
 print(len(df))
 #plots.createCompanyTweetNumbersPlot()
@@ -137,5 +143,6 @@ print(len(df))
 #plots.createCommentsPerTweetDatePlot()
 #plots.createLikesPerTweetDatePlot()
 #plots.createRetweetsPerTweetDatePlot()
-print(TweetDataframeExplore(df).getMostFrequentWriters(100))
-plots.createTweetsPerWriterPlot()
+#print(TweetDataframeExplore(df).getMostFrequentWriters(100))
+#plots.createTweetsPerWriterPlot()
+plots.createSentimentLabelNumbersPlot()
