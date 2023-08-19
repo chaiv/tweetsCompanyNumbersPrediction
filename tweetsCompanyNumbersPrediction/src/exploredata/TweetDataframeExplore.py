@@ -35,20 +35,20 @@ class TweetDataframeExplore(object):
         self.retweetNumberColumn = retweetNumberColumn
         self.writerColumn = writerColumn
                 
-    def getValueCounts(self,columnName):
-        return  self.dataframe[columnName].value_counts()
+    def getValueCounts(self,columnName,dataframe):
+        return  dataframe[columnName].value_counts()
     
     def getClassDistribution(self):
-        return  self.getValueCounts(self.classColumnName)
+        return  self.getValueCounts(self.classColumnName,self.dataframe)
     
     def getMostFrequentWords(self, firstN):  
         return  pd.Series(' '.join(self.dataframe[self.bodyColumnName].astype("string")).lower().split()).value_counts()[:firstN]
     
     def getCompanyTweetNumbers(self):
-        return self.getValueCounts(self.companyNameColumn)
+        return self.getValueCounts(self.companyNameColumn,self.dataframe)
     
     def getTweetWritersCounts(self):
-        writerCounts = self.getValueCounts(self.writerColumn)
+        writerCounts = self.getValueCounts(self.writerColumn,self.dataframe)
         average = writerCounts.mean()
         max_val = writerCounts.max()
         min_val = writerCounts.min()
@@ -154,27 +154,33 @@ class TweetDataframeExplore(object):
         exactDuplicatesTweetNumber= len(duplicatesDf)
         return totalTweetsNumber,exactDuplicatesTweetNumber
     
-    def getColumnValuesPerTweet(self,column):
-        dateColumnDf = pd.to_datetime(self.dataframe[self.postTSPColumn], unit='s')
-        valColumnDf = self.dataframe[column]
+    def getColumnValuesPerTweet(self,column,dataframe):
+        dateColumnDf = pd.to_datetime(dataframe[self.postTSPColumn], unit='s')
+        valColumnDf = dataframe[column]
         min_val = min(valColumnDf)
         max_val = max(valColumnDf)
         average = sum(valColumnDf) / len(valColumnDf)
         return dateColumnDf,valColumnDf, min_val,max_val,average
         
     def getCommentValuesPerTweet(self):
-        return self.getColumnValuesPerTweet(self.commentNumberColumn)
+        return self.getColumnValuesPerTweet(self.commentNumberColumn,self.dataframe)
     
     def getLikeValuesPerTweet(self):
-        return self.getColumnValuesPerTweet(self.likeNumberColumn)
+        return self.getColumnValuesPerTweet(self.likeNumberColumn,self.dataframe)
     
     def getRetweetValuesPerTweet(self):
-        return self.getColumnValuesPerTweet(self.retweetNumberColumn)
+        return self.getColumnValuesPerTweet(self.retweetNumberColumn,self.dataframe)
     
     def getSentimentLabelsCounts(self):
         sentimentLabelColumnName_="sentiment_label"
         dfWithSentiment = TweetSentimentAnalysis(self.dataframe,bodyColumnName =self.bodyColumnName,sentimentPolarityColumnName="sentiment_polarity",sentimentLabelColumnName = sentimentLabelColumnName_ ).getDfWithSentiment()
-        return   dfWithSentiment[sentimentLabelColumnName_].value_counts()
+        return self.getValueCounts(sentimentLabelColumnName_, dfWithSentiment)
+    
+    def getSentimentPolarityPerTweet(self):
+        sentimentPolarityColumnName_ = "sentiment_polarity"
+        dfWithSentiment = TweetSentimentAnalysis(self.dataframe,bodyColumnName =self.bodyColumnName,sentimentPolarityColumnName=sentimentPolarityColumnName_,).getDfWithSentiment()
+        return self.getColumnValuesPerTweet(sentimentPolarityColumnName_,dfWithSentiment)
+    
     
     def getPOSCounts(self):
         nlp = spacy.load('en_core_web_sm') 
