@@ -127,8 +127,19 @@ class DataframeExplorePlots(object):
         plt.title('Counts of Different Parts of Speech')
         plt.xticks(rotation=45, ha='right') 
         plt.show() 
+    def createSentimentLabelNumbersPlot(self):
+        _, ax = plt.subplots()
+        self.dataframeExplore.getSentimentLabelsCounts().plot(kind='pie', ax=ax, autopct='%1.1f%%')
+        ax.set_ylabel('') 
+        plt.show()
+        
+    def createSentimentPolarityPerTweetDatePlot(self):
+        dateColumnDf, valColumnDf,min_val,max_val,average = self.dataframeExplore.getSentimentPolarityPerTweet()
+        return self.createValPerTweetDatePlot(dateColumnDf, valColumnDf,min_val,max_val,average,'Tweet Date','Sentiment Polarity','Sentiment Polarity over Time')
+
      
         
+
 df =  pd.read_csv(DataDirHelper().getDataDir()+ 'companyTweets\\CompanyTweets.csv')
 #df =  pd.read_csv(DataDirHelper().getDataDir()+ 'companyTweets\\CompanyTweetsAAPLFirst1000.csv')
 #df = TweetDataframeQuery().query(df,TweetQueryParams(companyName ="AMZN")).head(100000).reset_index(drop=True)
@@ -149,3 +160,7 @@ plots.createCompanyTweetNumbersPlot()
 #print(TweetDataframeExplore(df).getMostFrequentWriters(100))
 #plots.createTweetsPerWriterPlot()
 #plots.createPOSCountsPlot()
+
+#plots.createSentimentLabelNumbersPlot()
+#plots.createSentimentPolarityPerTweetDatePlot()
+
