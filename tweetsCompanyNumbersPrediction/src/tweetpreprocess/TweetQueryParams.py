@@ -9,10 +9,11 @@ class TweetQueryParams(object):
  
 
 
-    def __init__(self, companyName = None, firstNTweets = None, tweetIds = None, fromDateStr = None, toDateStr = None,dateToTSP=DateTSPConverter()):
+    def __init__(self, companyName = None,companyNames = None, firstNTweets = None, tweetIds = None, fromDateStr = None, toDateStr = None,dateToTSP=DateTSPConverter()):
         self.companyName = companyName
         self.firstNTweets = firstNTweets
         self.tweetIds = tweetIds
+        self.companyNames = companyNames
         if(fromDateStr is not None):
             self.fromDateTSP= dateToTSP.dateStrToTSPInt(fromDateStr)
         else:

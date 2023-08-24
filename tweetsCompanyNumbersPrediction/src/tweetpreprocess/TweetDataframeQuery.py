@@ -21,6 +21,8 @@ class TweetDataframeQuery(object):
         companyTweets = allTweetsDf
         if(queryParams.companyName is not None):
             companyTweets = companyTweets[companyTweets[self.tweetDfCompanyColumn]==queryParams.companyName]
+        if(queryParams.companyNames is not None):
+            companyTweets = companyTweets[companyTweets[self.tweetDfCompanyColumn].isin(queryParams.companyNames)]     
         if(queryParams.tweetIds is not None):
             companyTweets = companyTweets[companyTweets[self.tweetDfIdColumn].isin(queryParams.tweetIds)]
         if(queryParams.fromDateTSP is not None):

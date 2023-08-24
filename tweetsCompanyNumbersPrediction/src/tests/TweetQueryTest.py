@@ -88,6 +88,23 @@ class TweetQueryTest(unittest.TestCase):
         self.assertEquals("company1",resultDf.iloc[0]['ticker_symbol'])  
         self.assertEquals("company2",resultDf.iloc[1]['ticker_symbol'])  
         pass
+    
+    def testWhenMultipleCompanyNamesQueryBoth(self):
+        tweetsDf = pd.DataFrame(
+                  [
+                  ("company1"),
+                  ("company2"),
+                  ("company3")
+                  ],
+                  columns=['ticker_symbol']
+                  )
+        
+        resultDf = TweetDataframeQuery().query(tweetsDf, TweetQueryParams(companyNames =["company1","company3"]))
+        self.assertEquals(2,resultDf.size)  
+        self.assertEquals("company1",resultDf.iloc[0]['ticker_symbol'])  
+        self.assertEquals("company3",resultDf.iloc[1]['ticker_symbol'])  
+        pass
+
 
 
 if __name__ == "__main__":
