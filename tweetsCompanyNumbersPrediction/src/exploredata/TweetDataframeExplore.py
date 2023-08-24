@@ -173,6 +173,7 @@ class TweetDataframeExplore(object):
     def getPOSCounts(self):
         nlp = spacy.load('en_core_web_sm') 
         pos_counts = {}
+        i = 0 
         for doc in nlp.pipe(self.dataframe[self.bodyColumnName]):
             for token in doc:
                 pos_type = token.pos_
@@ -180,5 +181,6 @@ class TweetDataframeExplore(object):
                     pos_counts[pos_type] += 1
                 else:
                     pos_counts[pos_type] = 1
+            print(i := i + 1)    
         return pos_counts
         
