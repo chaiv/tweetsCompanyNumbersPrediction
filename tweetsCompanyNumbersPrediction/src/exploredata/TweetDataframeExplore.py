@@ -68,14 +68,20 @@ class TweetDataframeExplore(object):
         return  daily_counts,min_val,max_val,average
     
     def getNumberOfWordsValues(self):
-        self.dataframe['word_count'] = self.dataframe[self.bodyColumnName].apply(lambda x: len(str(x).split()))
-        summary = self.dataframe['word_count'].describe()
-        word_counts = self.dataframe['word_count']
-        min_val = summary['min']
-        max_val = summary['max']
-        average = summary['mean']
-        return word_counts, min_val,max_val,average
+        return self.countValuesPerTweet(self.bodyColumnName,self.dataframe,lambda x: len(str(x).split()))
     
+    def getNumberofCharactersValues(self):
+        return self.countValuesPerTweet(self.bodyColumnName,self.dataframe,lambda x: len(str(x)))
+
+
+    def countValuesPerTweet(self,column,dataframe,countFunction):
+        self.dataframe['count'] = dataframe[column].apply(countFunction)
+        counts = self.dataframe['count']
+        min_val =  counts.min()
+        max_val =  counts.max()
+        average =  counts.mean()
+        return counts, min_val,max_val,average
+        
     
     def getNamedEntities(self,documents):  
         nlp = spacy.load('en_core_web_sm', disable=['parser'])  
@@ -110,7 +116,7 @@ class TweetDataframeExplore(object):
             counts.append(sum(1 for ent in doc.ents if ent.label_ == "CARDINAL"))
         return counts
     
-    def getCardinalNumbersPerTweetValues(self):
+    def getWrittenNumbersPerTweetValues(self):
         num_count = self.count_numbers(self.dataframe[self.bodyColumnName])
         self.dataframe['number_count'] = num_count   
         min_val = min(num_count)
@@ -123,12 +129,9 @@ class TweetDataframeExplore(object):
         urls = re.findall(url_regex, text)
         return len(urls)
     
-    def getURLPerTweetValues(self):
-        self.dataframe['url_count'] = self.dataframe[self.bodyColumnName].apply(self.count_urls_in_text)
-        min_val = self.dataframe['url_count'].min()
-        max_val = self.dataframe['url_count'].max()
-        average = self.dataframe['url_count'].mean()
-        return self.dataframe['url_count'], min_val, max_val, average
+    def getURLPerTweetValues(self):        
+        return self.countValuesPerTweet(self.bodyColumnName,self.dataframe,self.count_urls_in_text)
+
     
     def getExactAndNearDuplicateValues(self):
         nearDuplicates = NearDuplicateDetector(self.dataframe,self.bodyColumnName).geDuplicateRowIndexes()
@@ -154,7 +157,7 @@ class TweetDataframeExplore(object):
         exactDuplicatesTweetNumber= len(duplicatesDf)
         return totalTweetsNumber,exactDuplicatesTweetNumber
     
-    def getColumnValuesPerTweet(self,column,dataframe):
+    def getColumnValuesPerTweetBasedOnDate(self,column,dataframe):
         dateColumnDf = pd.to_datetime(dataframe[self.postTSPColumn], unit='s')
         valColumnDf = dataframe[column]
         min_val = min(valColumnDf)
@@ -163,13 +166,13 @@ class TweetDataframeExplore(object):
         return dateColumnDf,valColumnDf, min_val,max_val,average
         
     def getCommentValuesPerTweet(self):
-        return self.getColumnValuesPerTweet(self.commentNumberColumn,self.dataframe)
+        return self.getColumnValuesPerTweetBasedOnDate(self.commentNumberColumn,self.dataframe)
     
     def getLikeValuesPerTweet(self):
-        return self.getColumnValuesPerTweet(self.likeNumberColumn,self.dataframe)
+        return self.getColumnValuesPerTweetBasedOnDate(self.likeNumberColumn,self.dataframe)
     
     def getRetweetValuesPerTweet(self):
-        return self.getColumnValuesPerTweet(self.retweetNumberColumn,self.dataframe)
+        return self.getColumnValuesPerTweetBasedOnDate(self.retweetNumberColumn,self.dataframe)
     
     def getSentimentLabelsCounts(self):
         sentimentLabelColumnName_="sentiment_label"
@@ -179,7 +182,7 @@ class TweetDataframeExplore(object):
     def getSentimentPolarityPerTweet(self):
         sentimentPolarityColumnName_ = "sentiment_polarity"
         dfWithSentiment = TweetSentimentAnalysis(self.dataframe,bodyColumnName =self.bodyColumnName,sentimentPolarityColumnName=sentimentPolarityColumnName_,).getDfWithSentiment()
-        return self.getColumnValuesPerTweet(sentimentPolarityColumnName_,dfWithSentiment)
+        return self.getColumnValuesPerTweetBasedOnDate(sentimentPolarityColumnName_,dfWithSentiment)
     
     
     def getPOSCounts(self):

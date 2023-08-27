@@ -9,6 +9,7 @@ from tweetpreprocess.DataDirHelper import DataDirHelper
 from exploredata.TweetDataframeExplore import TweetDataframeExplore
 from tweetpreprocess.TweetDataframeQuery import TweetDataframeQuery
 from tweetpreprocess.TweetQueryParams import TweetQueryParams
+from datetime import timedelta
 
 
 class DataframeExplorePlots(object):
@@ -39,39 +40,38 @@ class DataframeExplorePlots(object):
         plt.title('Number of Tweets Per Day')
         plt.show()
         
-    def createNumberOfWordsPlot(self):
-        word_counts, min_val,max_val,average = self.dataframeExplore.getNumberOfWordsValues()
-        plt.hist(word_counts, bins=20, color='c', edgecolor='black')
+        
+    def createHistPlot(self,counts,min_val,max_val,average,xLabel,yLabel,title):
+        plt.hist(counts, bins=20, color='c', edgecolor='black')
         plt.axvline(min_val, color='red', linestyle='dashed', linewidth=2)
         plt.axvline(average, color='green', linestyle='dashed', linewidth=2)
         plt.axvline(max_val, color='blue', linestyle='dashed', linewidth=2)
         plt.text(min_val,plt.ylim()[1] - 0.03 * plt.ylim()[1], f'Min: {min_val:.2f}', color='red', fontsize=10, va='center')
         plt.text(average,plt.ylim()[1] - 0.03 * plt.ylim()[1], f'Average: {average:.2f}', color='green', fontsize=10, va='center')
         plt.text(max_val,plt.ylim()[1] - 0.03 * plt.ylim()[1], f'Max: {max_val:.2f}', color='blue', fontsize=10, va='center')
-        plt.xlabel('Number of words')
-        plt.ylabel('Number of tweets')
-        plt.title('Words per tweet distribution')
+        plt.xlabel(xLabel)
+        plt.ylabel(yLabel)
+        plt.title(title)
         plt.show()
         
-    def createCardinalNumbersPlot(self):
-        word_counts, min_val,max_val,average = self.dataframeExplore.getCardinalNumbersPerTweetValues()
-        plt.hist(word_counts, bins=20, color='c', edgecolor='black')
-        plt.axvline(min_val, color='red', linestyle='dashed', linewidth=2)
-        plt.axvline(average, color='green', linestyle='dashed', linewidth=2)
-        plt.axvline(max_val, color='blue', linestyle='dashed', linewidth=2)
-        plt.legend({'Min':min_val, 'Average':average, 'Max':max_val})
-        plt.title('Cardinal numbers per tweet')
-        plt.show()    
+        
+    def createNumberOfCharactersPlot(self):
+        counts, min_val,max_val,average = self.dataframeExplore.getNumberofCharactersValues()
+        return self.createHistPlot(counts,min_val,max_val,average,'Number of characters','Number of tweets','Characters per tweet distribution') 
+        
+    def createNumberOfWordsPlot(self):
+        counts, min_val,max_val,average = self.dataframeExplore.getNumberOfWordsValues()
+        return self.createHistPlot(counts,min_val,max_val,average,'Number of words','Number of tweets','Words per tweet distribution')
+        
+    def createWrittenNumbersPlot(self):
+        counts, min_val,max_val,average = self.dataframeExplore.getWrittenNumbersPerTweetValues()
+        return self.createHistPlot(counts,min_val,max_val,average,'Number of numbers','Number of tweets','Numbers per tweet distribution')
+
     
     def createURLPerTweetsPlot(self):
-        url_counts, min_val,max_val,average = self.dataframeExplore.getURLPerTweetValues()
-        plt.hist(url_counts, bins=20, color='c', edgecolor='black')
-        plt.axvline(min_val, color='red', linestyle='dashed', linewidth=2)
-        plt.axvline(average, color='green', linestyle='dashed', linewidth=2)
-        plt.axvline(max_val, color='blue', linestyle='dashed', linewidth=2)
-        plt.legend({'Min':min_val, 'Average':average, 'Max':max_val})
-        plt.title('URLs per tweet')
-        plt.show()    
+        counts, min_val,max_val,average = self.dataframeExplore.getURLPerTweetValues()
+        return self.createHistPlot(counts,min_val,max_val,average,'Number of URLs','Number of tweets','URLs per tweet distribution')
+ 
         
     def createExactAndNearDuplicatesPlot(self):
         plt.figure(figsize=(8, 8))
@@ -90,12 +90,18 @@ class DataframeExplorePlots(object):
         plt.show()    
         
         
-    def createValPerTweetDatePlot(self,dateColumnDf, valColumnDf,min_val,max_val,average,xLabel,yLabel,title):
+    def createValPerTweetDatePlot(self,dateColumnDf, valColumnDf,min_val,max_val,average,xLabel,yLabel,title,
+                                  xMinMaxAvrgLabelOffset = 100,yMinLabelOffset= -10,yMaxValOffset=0,yAvrgValOffset=0):
         plt.figure(figsize=(10, 6))
         plt.plot(dateColumnDf, valColumnDf, marker='o')
         plt.axhline(y=min_val, color='r', linestyle='--', label='Min Comment')
         plt.axhline(y=max_val, color='g', linestyle='--', label='Max Comment')
         plt.axhline(y=average, color='b', linestyle='--', label='Avg Comment')
+        x_offset_days =xMinMaxAvrgLabelOffset
+        x_offset_timedelta = timedelta(days=x_offset_days)
+        plt.text(dateColumnDf.iloc[-1]+x_offset_timedelta, min_val+yMinLabelOffset, f'Min: {min_val:.2f}', color='red', fontsize=10, va='center')
+        plt.text(dateColumnDf.iloc[-1]+x_offset_timedelta, max_val+yMaxValOffset, f'Max: {max_val:.2f}', color='green', fontsize=10, va='center')
+        plt.text(dateColumnDf.iloc[-1]+x_offset_timedelta, average+yAvrgValOffset, f'Average: {average:.2f}', color='blue', fontsize=10, va='center')
         plt.xlabel(xLabel)
         plt.ylabel(yLabel)
         plt.title(title)
@@ -104,27 +110,20 @@ class DataframeExplorePlots(object):
           
     def createCommentsPerTweetDatePlot(self):
         dateColumnDf, valColumnDf,min_val,max_val,average = self.dataframeExplore.getCommentValuesPerTweet()
-        return self.createValPerTweetDatePlot(dateColumnDf, valColumnDf,min_val,max_val,average,'Tweet Date','Comment Number','Comment Number over Time')
+        return self.createValPerTweetDatePlot(dateColumnDf, valColumnDf,min_val,max_val,average,'Tweet date','Comment number','Comment number over time')
+    
     
     def createLikesPerTweetDatePlot(self):
         dateColumnDf, valColumnDf,min_val,max_val,average = self.dataframeExplore.getLikeValuesPerTweet()
-        return self.createValPerTweetDatePlot(dateColumnDf, valColumnDf,min_val,max_val,average,'Tweet Date','Like Number','Like Number over Time')
+        return self.createValPerTweetDatePlot(dateColumnDf, valColumnDf,min_val,max_val,average,'Tweet date','Like number','Like number over time')
     
     def createRetweetsPerTweetDatePlot(self):
         dateColumnDf, valColumnDf,min_val,max_val,average = self.dataframeExplore.getRetweetValuesPerTweet()
-        return self.createValPerTweetDatePlot(dateColumnDf, valColumnDf,min_val,max_val,average,'Tweet Date','Retweet Number','Retweet Number over Time')
+        return self.createValPerTweetDatePlot(dateColumnDf, valColumnDf,min_val,max_val,average,'Tweet date','Retweet number','Retweet number over time')
     
     def createTweetsPerWriterPlot(self):
-        writer_counts, min_val,max_val,average = self.dataframeExplore.getTweetWritersCounts()
-        plt.hist(writer_counts, bins=20, color='c', edgecolor='black')
-        plt.axvline(min_val, color='red', linestyle='dashed', linewidth=2)
-        plt.axvline(average, color='green', linestyle='dashed', linewidth=2)
-        plt.axvline(max_val, color='blue', linestyle='dashed', linewidth=2)
-        plt.legend({'Min':min_val, 'Average':average, 'Max':max_val})
-        plt.title('Tweets per Writer')
-        plt.xlabel("Number of tweets")
-        plt.ylabel("Number of writers")
-        plt.show() 
+        counts, min_val,max_val,average = self.dataframeExplore.getTweetWritersCounts()
+        return self.createHistPlot(counts,min_val,max_val,average,'Number of tweets','Number of writers','Tweets per writer distribution')
         
     def createPOSCountsPlot(self):
         pos_counts = self.dataframeExplore.getPOSCounts()
@@ -158,16 +157,17 @@ print(len(dfGoogle),len(dfApple),len(dfMicrosoft),len(dfAmazon),len(dfTesla))
 plots = DataframeExplorePlots(TweetDataframeExplore(df))
 #plots.createCompanyTweetNumbersPlot()
 #plots.createTweetsPerDayPlot() 
-plots.createNumberOfWordsPlot()
-#plots.createCardinalNumbersPlot()
+#plots.createNumberOfWordsPlot()
+#plots.createNumberOfCharactersPlot()
+#plots.createWrittenNumbersPlot()
 #print(TweetDataframeExplore(df).getMostFrequentWordsNamedEntities(100))
 #plots.createURLPerTweetsPlot()
 #plots.createExactAndNearDuplicatesPlot()
 #plots.createExactDuplicatesPlot()
 #print(TweetDataframeExplore(df).printOriginalAndNearDuplicateRowsText())
-#plots.createCommentsPerTweetDatePlot()
+plots.createCommentsPerTweetDatePlot()
 #plots.createLikesPerTweetDatePlot()
-#plots.createRetweetsPerTweetDatePlot()
+#lots.createRetweetsPerTweetDatePlot()
 #print(TweetDataframeExplore(df).getMostFrequentWriters(100))
 #plots.createTweetsPerWriterPlot()
 #plots.createPOSCountsPlot()
