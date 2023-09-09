@@ -3,13 +3,16 @@ Created on 07.02.2023
 
 @author: vital
 '''
-import pandas as pd
-import spacy
 from collections import Counter
 import re
-from tweetpreprocess.nearduplicates.NearDuplicateDetector import NearDuplicateDetector
-from tweetpreprocess.nearduplicates.DuplicateDetector import DuplicateDetector
+
+import spacy
+
+import pandas as pd
 from sentiment.TweetSentimentAnalysis import TweetSentimentAnalysis
+from tweetpreprocess.nearduplicates.DuplicateDetector import DuplicateDetector
+from tweetpreprocess.nearduplicates.NearDuplicateDetector import NearDuplicateDetector
+
 
 class TweetDataframeExplore(object):
 
@@ -72,6 +75,17 @@ class TweetDataframeExplore(object):
     
     def getNumberofCharactersValues(self):
         return self.countValuesPerTweet(self.bodyColumnName,self.dataframe,lambda x: len(str(x)))
+
+    def getNumberOfLikes(self):
+        return self.countValuesPerTweet(self.likeNumberColumn,self.dataframe,lambda x: x)
+    
+    
+    def getNumberOfComments(self):
+        return self.countValuesPerTweet(self.commentNumberColumn,self.dataframe,lambda x: x)
+    
+    
+    def getNumberOfRetweets(self):
+        return self.countValuesPerTweet(self.retweetNumberColumn,self.dataframe,lambda x: x)
 
 
     def countValuesPerTweet(self,column,dataframe,countFunction):
