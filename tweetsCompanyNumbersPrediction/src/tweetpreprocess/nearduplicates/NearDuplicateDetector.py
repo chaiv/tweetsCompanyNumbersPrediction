@@ -36,13 +36,14 @@ class NearDuplicateDetector(object):
     
     def getOriginalRowsWithDuplicateRowIndexesDefault(self):
         tweet_texts = self.dataframe[self.bodyColumnName].tolist()
+        f = 128
         simhashes = []
         for i in range(len(tweet_texts)):
             tweet_text = tweet_texts[i]
-            val = (i,Simhash(self.get_features(tweet_text)))
+            val = (i,Simhash(self.get_features(tweet_text),f=f))
             simhashes.append(val)
             print("Row "+str(i))
-        index = SimhashIndex(simhashes, k=3)
+        index = SimhashIndex(simhashes, k=3,f=f)
         allResults = []
         for i in range(len(self.dataframe)): 
             result = index.get_near_dups(simhashes[i][1])

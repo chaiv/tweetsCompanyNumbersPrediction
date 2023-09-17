@@ -167,18 +167,20 @@ dfMicrosoft = TweetDataframeQuery().query(df,TweetQueryParams(companyNames =["MS
 dfAmazon = TweetDataframeQuery().query(df,TweetQueryParams(companyNames =["AMZN"]))
 dfTesla = TweetDataframeQuery().query(df,TweetQueryParams(companyNames =["TSLA"]))
 print(len(dfGoogle),len(dfApple),len(dfMicrosoft),len(dfAmazon),len(dfTesla))
-plots = DataframeExplorePlots(TweetDataframeExplore(df))
+dataframeExplore = TweetDataframeExplore(df)
+plots = DataframeExplorePlots(dataframeExplore)
 
-#plots.createWrittenNumbersPlot()
-#print(TweetDataframeExplore(df).getMostFrequentWordsNamedEntities(100))
-#plots.createExactAndNearDuplicatesPlot()
+
 #print(TweetDataframeExplore(df).printOriginalAndNearDuplicateRowsText())
-#print(TweetDataframeExplore(df).getMostFrequentWriters(100))
-#plots.createPOSCountsPlot()
 #plots.createSentimentLabelNumbersPlot()
 #plots.createSentimentPolarityPerTweetDatePlot()
 
 #DONE
+#plots.createPOSCountsPlot()
+#dataframeExplore.printValueCounts(dataframeExplore.getMostFrequentWriters(100))
+#plots.createExactAndNearDuplicatesPlot()
+#print(TweetDataframeExplore(df).getMostFrequentWordsNamedEntities(100))
+#plots.createWrittenNumbersPlot()
 #plots.createCompanyTweetNumbersPlot()
 #plots.createTweetsPerDayPlot() 
 #plots.createNumberOfWordsPlot()

@@ -112,6 +112,10 @@ class TweetDataframeExplore(object):
             print(i := i + 1)
             entity_freq.update([entity.text for entity in doc.ents])
         return entity_freq
+    
+    def printValueCounts(self,valueCounts):
+        for value, count in valueCounts.items():
+            print(f"{value} : {count}")
 
     def getMostFrequentWordsNamedEntities(self,firstN):
         entity_freq = self.getNamedEntitiesFrequences()        
