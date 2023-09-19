@@ -170,12 +170,9 @@ print(len(dfGoogle),len(dfApple),len(dfMicrosoft),len(dfAmazon),len(dfTesla))
 dataframeExplore = TweetDataframeExplore(df)
 plots = DataframeExplorePlots(dataframeExplore)
 
-
-#print(TweetDataframeExplore(df).printOriginalAndNearDuplicateRowsText())
-#plots.createSentimentLabelNumbersPlot()
-#plots.createSentimentPolarityPerTweetDatePlot()
-
 #DONE
+#plots.createSentimentLabelNumbersPlot()
+#print(TweetDataframeExplore(dfMicrosoft).printOriginalAndNearDuplicateRowsText())
 #plots.createPOSCountsPlot()
 #dataframeExplore.printValueCounts(dataframeExplore.getMostFrequentWriters(100))
 #plots.createExactAndNearDuplicatesPlot()
