@@ -10,8 +10,8 @@ from topicmodelling.TopicModelCreator import TopicModelCreator
 from topicmodelling.TopicExtractor import TopicExtractor
 from nlpvectors.VocabularyCreator import PAD_TOKEN, UNK_TOKEN, SEP_TOKEN
 
-modelpath =  DataDirHelper().getDataDir()+ "companyTweets\\amazonTopicModelV2"
-wordVectorsPath = DataDirHelper().getDataDir()+ "companyTweets\WordVectorsAmazonV2.txt"
+modelpath =  DataDirHelper().getDataDir()+ "companyTweets\\TopicModelAAPLFirst1000V2"
+wordVectorsPath = DataDirHelper().getDataDir()+ "companyTweets\WordVectorsAAPLFirst1000.txt"
 
 # Load the word vectors
 topicExtractor = TopicExtractor(TopicModelCreator().load(modelpath))

@@ -27,19 +27,22 @@ from classifier.Trainer import Trainer
 from classifier.transformer.Predictor import Predictor
 from classifier.PredictionClassMappers import BINARY_0_1
 from classifier.ClassificationMetrics import ClassificationMetrics
+from classifier.TweetGroupDataset import TweetGroupDataset
 
-
-#TODO recreate Word vector file because of SEP_TOKEN!
 
 torch.set_float32_matmul_precision('medium') #needed for quicker cuda 
 
 if  __name__ == "__main__":
-    batch_size = 2048
+    batch_size = 100
     epochs = 10
-    num_workers = 8
+    num_workers = 2
     emb_size = 300
      
-    df = pd.read_csv(DataDirHelper().getDataDir()+"companyTweets\\amazonTweetsWithNumbers.csv") 
+     
+    #df = pd.read_csv(DataDirHelper().getDataDir()+"companyTweets\\CompanyTweetsAAPLFirst1000WithNumbers.csv") 
+    #word_vectors = KeyedVectors.load_word2vec_format(DataDirHelper().getDataDir()+ "companyTweets\\WordVectorsAAPLFirst1000.txt", binary=False) 
+    df = pd.read_csv(DataDirHelper().getDataDir()+"companyTweets\\amazonTweetsWithNumbers.csv")
+    df.fillna('', inplace=True) #nan values in body columns 
     word_vectors = KeyedVectors.load_word2vec_format(DataDirHelper().getDataDir()+ "companyTweets\\WordVectorsAmazonV2.txt", binary=False)
     textEncoder = WordVectorsIDEncoder(word_vectors)
     
@@ -56,7 +59,9 @@ if  __name__ == "__main__":
     #     lr=1e-4, n_outputs=2, vocab_size=vocab_size,channels= 300
     #     ) #https://discuss.pytorch.org/t/solved-assertion-srcindex-srcselectdimsize-failed-on-gpu-for-torch-cat/1804/13
     
-    kfold_cross_val = KFold(n_splits=10, shuffle=True, random_state=1337)
+    kfold_splits = 10
+    
+    kfold_cross_val = KFold(n_splits=kfold_splits, shuffle=True, random_state=1337)
     for fold, (train_idx, test_idx) in enumerate(kfold_cross_val.split(df)):
         train_idx, val_idx = train_test_split(train_idx, random_state=1337, test_size=0.3)
         train_df = df.iloc[train_idx]
@@ -67,13 +72,13 @@ if  __name__ == "__main__":
         print("Val classes",TweetDataframeExplore(val_df).getClassDistribution())
         print("Test classes",TweetDataframeExplore(test_df).getClassDistribution())
         
-        train_data = Dataset(dataframe=train_df,tokenizer = tokenizer, textEncoder = textEncoder)
-        val_data = Dataset(dataframe=val_df,tokenizer = tokenizer,textEncoder =textEncoder)
-        test_data = Dataset(dataframe=test_df,tokenizer = tokenizer,textEncoder = textEncoder)
+        train_data = TweetGroupDataset(dataframe=train_df, n_tweets_as_sample=5, tokenizer = tokenizer,textEncoder = textEncoder)
+        val_data = TweetGroupDataset(dataframe=val_df, n_tweets_as_sample=5, tokenizer = tokenizer,textEncoder = textEncoder)
+        test_data = TweetGroupDataset(dataframe=test_df, n_tweets_as_sample=5, tokenizer = tokenizer,textEncoder = textEncoder)
     
-        print("len(train_data)", len(train_data))
-        print("len(val_data)", len(val_data))
-        print("len(test_data)", len(test_data))
+        print("len(train_data)", train_data.__len__())
+        print("len(val_data)", val_data.__len__())
+        print("len(test_data)", test_data.__len__())
         
         Trainer().train(
             batch_size=batch_size, 
@@ -90,10 +95,10 @@ if  __name__ == "__main__":
             checkpointName = f"tweetpredict_fold{fold}"
             )
         
-        predictionClassMapper = BINARY_0_1 
-        predictor = Predictor(model,tokenizer,textEncoder,predictionClassMapper,None)
-        predictions = predictor.predictMultipleInChunks(test_df["body"].tolist(),chunkSize=1000)
-        true_classes = test_df["class"].tolist()
-        metrics = ClassificationMetrics() 
-        print(metrics.classification_report(true_classes, predictions))
+        # predictionClassMapper = BINARY_0_1 
+        # predictor = Predictor(model,tokenizer,textEncoder,predictionClassMapper,None)
+        # predictions = predictor.predictMultipleInChunks(test_df["body"].tolist(),chunkSize=1000)
+        # true_classes = test_df["class"].tolist()
+        # metrics = ClassificationMetrics() 
+        # print(metrics.classification_report(true_classes, predictions))
 
