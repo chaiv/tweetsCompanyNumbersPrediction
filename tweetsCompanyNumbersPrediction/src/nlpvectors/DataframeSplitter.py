@@ -7,11 +7,10 @@ Created on 24.04.2023
 class DataframeSplitter(object):
 
 
-
     def __init__(self):
         pass
     
-    def splitDfByNSamplesForClass(self, df, split_size, classColumnName="class"):
+    def getDfSplitIndexes(self, df, split_size, classColumnName="class"):
         # Create an empty list to store the resulting splits
         splits = []
         
@@ -28,14 +27,14 @@ class DataframeSplitter(object):
 
             # Add the splits to the list
             for i in range(num_splits):
-                split = class_df.iloc[i * split_size : (i + 1) * split_size]
-                splits.append(split)
+                splitDf = class_df.iloc[i * split_size : (i + 1) * split_size]
+                splits.append(splitDf.index.tolist())
 
             # Add the remaining rows to a smaller split if there are any
             remaining_rows = len(class_df) % split_size
             if remaining_rows > 0:
-                split = class_df.iloc[-remaining_rows:]
-                splits.append(split)
+                splitDf = class_df.iloc[-remaining_rows:]
+                splits.append(splitDf.index.tolist())
 
         return splits    
          

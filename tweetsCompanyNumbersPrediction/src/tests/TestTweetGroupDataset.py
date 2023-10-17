@@ -9,6 +9,7 @@ from nlpvectors.AbstractTokenizer import AbstractTokenizer
 from nlpvectors.AbstractEncoder import AbstractEncoder
 from classifier.TweetGroupDataset import TweetGroupDataset
 import torch
+from nlpvectors.DataframeSplitter import DataframeSplitter
 
 class FakeTokenizer(AbstractTokenizer):
     def __init__(self):
@@ -43,11 +44,10 @@ class TestTweetGroupDataset(unittest.TestCase):
             'class': [0, 0, 1, 1,0]
         }
         df = pd.DataFrame(data)
-        n_tweets_as_sample = 2
         tokenizer = FakeTokenizer()
         textEncoder = FakeTextEncoder()
-
-        self.dataset = TweetGroupDataset(df, n_tweets_as_sample, tokenizer, textEncoder)
+        samples = DataframeSplitter().getDfSplitIndexes(df, 2, 'class')
+        self.dataset = TweetGroupDataset(df, samples, tokenizer, textEncoder)
 
     def test_len(self):
         self.assertEqual(len(self.dataset), 3)
