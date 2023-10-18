@@ -14,6 +14,28 @@ class TestDataframeSplitter(unittest.TestCase):
     def setUp(self):
         self.splitter = DataframeSplitter()
         
+        
+    def testFlattenFoldsAndUseAsIndexes(self):
+        data = {
+            'class': ['A', 'A', 'B', 'B', 'A']
+        }
+        df = pd.DataFrame(data)
+        splits = self.splitter.getDfSplitIndexes(df, 2)
+        kfold = KFold(n_splits=2, shuffle=True, random_state=1337)
+        folds = list(enumerate(kfold.split(splits)))
+        fold_0, (train_idx_0, test_idx_0) = folds[0]
+        fold_1, (train_idx_1, test_idx_1) = folds[1]
+        train_rows_0 = self.splitter.getRowIndexesOfSplitsAsFlattenedList(splits,train_idx_0)
+        test_rows_0 = self.splitter.getRowIndexesOfSplitsAsFlattenedList(splits,test_idx_0)
+        train_rows_1 = self.splitter.getRowIndexesOfSplitsAsFlattenedList(splits,train_idx_1)
+        test_rows_1 = self.splitter.getRowIndexesOfSplitsAsFlattenedList(splits,test_idx_1)
+        self.assertEqual([4],train_rows_0)
+        self.assertEqual([0,1,2,3],test_rows_0)
+        self.assertEqual([0,1,2,3],train_rows_1)
+        self.assertEqual([4],test_rows_1)
+        self.assertEqual(4,len(df.iloc[test_rows_0]))
+        
+        
     def testKFoldWithSplits(self):
         data = {
             'class': ['A', 'A', 'B', 'B', 'A']

@@ -10,6 +10,12 @@ class DataframeSplitter(object):
     def __init__(self):
         pass
     
+    def getRowIndexesOfSplitsAsFlattenedList(self,splits,splitIndexes):
+        row_indexes= []
+        for split_index in splitIndexes:
+            row_indexes.extend(splits[split_index ])
+        return row_indexes
+    
     def getDfSplitIndexes(self, df, split_size, classColumnName="class"):
         # Create an empty list to store the resulting splits
         splits = []
