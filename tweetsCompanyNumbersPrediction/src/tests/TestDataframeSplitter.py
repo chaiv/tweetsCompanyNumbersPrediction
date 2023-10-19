@@ -5,18 +5,34 @@ Created on 24.04.2023
 '''
 import unittest
 import pandas as pd
-import numpy as np
 from nlpvectors.DataframeSplitter import DataframeSplitter
 from sklearn.model_selection._split import KFold
+from nlpvectors.VocabularyCreator import SEP_TOKEN
 
 class TestDataframeSplitter(unittest.TestCase):
 
     def setUp(self):
         self.splitter = DataframeSplitter()
+     
+    def testDfWithGroupedTweets(self):
+        data = {
+            "tweet_id" : [0,1,2,3,4],
+            "body" : ["tweet_0","tweet_1","tweet_2","tweet_3","tweet_4"],
+            'class': ['A', 'A', 'B', 'B', 'A']
+        }
+        df = pd.DataFrame(data)
+        resultDf = self.splitter.getDfWithGroupedTweets(df,2)
+        self.assertEqual(3,len(resultDf))
+        self.assertEqual([0, 1],resultDf.iloc[0]["tweet_ids"])
+        self.assertEqual([4],resultDf.iloc[1]["tweet_ids"])
+        self.assertEqual([2, 3],resultDf.iloc[2]["tweet_ids"])
+        self.assertEqual('tweet_0'+SEP_TOKEN+'tweet_1',resultDf.iloc[0]["body"]) 
+        self.assertEqual('B',resultDf.iloc[2]["class"]) 
         
         
     def testFlattenFoldsAndUseAsIndexes(self):
         data = {
+            "tweet_id" : [0,1,2,3,4],
             'class': ['A', 'A', 'B', 'B', 'A']
         }
         df = pd.DataFrame(data)
@@ -38,6 +54,7 @@ class TestDataframeSplitter(unittest.TestCase):
         
     def testKFoldWithSplits(self):
         data = {
+            "tweet_id" : [0,1,2,3,4],
             'class': ['A', 'A', 'B', 'B', 'A']
         }
         df = pd.DataFrame(data)
@@ -54,6 +71,7 @@ class TestDataframeSplitter(unittest.TestCase):
 
     def test_splitDfByNSamplesForClass(self):
         data = {
+            "tweet_id" : [0,1,2,3,4,5,6,7,8],
             'class': ['A', 'A', 'B', 'B', 'A', 'A', 'B', 'B','A']
         }
         df = pd.DataFrame(data)
@@ -70,6 +88,7 @@ class TestDataframeSplitter(unittest.TestCase):
 
     def test_splitDfBySingleSampleForClass(self):
         data = {
+            "tweet_id" : [0,1,2,3],
             'class': ['A', 'A', 'B','A']
         }
         df = pd.DataFrame(data)
