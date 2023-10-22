@@ -42,15 +42,15 @@ if  __name__ == "__main__":
     #     ) #https://discuss.pytorch.org/t/solved-assertion-srcindex-srcselectdimsize-failed-on-gpu-for-torch-cat/1804/13
     
     splitter = DataframeSplitter()
-    tweetSplits = DataframeSplitter().getDfSplitIndexes(df, 5, 'class') #how many tweets should be trained as one sample
+    tweetSplits = DataframeSplitter().getSplitIds(df, 5) #how many tweets should be trained as one sample
     kfold_splits = 10
     kfold_cross_val = KFold(n_splits=kfold_splits, shuffle=True, random_state=1337)
     for fold, (train_idx, test_idx) in enumerate(kfold_cross_val.split(tweetSplits)):
         np.save(DataDirHelper().getDataDir() + f'companyTweets\\model\\test_idx_fold{fold}.npy', test_idx) #save test indexes for later classification metrics
         train_idx, val_idx = train_test_split(train_idx, random_state=1337, test_size=0.3)
-        train_df = df.iloc[splitter.getRowIndexesOfSplitsAsFlattenedList(tweetSplits,train_idx)]
-        val_df = df.iloc[splitter.getRowIndexesOfSplitsAsFlattenedList(tweetSplits,val_idx)]
-        test_df = df.iloc[splitter.getRowIndexesOfSplitsAsFlattenedList(tweetSplits,test_idx)]
+        train_df = df.iloc[splitter.getIdsOfSplitsAsFlattenedList(tweetSplits,train_idx)]
+        val_df = df.iloc[splitter.getIdsOfSplitsAsFlattenedList(tweetSplits,val_idx)]
+        test_df = df.iloc[splitter.getIdsOfSplitsAsFlattenedList(tweetSplits,test_idx)]
         print("Train classes", TweetDataframeExplore(train_df).getClassDistribution())
         print("Val classes", TweetDataframeExplore(val_df).getClassDistribution())
         print("Test classes", TweetDataframeExplore(test_df).getClassDistribution())

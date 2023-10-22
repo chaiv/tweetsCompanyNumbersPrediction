@@ -5,6 +5,7 @@ Created on 24.04.2023
 @author: vital
 '''
 import pandas as pd
+from collections import Counter
 
 class DataframeSplitter(object):
 
@@ -12,17 +13,29 @@ class DataframeSplitter(object):
     def __init__(self):
         pass
     
-    def getRowIndexesOfSplitsAsFlattenedList(self,splits,splitIndexes):
-        row_indexes= []
+    
+    
+    
+    def getClassCountsOfSplits(self,df,splits,idColumnName = "tweet_id",classColumnName="class"):
+        classCounts = Counter()
+        for split in splits:
+             classLabel = df[df[idColumnName]==split[0]].iloc[0][classColumnName]
+             classCounts[classLabel] += 1
+        return  classCounts   
+        
+    
+    
+    def getIdsOfSplitsAsFlattenedList(self,splits,splitIndexes):
+        ids= []
         for split_index in splitIndexes:
-            row_indexes.extend(splits[split_index ])
-        return row_indexes
+            ids.extend(splits[split_index ])
+        return ids
     
     
     def getDfWithGroupedTweets(self,df,split_size,idColumnName = "tweet_id",bodyColumnName="body",classColumnName="class",
                                combinedIdsColumnName= 'tweet_ids',combinedBodyColumnName='body'
                                ):
-        splits = self.getDfSplitIndexes(df, split_size,idColumnName, classColumnName)
+        splits = self.getSplitIds(df, split_size,idColumnName, classColumnName)
         combined_text_lists = []
         combined_ids_lists = []
         combined_class_lists = []
@@ -36,7 +49,7 @@ class DataframeSplitter(object):
         grouped_tweets_df = pd.DataFrame({combinedIdsColumnName: combined_ids_lists,combinedBodyColumnName: combined_text_lists, classColumnName : combined_class_lists })
         return grouped_tweets_df
     
-    def getDfSplitIndexes(self, df, split_size,idColumnName = "tweet_id", classColumnName="class"):
+    def getSplitIds(self, df, split_size,idColumnName = "tweet_id", classColumnName="class"):
         # Create an empty list to store the resulting splits
         splits = []
         

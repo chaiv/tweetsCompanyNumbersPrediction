@@ -48,7 +48,7 @@ class TestTweetGroupDataset(unittest.TestCase):
         df = pd.DataFrame(data)
         tokenizer = FakeTokenizer()
         textEncoder = FakeTextEncoder()
-        samples = DataframeSplitter().getDfSplitIndexes(df, 2)
+        samples = DataframeSplitter().getSplitIds(df, 2)
         self.dataset = TweetGroupDataset(df, samples, tokenizer, textEncoder)
 
     def test_len(self):
