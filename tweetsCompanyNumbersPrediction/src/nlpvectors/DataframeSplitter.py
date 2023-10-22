@@ -54,13 +54,15 @@ class DataframeSplitter(object):
             # Add the splits to the list
             for i in range(num_splits):
                 splitDf = class_df.iloc[i * split_size : (i + 1) * split_size]
-                splits.append(splitDf[idColumnName].tolist())
+                splitIds = splitDf[idColumnName].tolist() 
+                splits.append(splitIds)
 
             # Add the remaining rows to a smaller split if there are any
             remaining_rows = len(class_df) % split_size
             if remaining_rows > 0:
                 splitDf = class_df.iloc[-remaining_rows:]
-                splits.append(splitDf[idColumnName].tolist())
+                splitIds = splitDf[idColumnName].tolist() 
+                splits.append(splitIds)
 
         return splits    
          

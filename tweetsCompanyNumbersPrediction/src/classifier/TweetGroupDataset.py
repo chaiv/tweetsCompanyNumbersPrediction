@@ -13,22 +13,24 @@ class TweetGroupDataset(Dataset):
     '''
     This dataset processes multiple tweets as a single sample
     '''
-    def __init__(self, dataframe,samples, tokenizer:AbstractTokenizer,textEncoder:AbstractEncoder, textColumnName = "body" , classColumnName = "class"):
+    def __init__(self, dataframe,splits, tokenizer:AbstractTokenizer,textEncoder:AbstractEncoder, tweetIdColumn = "tweet_id", textColumnName = "body" , classColumnName = "class"):
         self.textColumnName = textColumnName
         self.classColumnName = classColumnName
         self.textEncoder = textEncoder
         self.tokenizer = tokenizer
-        self.samples = samples
         self.dataframe = dataframe
+        self.splits = splits
+        self.tweetIdColumn = tweetIdColumn
         
 
     def __len__(self):
-        return len(self.samples)
+        return len(self.splits)
 
     def __getitem__(self, idx):
-        row_idx = self.samples[idx]
-        sentences = self.dataframe.iloc[row_idx][self.textColumnName]
-        label = self.dataframe.iloc[row_idx][self.classColumnName].iloc[0]
+        split = self.splits[idx]
+        splitDf =  self.dataframe [ self.dataframe [self.tweetIdColumn].isin( split)]
+        sentences = splitDf [self.textColumnName]
+        label = splitDf[self.classColumnName].iloc[0]
         sentencesWrapper = createSentencesWrapper(self.tokenizer,self.textEncoder,sentences,sentenceIds=None)
         x = sentencesWrapper.getFeatureVector()
         x = torch.tensor(x, dtype=torch.long)

@@ -39,14 +39,16 @@ class FakeTextEncoder(AbstractEncoder):
 class TestTweetGroupDataset(unittest.TestCase):
       
     def setUp(self):
+        
         data = {
+            'tweet_id' : [1,2,3,4,5],
             'body': ['tweet 1', 'tweet 2', 'tweet 3', 'tweet 4','tweet 5'],
             'class': [0, 0, 1, 1,0]
         }
         df = pd.DataFrame(data)
         tokenizer = FakeTokenizer()
         textEncoder = FakeTextEncoder()
-        samples = DataframeSplitter().getDfSplitIndexes(df, 2, 'class')
+        samples = DataframeSplitter().getDfSplitIndexes(df, 2)
         self.dataset = TweetGroupDataset(df, samples, tokenizer, textEncoder)
 
     def test_len(self):
