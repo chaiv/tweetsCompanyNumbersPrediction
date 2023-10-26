@@ -13,7 +13,7 @@ class TweetGroupDataset(Dataset):
     '''
     This dataset processes multiple tweets as a single sample
     '''
-    def __init__(self, dataframe,splits, tokenizer:AbstractTokenizer,textEncoder:AbstractEncoder, tweetIdColumn = "tweet_id", textColumnName = "body" , classColumnName = "class"):
+    def __init__(self, dataframe,splits,splitIndexes, tokenizer:AbstractTokenizer,textEncoder:AbstractEncoder, tweetIdColumn = "tweet_id", textColumnName = "body" , classColumnName = "class"):
         self.textColumnName = textColumnName
         self.classColumnName = classColumnName
         self.textEncoder = textEncoder
@@ -21,13 +21,14 @@ class TweetGroupDataset(Dataset):
         self.dataframe = dataframe
         self.splits = splits
         self.tweetIdColumn = tweetIdColumn
+        self.splitIndexes = splitIndexes
         
 
     def __len__(self):
-        return len(self.splits)
+        return len(self.splitIndexes)
 
     def __getitem__(self, idx):
-        split = self.splits[idx]
+        split = self.splits[self.splitIndexes[idx]]
         splitDf =  self.dataframe [ self.dataframe [self.tweetIdColumn].isin( split)]
         sentences = splitDf [self.textColumnName]
         label = splitDf[self.classColumnName].iloc[0]

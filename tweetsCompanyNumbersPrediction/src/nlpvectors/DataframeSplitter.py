@@ -1,7 +1,8 @@
 from nlpvectors.VocabularyCreator import SEP_TOKEN
 '''
 Created on 24.04.2023
-
+The purpose of this class is to split a dataframe into group of tweets that have the same class value. 
+Because of pandas large data perfomance issues the splits are returned as list of indexes or tweet ids
 @author: vital
 '''
 import pandas as pd
@@ -13,7 +14,11 @@ class DataframeSplitter(object):
     def __init__(self):
         pass
     
-    
+    def getClassCountsOfSplitsByIndexes(self,df,splits,splitIndexes,idColumnName = "tweet_id",classColumnName="class"):
+        splitsFromIndexes = []
+        for splitIndex in splitIndexes:
+            splitsFromIndexes.append(splits[splitIndex])
+        return self.getClassCountsOfSplits(df, splitsFromIndexes,idColumnName,classColumnName)
     
     
     def getClassCountsOfSplits(self,df,splits,idColumnName = "tweet_id",classColumnName="class"):

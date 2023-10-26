@@ -48,13 +48,18 @@ class TestTweetGroupDataset(unittest.TestCase):
         df = pd.DataFrame(data)
         tokenizer = FakeTokenizer()
         textEncoder = FakeTextEncoder()
-        samples = DataframeSplitter().getSplitIds(df, 2)
-        self.dataset = TweetGroupDataset(df, samples, tokenizer, textEncoder)
+        self.splits= DataframeSplitter().getSplitIds(df, 2) 
+        splitIndexes = [0,1]
+        self.dataset = TweetGroupDataset(df, self.splits, splitIndexes, tokenizer, textEncoder)
+
+
+    def test_splits(self):
+        self.assertEqual([[1, 2], [5], [3, 4]],self.splits)
 
     def test_len(self):
-        self.assertEqual(len(self.dataset), 3)
+        self.assertEqual(len(self.dataset), 2)
 
-    def test_getitem_multiple_tweets(self):
+    def test_getitem_multiple_tweets_of_class_0(self):
         x, y = self.dataset[0]
         self.assertIsInstance(x, torch.Tensor)
         self.assertTrue(x.dtype == torch.long)
@@ -63,8 +68,8 @@ class TestTweetGroupDataset(unittest.TestCase):
         self.assertTrue(torch.equal(x, expected_x))
         self.assertEqual(y, expected_y)
         
-    def test_getitem_remaining_tweet(self):
-        x, y = self.dataset[1] # 1 and not 2, because it is sorted by class labels and the last remaining sentence with class 0 is put as own sample after the first two with class 0. 
+    def test_getitem_remaining_tweet_of_class_0(self):
+        x, y = self.dataset[1] 
         self.assertIsInstance(x, torch.Tensor)
         self.assertTrue(x.dtype == torch.long)
         expected_x = torch.tensor([1,1])

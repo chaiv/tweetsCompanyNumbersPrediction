@@ -13,6 +13,19 @@ class TestDataframeSplitter(unittest.TestCase):
 
     def setUp(self):
         self.splitter = DataframeSplitter()
+    
+    def testClassCountsOfSplitsByIndexes(self):
+        data = {
+            "tweet_id" : [4,1,8,3,7],
+            'class': [0, 1, 1, 0, 1]
+        }
+        df = pd.DataFrame(data)
+        splits = self.splitter.getSplitIds(df, 2)
+        splitIndexes = [1,2]
+        resultCounts = self.splitter.getClassCountsOfSplitsByIndexes(df, splits,splitIndexes)
+        self.assertEqual(resultCounts[0],0)
+        self.assertEqual(resultCounts[1],2)
+    
      
      
     def testClassCountsOfSplits(self):

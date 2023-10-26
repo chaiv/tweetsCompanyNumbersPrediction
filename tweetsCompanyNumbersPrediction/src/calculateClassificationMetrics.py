@@ -33,6 +33,8 @@ predictionClassMapper = BINARY_0_1
 predictor = Predictor(model,TweetTokenizer(DefaultWordFilter()),encoder,predictionClassMapper,None)
 df = pd.read_csv(DataDirHelper().getDataDir()+ 'companyTweets\\amazonTweetsWithNumbers.csv')
 df.fillna('', inplace=True) #nan values in body columns
+
+
 testsamples = DataframeSplitter().splitDfByNSamplesForClass(df.iloc[np.load(DataDirHelper().getDataDir()+"companyTweets\\model\\test_idx_fold0.npy")],5, 'class')
 sentenceWrappers = df["body"].tolist()
 true_classes = [testsample["class"] for testsample in testsamples]
