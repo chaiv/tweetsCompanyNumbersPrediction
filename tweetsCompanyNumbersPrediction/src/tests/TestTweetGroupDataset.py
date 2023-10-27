@@ -76,6 +76,12 @@ class TestTweetGroupDataset(unittest.TestCase):
         expected_y = 0
         self.assertTrue(torch.equal(x, expected_x))
         self.assertEqual(y, expected_y)
+        
+    def test_getAsTweetGroup(self):
+        tweetGroup = self.dataset.getAsTweetGroup(0)
+        self.assertEqual([1,1,2,1,1],tweetGroup.getFeatureVector())
+        self.assertEqual(0,tweetGroup.getLabel())
+        self.assertEqual([1,2],tweetGroup.getSentenceIds())
 
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']

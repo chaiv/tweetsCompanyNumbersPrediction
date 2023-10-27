@@ -16,9 +16,11 @@ from gensim.models import KeyedVectors
 from nlpvectors.WordVectorsIDEncoder import WordVectorsIDEncoder
 from classifier.LSTMNN import LSTMNN
 from nlpvectors.DataframeSplitter import DataframeSplitter
+from classifier.TweetGroupDataset import TweetGroupDataset
 
 word_vectors = KeyedVectors.load_word2vec_format(DataDirHelper().getDataDir()+ "companyTweets\\WordVectorsAmazonV2.txt", binary=False)
-encoder = WordVectorsIDEncoder(word_vectors)
+textEncoder = WordVectorsIDEncoder(word_vectors)
+tokenizer = TweetTokenizer(DefaultWordFilter())
 checkpointName = "\\amazonRevenueLSTMN5\\tweetpredict_fold0.ckpt"
 model = LSTMNN(300,word_vectors)
 # model = Transformer(
@@ -26,20 +28,23 @@ model = LSTMNN(300,word_vectors)
 #         lr=1e-4, n_outputs=2, vocab_size=encoder.getVocabularyLength(),channels= 300
 #         )
 model = model.to(torch.device("cuda:0"))
-checkpoint = torch.load(DataDirHelper().getDataDir()+"companyTweets\\model\\"+checkpointName)
+checkpoint = torch.load(DataDirHelper().getDataDir()+"companyTweets\\model\\amazonRevenueLSTMN5\\tweetpredict_fold2.ckpt")
 model.load_state_dict(checkpoint['state_dict'])
 model.eval()
-predictionClassMapper = BINARY_0_1 
-predictor = Predictor(model,TweetTokenizer(DefaultWordFilter()),encoder,predictionClassMapper,None)
+predictor = Predictor(model,tokenizer,textEncoder ,BINARY_0_1 ,None)
 df = pd.read_csv(DataDirHelper().getDataDir()+ 'companyTweets\\amazonTweetsWithNumbers.csv')
 df.fillna('', inplace=True) #nan values in body columns
-
-
-testsamples = DataframeSplitter().splitDfByNSamplesForClass(df.iloc[np.load(DataDirHelper().getDataDir()+"companyTweets\\model\\test_idx_fold0.npy")],5, 'class')
-sentenceWrappers = df["body"].tolist()
-true_classes = [testsample["class"] for testsample in testsamples]
-predictions = predictor.predictMultipleInChunks(sentences,chunkSize=1000)
+splits = DataframeSplitter().getSplitIds(df,5)
+testSplitIndexes = np.load(DataDirHelper().getDataDir()+"companyTweets\\model\\amazonRevenueLSTMN5\\test_idx_fold2.npy")
+test_dataset = TweetGroupDataset(dataframe=df,splits = splits, splitIndexes= testSplitIndexes, tokenizer=tokenizer, textEncoder=textEncoder)
+tweetGroups = []
+true_classes = []
+for i in range(len(test_dataset)):
+    tweetGroup = test_dataset.getAsTweetGroup(i)
+    tweetGroups.append(tweetGroup)
+    true_classes.append(tweetGroup.getLabel())
+prediction_classes = predictor.predictMultipleAsTweetGroupsInChunks(tweetGroups, 1000)
 metrics = ClassificationMetrics() 
-print(metrics.classification_report(true_classes, predictions))
+print(metrics.classification_report(true_classes, prediction_classes))
 
 

@@ -30,7 +30,7 @@ class Predictor(object):
         self.deviceToUse = deviceToUse
         self.predictionClassMapper = predictionClassMapper
         
-    def predictMultipleAsWrapper(self,sentenceWrappers):
+    def predictMultipleAsTweetGroups(self,sentenceWrappers):
         x = [torch.tensor(sentenceWrapper.getFeatureVector(), dtype=torch.long).to(self.deviceToUse) for sentenceWrapper in sentenceWrappers]
         x = torch.nn.utils.rnn.pad_sequence(x, batch_first=True, padding_value=self.textEncoder.getPADTokenID())
         with torch.no_grad():
@@ -39,11 +39,11 @@ class Predictor(object):
             predicted_classes = predicted.tolist()
         return [self.predictionClassMapper.index_to_class(pred) for pred in predicted_classes]
     
-    def predictMultipleAsWrappersInChunks(self,sentenceWrappers, chunkSize):
+    def predictMultipleAsTweetGroupsInChunks(self,sentenceWrappers, chunkSize):
         predictions = []
         for i in range(0, len(sentenceWrappers), chunkSize):
             chunk = sentenceWrappers[i:i + chunkSize]
-            chunkPredictions = self.predictMultipleAsWrapper(chunk)
+            chunkPredictions = self.predictMultipleAsTweetGroups(chunk)
             predictions += chunkPredictions
             print("Chunks processed",len(predictions))
         return predictions
@@ -99,7 +99,7 @@ class Predictor(object):
     
         return splitted_list
     
-    def calculateWordScoresOfSentenceWrapper(self,attributionsForSentenceWrapper,sentenceWrapper):
+    def calculateWordScoresOfTweetGroup(self,attributionsForSentenceWrapper,sentenceWrapper):
         separator_indexes = sentenceWrapper.getSeparatorIndexesInFeatureVector()
         attributionsForSentenceWrapperSplitted = self.split_list_on_indices(attributionsForSentenceWrapper.tolist(),separator_indexes)
         attribution_lists_for_sentences_of_wrapper = []
@@ -109,7 +109,7 @@ class Predictor(object):
             attribution_lists_for_sentences_of_wrapper.append(attributionsForSentence)
         return WordScoresWrapper(sentenceWrapper, attribution_lists_for_sentences_of_wrapper)
     
-    def calculateWordScoresForWrappers(self, sentenceWrappers : list, observed_class,n_steps=500,internal_batch_size = 10):
+    def calculateWordScoresForTweetGroup(self, sentenceWrappers : list, observed_class,n_steps=500,internal_batch_size = 10):
         x = [torch.tensor(sentenceWrapper.getFeatureVector(), dtype=torch.long).to(self.deviceToUse) for sentenceWrapper in sentenceWrappers]
         x = torch.nn.utils.rnn.pad_sequence(x, batch_first=True, padding_value=self.textEncoder.getPADTokenID())
         ref_tokens = [[self.textEncoder.getPADTokenID()] * len(x[0])] * len(sentenceWrappers)
@@ -120,7 +120,7 @@ class Predictor(object):
         
         for i in range(len(sentenceWrappers)):
             sentenceWrapper = sentenceWrappers[i]
-            wordScoresWrappers.append(self.calculateWordScoresOfSentenceWrapper(attributionsOfAllSentenceWrappers[i],sentenceWrapper))
+            wordScoresWrappers.append(self.calculateWordScoresOfTweetGroup(attributionsOfAllSentenceWrappers[i],sentenceWrapper))
         
         return wordScoresWrappers
         

@@ -24,7 +24,7 @@ from tests import TestPredictor
 from tests import EqualClassSamplerTest
 from tests import ImportantWordStoreTest
 from tests import ClassificationMetricsTest
-from tests.TestCreateSentencesWrapper import TestCreateSentencesWrapper
+from tests.TestCreateTweetGroup import TestCreateTweetGroup
 from tests.TestTweetGroupDataset import TestTweetGroupDataset
 from tests.TestDataframeSplitter import TestDataframeSplitter
 from tests.TestKFold import TestKFold
@@ -55,7 +55,7 @@ suite.addTests(loader.loadTestsFromModule(TestPredictor))
 suite.addTests(loader.loadTestsFromModule(TestTopicHeaderAddToDataframe))
 suite.addTests(loader.loadTestsFromModule(TweetDataframeExploreTest))
 suite.addTests(loader.loadTestsFromModule(TestManualTopicAnalyzer))
-suite.addTests(loader.loadTestsFromModule(TestCreateSentencesWrapper))
+suite.addTests(loader.loadTestsFromModule(TestCreateTweetGroup))
 suite.addTests(loader.loadTestsFromModule(TestTweetGroupDataset))
 suite.addTests(loader.loadTestsFromModule(TestDataframeSplitter))
 suite.addTests(loader.loadTestsFromModule(TestKFold))

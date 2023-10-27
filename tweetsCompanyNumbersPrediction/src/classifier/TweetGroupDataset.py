@@ -7,7 +7,8 @@ import torch
 from torch.utils.data import Dataset
 from nlpvectors.AbstractTokenizer import AbstractTokenizer
 from nlpvectors.AbstractEncoder import AbstractEncoder
-from nlpvectors.SentenceWrapper import createSentencesWrapper
+from nlpvectors.TweetGroup import createTweetGroup
+
 
 class TweetGroupDataset(Dataset):
     '''
@@ -26,15 +27,21 @@ class TweetGroupDataset(Dataset):
 
     def __len__(self):
         return len(self.splitIndexes)
-
-    def __getitem__(self, idx):
+    
+    
+    def getAsTweetGroup(self,idx):
         split = self.splits[self.splitIndexes[idx]]
         splitDf =  self.dataframe [ self.dataframe [self.tweetIdColumn].isin( split)]
+        sentenceIds = split
         sentences = splitDf [self.textColumnName]
         label = splitDf[self.classColumnName].iloc[0]
-        sentencesWrapper = createSentencesWrapper(self.tokenizer,self.textEncoder,sentences,sentenceIds=None)
-        x = sentencesWrapper.getFeatureVector()
+        tweetGroup = createTweetGroup(self.tokenizer,self.textEncoder,sentences,sentenceIds ,label)
+        return tweetGroup
+
+    def __getitem__(self, idx):
+        tweetGroup = self.getAsTweetGroup(idx)
+        x = tweetGroup.getFeatureVector()
         x = torch.tensor(x, dtype=torch.long)
-        y = label
+        y = tweetGroup.getLabel()
         return x, y
         

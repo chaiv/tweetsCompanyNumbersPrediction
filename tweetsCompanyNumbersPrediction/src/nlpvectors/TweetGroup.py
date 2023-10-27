@@ -9,10 +9,10 @@ from itertools import chain
 
 
 
-def createSentencesWrapper(tokenizer: AbstractTokenizer,textEncoder : AbstractEncoder, sentences,sentenceIds):
+def createTweetGroup(tokenizer: AbstractTokenizer,textEncoder : AbstractEncoder, sentences,sentenceIds,label):
     
     if len(sentences)==0: 
-        return SentencesWrapper()
+        return TweetGroup()
     
     totalTokenIndexes = []
     totalTokens = []
@@ -30,20 +30,21 @@ def createSentencesWrapper(tokenizer: AbstractTokenizer,textEncoder : AbstractEn
     # Find the indexes of encodedSeparatorToken in the totalFeatureVector
     separatorIndexesInFeatureVector = [i for i, token in enumerate(totalFeatureVector) if token == encodedSeparatorToken] 
             
-    sentencesWrapper = SentencesWrapper(sentences,sentenceIds,totalTokenIndexes,totalTokens,totalFeatureVector,separatorIndexesInFeatureVector)
-    return sentencesWrapper
+    tweetGroup = TweetGroup(sentences,sentenceIds,totalTokenIndexes,totalTokens,totalFeatureVector,separatorIndexesInFeatureVector,label)
+    return tweetGroup
 
 
-class SentencesWrapper(object):
+class TweetGroup(object):
 
 
-    def __init__(self,sentences=[],sentenceIds=[],totalTokenIndexes=[],totalTokens=[],totalFeatureVector=[],separatorIndexesInFeatureVector=[]):
+    def __init__(self,sentences=[],sentenceIds=[],totalTokenIndexes=[],totalTokens=[],totalFeatureVector=[],separatorIndexesInFeatureVector=[],label = None):
         self.sentences = sentences
         self.sentenceIds = sentenceIds
         self.totalTokenIndexes = totalTokenIndexes
         self.totalTokens = totalTokens
         self.totalFeatureVector = totalFeatureVector
         self.separatorIndexesInFeatureVector = separatorIndexesInFeatureVector
+        self.label = label
         
     def getFeatureVector(self):
         return self.totalFeatureVector
@@ -59,5 +60,8 @@ class SentencesWrapper(object):
     
     def getTokenIndexes(self):
         return self.totalTokenIndexes 
+    
+    def getLabel(self):
+        return self.label
         
     

@@ -78,7 +78,7 @@ class TestPredictor(unittest.TestCase):
                 ]
                 )
             )
-        result = self.predictor.calculateWordScoresForWrappers(sentenceWrappers, observed_class=None, n_steps=None, internal_batch_size=None)
+        result = self.predictor.calculateWordScoresForTweetGroup(sentenceWrappers, observed_class=None, n_steps=None, internal_batch_size=None)
         self.assertEquals(2,len(result))
         self.assertEquals([0,1],result[0].getSentenceIds())
         self.assertEquals([[1, 1], [2, 2]],result[0].getAttributions())
@@ -91,7 +91,7 @@ class TestPredictor(unittest.TestCase):
 
         sentence_wrapper = SentenceWrapperFakeWithTwoSentences()
 
-        wordScoresWrapper = self.predictor.calculateWordScoresOfSentenceWrapper(attributions_for_sentence_wrapper, sentence_wrapper)
+        wordScoresWrapper = self.predictor.calculateWordScoresOfTweetGroup(attributions_for_sentence_wrapper, sentence_wrapper)
 
         expected_attributions = [
             [1, 1],
