@@ -8,7 +8,7 @@ import pandas as pd
 from tweetpreprocess.TweetDataframeSorter import TweetDataframeSorter
 
 
-class ClassificationMetricsTest(unittest.TestCase):
+class BinaryClassificationMetricsTest(unittest.TestCase):
 
 
     def testSortPostTSPAsc(self):
@@ -26,5 +26,5 @@ class ClassificationMetricsTest(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    #import sys;sys.argv = ['', 'ClassificationMetricsTest.testSortPostTSPAsc']
+    #import sys;sys.argv = ['', 'BinaryClassificationMetricsTest.testSortPostTSPAsc']
     unittest.main()

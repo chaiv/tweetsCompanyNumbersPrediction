@@ -11,7 +11,7 @@ from classifier.transformer.Predictor import Predictor
 from classifier.PredictionClassMappers import BINARY_0_1
 from tweetpreprocess.wordfiltering.DefaultWordFilter import DefaultWordFilter
 from nlpvectors.TweetTokenizer import TweetTokenizer
-from classifier.ClassificationMetrics import ClassificationMetrics
+from classifier.BinaryClassificationMetrics import BinaryClassificationMetrics
 from gensim.models import KeyedVectors
 from nlpvectors.WordVectorsIDEncoder import WordVectorsIDEncoder
 from classifier.LSTMNN import LSTMNN
@@ -44,7 +44,7 @@ for i in range(len(test_dataset)):
     tweetGroups.append(tweetGroup)
     true_classes.append(tweetGroup.getLabel())
 prediction_classes = predictor.predictMultipleAsTweetGroupsInChunks(tweetGroups, 1000)
-metrics = ClassificationMetrics() 
+metrics = BinaryClassificationMetrics() 
 print(metrics.classification_report(true_classes, prediction_classes))
 
 

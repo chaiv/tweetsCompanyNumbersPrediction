@@ -23,7 +23,7 @@ from tests import TweetTextFilterTransformerTest
 from tests import TestPredictor
 from tests import EqualClassSamplerTest
 from tests import ImportantWordStoreTest
-from tests import ClassificationMetricsTest
+from tests import BinaryClassificationMetricsTest
 from tests.TestCreateTweetGroup import TestCreateTweetGroup
 from tests.TestTweetGroupDataset import TestTweetGroupDataset
 from tests.TestDataframeSplitter import TestDataframeSplitter
@@ -50,7 +50,7 @@ suite.addTests(loader.loadTestsFromModule(FeatureDataframeCreatorTest))
 suite.addTests(loader.loadTestsFromModule(EqualClassSamplerTest))
 suite.addTests(loader.loadTestsFromModule(TweetTextFilterTransformerTest))
 suite.addTests(loader.loadTestsFromModule(ImportantWordStoreTest))
-suite.addTests(loader.loadTestsFromModule(ClassificationMetricsTest))
+suite.addTests(loader.loadTestsFromModule(BinaryClassificationMetricsTest))
 suite.addTests(loader.loadTestsFromModule(TestPredictor))
 suite.addTests(loader.loadTestsFromModule(TestTopicHeaderAddToDataframe))
 suite.addTests(loader.loadTestsFromModule(TweetDataframeExploreTest))

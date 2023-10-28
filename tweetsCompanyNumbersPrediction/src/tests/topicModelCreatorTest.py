@@ -7,7 +7,7 @@ import unittest
 import pandas as pd
 from topicmodelling.TopicModelCreator import TopicModelCreator
 
-class ClassificationMetricsTest(unittest.TestCase):
+class BinaryClassificationMetricsTest(unittest.TestCase):
 
 
     def testModelCreateAndSave(self):
@@ -20,5 +20,5 @@ class ClassificationMetricsTest(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    #import sys;sys.argv = ['', 'ClassificationMetricsTest.testModelCreateAndSave']
+    #import sys;sys.argv = ['', 'BinaryClassificationMetricsTest.testModelCreateAndSave']
     unittest.main()
