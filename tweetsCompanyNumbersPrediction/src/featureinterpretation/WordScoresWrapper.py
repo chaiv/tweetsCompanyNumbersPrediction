@@ -7,20 +7,20 @@ from nlpvectors.TweetGroup import TweetGroup
 
 class WordScoresWrapper(object):
 
-    def __init__(self, sentencesWrapper : TweetGroup, total_attributions):
-        self.sentencesWrapper = sentencesWrapper
+    def __init__(self, tweetGroup : TweetGroup, total_attributions):
+        self.tweetGroup = tweetGroup
         self.total_attributions = total_attributions
         
 
     
     def getSentenceIds(self):
-        return self.sentencesWrapper.getSentenceIds()
+        return self.tweetGroup.getSentenceIds()
     
     def getTokenIndexes(self):
-        return self.sentencesWrapper.getTokenIndexes()
+        return self.tweetGroup.getTokenIndexes()
     
     def getTokens(self):
-        return self.sentencesWrapper.getTokens()
+        return self.tweetGroup.getTokens()
     
     def getAttributions(self):
         return self.total_attributions
