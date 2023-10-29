@@ -54,9 +54,9 @@ if  __name__ == "__main__":
         train_data = TweetGroupDataset(dataframe=df,splits = tweetSplits, splitIndexes= train_idx, tokenizer=tokenizer, textEncoder=textEncoder)
         val_data = TweetGroupDataset(dataframe=df,splits = tweetSplits, splitIndexes = val_idx, tokenizer=tokenizer, textEncoder=textEncoder)
         test_data = TweetGroupDataset(dataframe=df,splits = tweetSplits, splitIndexes = test_idx, tokenizer=tokenizer, textEncoder=textEncoder)
-        print("len(train_data)", train_data.__len__())
-        print("len(val_data)", val_data.__len__())
-        print("len(test_data)", test_data.__len__())
+        print("len(train_data)", len(train_data))
+        print("len(val_data)", len(val_data))
+        print("len(test_data)", len(test_data))
         Trainer().train(
             batch_size=100, 
             epochs=10, 
