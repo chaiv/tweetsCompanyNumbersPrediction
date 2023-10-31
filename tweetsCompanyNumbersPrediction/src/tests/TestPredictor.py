@@ -90,7 +90,7 @@ class TestPredictor(unittest.TestCase):
                 ]
                 )
             )
-        result = self.predictor.calculateWordScoresForTweetGroup(sentenceWrappers, observed_class=None, n_steps=None, internal_batch_size=None)
+        result = self.predictor.calculateWordScoresOfTweetGroups(sentenceWrappers, observed_class=None, n_steps=None, internal_batch_size=None)
         self.assertEquals(2,len(result))
         self.assertEquals([0,1],result[0].getSentenceIds())
         self.assertEquals([[1, 1], [2, 2]],result[0].getAttributions())

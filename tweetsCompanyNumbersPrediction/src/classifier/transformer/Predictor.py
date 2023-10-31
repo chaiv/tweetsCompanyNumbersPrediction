@@ -109,19 +109,16 @@ class Predictor(object):
             attribution_lists_for_sentences_of_wrapper.append(attributionsForSentence)
         return WordScoresWrapper(tweetGroup, attribution_lists_for_sentences_of_wrapper)
     
-    def calculateWordScoresForTweetGroup(self, tweetGroups : list, observed_class,n_steps=500,internal_batch_size = 10):
+    def calculateWordScoresOfTweetGroups(self, tweetGroups : list, observed_class,n_steps=500,internal_batch_size = 10):
         x = [torch.tensor(tweetGroup.getFeatureVector(), dtype=torch.long).to(self.deviceToUse) for tweetGroup in tweetGroups]
         x = torch.nn.utils.rnn.pad_sequence(x, batch_first=True, padding_value=self.textEncoder.getPADTokenID())
         ref_tokens = [[self.textEncoder.getPADTokenID()] * len(x[0])] * len(tweetGroups)
         ref = torch.tensor(ref_tokens, dtype=torch.long).to(self.deviceToUse)   
         attributionsOfAllTweetGroups = self.attributionsCalculator.attribute(x, ref, n_steps, observed_class, internal_batch_size)
-        
         wordScoresWrappers = []
-        
         for i in range(len(tweetGroups)):
             tweetGroup = tweetGroups[i]
             wordScoresWrappers.append(self.calculateWordScoresOfTweetGroup(attributionsOfAllTweetGroups[i],tweetGroup))
-        
         return wordScoresWrappers
         
     
