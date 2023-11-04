@@ -18,42 +18,8 @@ from classifier.LSTMNN import LSTMNN
 from nlpvectors.DataframeSplitter import DataframeSplitter
 from classifier.TweetGroupDataset import TweetGroupDataset
 from classifier.BinaryClassificationMetricsPlots import BinaryClassificationMetricsPlots
-
-
-
-def loadModel(path,wordVectors):
-    model = LSTMNN(300,wordVectors)
-    # model = Transformer(
-    #         embeddings= Word2VecTransformerEmbedding(word_vectors =  torch.tensor(word_vectors.vectors), emb_size=300,pad_token_id = encoder.getPADTokenID()),
-    #         lr=1e-4, n_outputs=2, vocab_size=encoder.getVocabularyLength(),channels= 300
-    #         )
-    model = model.to(torch.device("cuda:0"))
-    checkpoint = torch.load(path)
-    model.load_state_dict(checkpoint['state_dict'])
-    model.eval()
-    return model
-    
-
-
-def createTweetGroupsAndTrueClasses(
-        tweetDf,
-        splitNumber,
-        splitIndexes,
-        tokenizer,
-        textEncoder
-        ):
-    tweetDf.fillna('', inplace=True) #nan values in body columns
-    splits = DataframeSplitter().getSplitIds(df,splitNumber)
-    test_dataset = TweetGroupDataset(dataframe=tweetDf,splits = splits, splitIndexes= splitIndexes, tokenizer=tokenizer, textEncoder=textEncoder)
-    tweetGroups = []
-    trueClasses = []
-    for i in range(len(test_dataset)):
-        tweetGroup = test_dataset.getAsTweetGroup(i)
-        tweetGroups.append(tweetGroup)
-        trueClasses.append(tweetGroup.getLabel())
-        print("created tweet group "+str(i))
-    return tweetGroups,trueClasses
-    
+from classifier.ModelEvaluationHelper import loadModel,\
+    createTweetGroupsAndTrueClasses
 
 word_vectors = KeyedVectors.load_word2vec_format(DataDirHelper().getDataDir()+ "companyTweets\\WordVectorsAmazonV2.txt", binary=False)
 textEncoder = WordVectorsIDEncoder(word_vectors)

@@ -120,6 +120,20 @@ class Predictor(object):
             tweetGroup = tweetGroups[i]
             wordScoresWrappers.append(self.calculateWordScoresOfTweetGroup(attributionsOfAllTweetGroups[i],tweetGroup))
         return wordScoresWrappers
+    
+    
+    def calculateWordScoresOfTweetGroupsInChunks(self, sentences: list, observed_class, chunk_size, n_steps=500, internal_batch_size=10):
+        token_indexes_lists = []
+        token_lists = []
+        attributions_lists = []
+        for i in range(0, len(sentences), chunk_size):
+            chunk = sentences[i:i + chunk_size]
+            chunk_token_indexes, chunk_token_lists, chunk_attributions = self.calculateWordScores(chunk, observed_class, n_steps, internal_batch_size)
+            token_indexes_lists +=  chunk_token_indexes
+            token_lists += chunk_token_lists
+            attributions_lists += chunk_attributions
+            print("Chunks processed",len(token_indexes_lists))
+        return token_indexes_lists, token_lists, attributions_lists
         
     
     

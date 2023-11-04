@@ -10,7 +10,8 @@ from classifier.transformer.models import Transformer
 from tweetpreprocess.DataDirHelper import DataDirHelper
 from classifier.transformer.Predictor import Predictor
 from classifier.PredictionClassMappers import BINARY_0_1
-from featureinterpretation.ImportantWordsStore import ImportantWordStore
+from featureinterpretation.ImportantWordsStore import ImportantWordStore,\
+    createImportantWordStore
 from featureinterpretation.AttributionsCalculator import AttributionsCalculator
 from nlpvectors.VocabularyIDEncoder import VocabularyIDEncoder
 from tweetpreprocess.wordfiltering.DefaultWordFilter import DefaultWordFilter
@@ -22,9 +23,6 @@ from nlpvectors.DataframeSplitter import DataframeSplitter
 from classifier.TweetGroupDataset import TweetGroupDataset
 from calculateClassificationMetrics import loadModel,\
     createTweetGroupsAndTrueClasses
-
-
-
 
 word_vectors = KeyedVectors.load_word2vec_format(DataDirHelper().getDataDir()+ "companyTweets\\WordVectorsAmazonV2.txt", binary=False)
 textEncoder = WordVectorsIDEncoder(word_vectors)
@@ -40,20 +38,11 @@ tweetGroups,trueClasses = createTweetGroupsAndTrueClasses(
         textEncoder
         )
 predictor = Predictor(model,tokenizer ,textEncoder,BINARY_0_1,AttributionsCalculator(model,model.embedding))
-
-
-predictions = predictor.predictMultipleInChunks(sentences,chunkSize=10000)
 observed_class = 1
-token_indexes, tokens, attributions =  predictor.calculateWordScoresInChunks(sentences, observed_class, chunk_size=200, n_steps=10, internal_batch_size=200)
-importantWordsDf = ImportantWordStore(
-                {
-                "id" : sentence_ids,
-                "token_index" : token_indexes,
-                "token" : tokens,
-                "attribution" : attributions,
-                "prediction" : predictions
-                }
-                ).to_dataframe()
+prediction_classes = predictor.predictMultipleAsTweetGroupsInChunks(tweetGroups, 1000)
+wordScoresWrappers = predictor.calculateWordScoresOfTweetGroups(tweetGroups,1)
+importantWordsStore = createImportantWordStore(wordScoresWrappers,prediction_classes)
+importantWordsDf = importantWordsStore.to_dataframe()
 importantWordsDf.to_csv(DataDirHelper().getDataDir()+"companyTweets\\importantWordsClass"+str(observed_class)+"Amazon.csv")
 
 

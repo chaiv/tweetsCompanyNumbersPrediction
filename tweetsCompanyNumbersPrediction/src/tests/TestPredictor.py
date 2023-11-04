@@ -95,6 +95,11 @@ class TestPredictor(unittest.TestCase):
         self.assertEquals([0,1],result[0].getSentenceIds())
         self.assertEquals([[1, 1], [2, 2]],result[0].getAttributions())
         
+    
+
+
+
+        
         
             
     def test_calculate_attributions_of_tweetGroup(self):
