@@ -95,13 +95,26 @@ class TestPredictor(unittest.TestCase):
         self.assertEquals([0,1],result[0].getSentenceIds())
         self.assertEquals([[1, 1], [2, 2]],result[0].getAttributions())
         
-    
-
-
-
+    def test_calculateWordScores_of_tweetGroup_in_chunks(self):
+        sentenceWrappers = [
+            TweetGroupFakeWithTwoSentences(),
+            TweetGroupFakeWithTwoSentences()
+            ]
+        self.encoder_mock.getPADTokenID = MagicMock(return_value=0)
+        self.attributions_calculator_mock.attribute = MagicMock(return_value=
+            torch.tensor(
+                [
+                    [1,1,0,2,2,0],
+                    [1,1,0,2,2,0]
+                ]
+                )
+            )
+        result = self.predictor.calculateWordScoresOfTweetGroupsInChunks(sentenceWrappers, observed_class=None,chunkSize= 1, n_steps=None, internal_batch_size=None)
+        self.assertEquals(2,len(result))
+        self.assertEquals([0,1],result[0].getSentenceIds())
+        self.assertEquals([[1, 1], [2, 2]],result[0].getAttributions())
         
-        
-            
+      
     def test_calculate_attributions_of_tweetGroup(self):
 
         attributions_for_sentence_wrapper = torch.tensor([1,1,0,2,2,0])

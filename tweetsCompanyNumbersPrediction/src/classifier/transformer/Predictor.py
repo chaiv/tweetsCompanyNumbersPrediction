@@ -10,6 +10,7 @@ from featureinterpretation.AttributionsCalculator import AttributionsCalculator
 from nlpvectors.AbstractEncoder import AbstractEncoder
 from nlpvectors.AbstractTokenizer import AbstractTokenizer
 from featureinterpretation.WordScoresWrapper import WordScoresWrapper
+from torch.ao.quantization import observer
 
 
 
@@ -122,19 +123,14 @@ class Predictor(object):
         return wordScoresWrappers
     
     
-    def calculateWordScoresOfTweetGroupsInChunks(self, sentences: list, observed_class, chunk_size, n_steps=500, internal_batch_size=10):
-        token_indexes_lists = []
-        token_lists = []
-        attributions_lists = []
-        for i in range(0, len(sentences), chunk_size):
-            chunk = sentences[i:i + chunk_size]
-            chunk_token_indexes, chunk_token_lists, chunk_attributions = self.calculateWordScores(chunk, observed_class, n_steps, internal_batch_size)
-            token_indexes_lists +=  chunk_token_indexes
-            token_lists += chunk_token_lists
-            attributions_lists += chunk_attributions
-            print("Chunks processed",len(token_indexes_lists))
-        return token_indexes_lists, token_lists, attributions_lists
-        
+    def calculateWordScoresOfTweetGroupsInChunks(self, tweetGroups : list, observed_class,chunkSize, n_steps=500,internal_batch_size = 10):
+        wordScoresWrappers = []
+        for i in range(0, len(tweetGroups), chunkSize):
+            chunk = tweetGroups[i:i + chunkSize]
+            chunkWordScoresWrappers = self.calculateWordScoresOfTweetGroups(chunk,observed_class,n_steps,internal_batch_size)
+            wordScoresWrappers += chunkWordScoresWrappers
+            print("Chunks processed",len(chunkWordScoresWrappers))
+        return wordScoresWrappers
     
     
     
