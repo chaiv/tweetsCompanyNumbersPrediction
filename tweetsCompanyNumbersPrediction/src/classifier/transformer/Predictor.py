@@ -129,7 +129,7 @@ class Predictor(object):
             chunk = tweetGroups[i:i + chunkSize]
             chunkWordScoresWrappers = self.calculateWordScoresOfTweetGroups(chunk,observed_class,n_steps,internal_batch_size)
             wordScoresWrappers += chunkWordScoresWrappers
-            print("Chunks processed",len(chunkWordScoresWrappers))
+            print("Chunks processed",len(wordScoresWrappers))
         return wordScoresWrappers
     
     

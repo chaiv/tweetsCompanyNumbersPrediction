@@ -12,7 +12,7 @@ from nlpvectors.DataframeSplitter import DataframeSplitter
 from classifier.TweetGroupDataset import TweetGroupDataset
 
 
-def loadModel(path,wordVectors):
+def loadModel(path,wordVectors,evalMode=True):
     model = LSTMNN(300,wordVectors)
     # model = Transformer(
     #         embeddings= Word2VecTransformerEmbedding(word_vectors =  torch.tensor(word_vectors.vectors), emb_size=300,pad_token_id = encoder.getPADTokenID()),
@@ -21,7 +21,8 @@ def loadModel(path,wordVectors):
     model = model.to(torch.device("cuda:0"))
     checkpoint = torch.load(path)
     model.load_state_dict(checkpoint['state_dict'])
-    model.eval()
+    if(evalMode):
+        model.eval()
     return model
     
 
