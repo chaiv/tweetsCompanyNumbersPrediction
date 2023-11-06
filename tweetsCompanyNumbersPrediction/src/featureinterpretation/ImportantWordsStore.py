@@ -7,8 +7,9 @@ import pandas as pd
 import copy
 
         
-def pad_dict_lists(data):
+def pad_dict_lists(input_dict):
     
+    data = dict(input_dict)
     sublist_sizes = {}
     
     #calculate size of each sublist in a list value
@@ -58,19 +59,30 @@ def createImportantWordStore(wordscoreWrappers,predictions):
     for wordscoreWrapperIndex  in range(len(wordscoreWrappers)):
         prediction = predictions[wordscoreWrapperIndex]
         wordscoreWrapper =wordscoreWrappers[wordscoreWrapperIndex] 
-        dict =  {
+        wordscore_dict =  {
                 "id" : wordscoreWrapper.getSentenceIds(),
                 "token_index" : wordscoreWrapper.getTokenIndexes(),
                 "token" : wordscoreWrapper.getTokens(),
                 "attribution" : wordscoreWrapper.getAttributions(),
                 "prediction" : prediction
                 }
-        dict = flatten_dict_lists(pad_dict_lists(dict))
-        totalSentencesIds += dict["id"]
-        totalTokenIndexes += dict["token_index"]
-        totalTokens += dict["token"]
-        totalAttributions += dict["attribution"]
-        totalPredictions += dict["prediction"]
+        
+        wordscore_dict_flattened = flatten_dict_lists(pad_dict_lists(wordscore_dict))
+        allLists = [wordscore_dict_flattened ["id"],wordscore_dict_flattened ["token_index"],wordscore_dict_flattened ["token"],wordscore_dict_flattened ["attribution"],wordscore_dict_flattened ["prediction"]]
+        are_equal = all(len(lst) == len(allLists[0]) for lst in allLists)
+        if are_equal:
+            print("All lists have the same size.") 
+        else: 
+            print("Lists have different sizes.") 
+        
+        
+        
+        totalSentencesIds += wordscore_dict_flattened["id"]
+        totalTokenIndexes += wordscore_dict_flattened["token_index"]
+        totalTokens += wordscore_dict_flattened["token"]
+        totalAttributions += wordscore_dict_flattened["attribution"]
+        totalPredictions += wordscore_dict_flattened["prediction"]
+        
         
     return ImportantWordStore(
         {

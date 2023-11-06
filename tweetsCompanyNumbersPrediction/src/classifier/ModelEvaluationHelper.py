@@ -24,8 +24,26 @@ def loadModel(path,wordVectors,evalMode=True):
     if(evalMode):
         model.eval()
     return model
-    
 
+
+def createTweetGroupsAndTrueClassesWithoutSplitIndexes(
+         tweetDf,
+        splitNumber,
+        tokenizer,
+        textEncoder
+        ): 
+        tweetDf.fillna('', inplace=True) #nan values in body columns
+        splits = DataframeSplitter().getSplitIds(tweetDf,splitNumber)
+        test_dataset = TweetGroupDataset(dataframe=tweetDf,splits = splits, splitIndexes= [i for i in range(0,len(splits))], tokenizer=tokenizer, textEncoder=textEncoder)   
+        tweetGroups = []
+        trueClasses = []
+        for i in range(len(test_dataset)):
+            tweetGroup = test_dataset.getAsTweetGroup(i)
+            tweetGroups.append(tweetGroup)
+            trueClasses.append(tweetGroup.getLabel())
+            print("created tweet group "+str(i))
+        return tweetGroups,trueClasses
+    
 
 def createTweetGroupsAndTrueClasses(
         tweetDf,

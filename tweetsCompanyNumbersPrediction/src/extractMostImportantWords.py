@@ -22,25 +22,32 @@ from classifier.LSTMNN import LSTMNN
 from nlpvectors.DataframeSplitter import DataframeSplitter
 from classifier.TweetGroupDataset import TweetGroupDataset
 from classifier.ModelEvaluationHelper import createTweetGroupsAndTrueClasses,\
-    loadModel
+    loadModel, createTweetGroupsAndTrueClassesWithoutSplitIndexes
 
 word_vectors = KeyedVectors.load_word2vec_format(DataDirHelper().getDataDir()+ "companyTweets\\WordVectorsAmazonV2.txt", binary=False)
 textEncoder = WordVectorsIDEncoder(word_vectors)
 tokenizer = TweetTokenizer(DefaultWordFilter())
 model = loadModel(DataDirHelper().getDataDir()+"companyTweets\\model\\amazonRevenueLSTMN5\\tweetpredict_fold1.ckpt",word_vectors,evalMode=False)
 df = pd.read_csv(DataDirHelper().getDataDir()+ 'companyTweets\\amazonTweetsWithNumbers.csv')
+df = df.head(20000)
 testSplitIndexes = np.load(DataDirHelper().getDataDir()+"companyTweets\\model\\amazonRevenueLSTMN5\\test_idx_fold1.npy")
-tweetGroups,trueClasses = createTweetGroupsAndTrueClasses(
+# tweetGroups,trueClasses = createTweetGroupsAndTrueClasses(
+#         df,
+#         5,
+#         testSplitIndexes,
+#         tokenizer,
+#         textEncoder
+#         )
+tweetGroups,trueClasses = createTweetGroupsAndTrueClassesWithoutSplitIndexes(
         df,
         5,
-        testSplitIndexes,
         tokenizer,
         textEncoder
         )
 predictor = Predictor(model,tokenizer ,textEncoder,BINARY_0_1,AttributionsCalculator(model,model.embedding))
 observed_class = 1
-prediction_classes = predictor.predictMultipleAsTweetGroupsInChunks(tweetGroups, 1000)
-wordScoresWrappers = predictor.calculateWordScoresOfTweetGroupsInChunks(tweetGroups,1,100)
+prediction_classes = predictor.predictMultipleAsTweetGroupsInChunks(tweetGroups,1000)
+wordScoresWrappers = predictor.calculateWordScoresOfTweetGroupsInChunks(tweetGroups,observed_class=1,chunkSize=100,n_steps=500,internal_batch_size = 100)
 importantWordsStore = createImportantWordStore(wordScoresWrappers,prediction_classes)
 importantWordsDf = importantWordsStore.to_dataframe()
 importantWordsDf.to_csv(DataDirHelper().getDataDir()+"companyTweets\\importantWordsClass"+str(observed_class)+"Amazon.csv")
