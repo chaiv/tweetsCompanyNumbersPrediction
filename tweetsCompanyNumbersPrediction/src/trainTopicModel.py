@@ -17,8 +17,8 @@ from nlpvectors.TweetTokenizer import TweetTokenizer
 #tweetsFile = "amazonTweetsWithNumbers.csv"
 #topicModelFile = "amazonTopicModelV2"
 
-tweetsFile = "CompanyTweetsAppleWithIPhoneSales.csv"
-topicModelFile = "appleTopicModel"
+tweetsFile = "CompanyTweetsTeslaWithCarSales.csv"
+topicModelFile = "teslaTopicModel"
 tweets = pd.read_csv (DataDirHelper().getDataDir()+ "companyTweets\\"+tweetsFile)  
 tokenizer = TweetTokenizer(DefaultWordFilter())
 documents = []
