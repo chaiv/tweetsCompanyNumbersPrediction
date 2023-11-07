@@ -57,13 +57,14 @@ def createImportantWordStore(wordscoreWrappers,predictions):
     totalPredictions = []
   
     for wordscoreWrapperIndex  in range(len(wordscoreWrappers)):
+        
         prediction = predictions[wordscoreWrapperIndex]
         wordscoreWrapper =wordscoreWrappers[wordscoreWrapperIndex] 
-        wordscore_dict =  {
-                "id" : wordscoreWrapper.getSentenceIds(),
-                "token_index" : wordscoreWrapper.getTokenIndexes(),
-                "token" : wordscoreWrapper.getTokens(),
-                "attribution" : wordscoreWrapper.getAttributions(),
+        wordscore_dict =  { #copy the lists because wordscoreWrapper should not be changed
+                "id" : list(wordscoreWrapper.getSentenceIds()),
+                "token_index" : list(wordscoreWrapper.getTokenIndexes()),
+                "token" : list(wordscoreWrapper.getTokens()),
+                "attribution" : list(wordscoreWrapper.getAttributions()),
                 "prediction" : prediction
                 }
         
