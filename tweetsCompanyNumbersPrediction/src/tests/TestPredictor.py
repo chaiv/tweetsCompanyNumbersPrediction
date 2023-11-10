@@ -146,11 +146,11 @@ class TestPredictor(unittest.TestCase):
          
         
     def test_predict_multiple_as_tweet_groups(self):
-        tweetGroup1 = TweetGroup(sentences=["tweet 1", "second tweet"],sentenceIds=[123,456],totalTokenIndexes=[1,2,1,2],
-                                 totalTokens=["tweet", "1", "second", "tweet"],
+        tweetGroup1 = TweetGroup(sentences=["tweet 1", "second tweet"],sentenceIds=[123,456],totalTokenIndexes=[[1,2],[1,2]],
+                                 totalTokens=[["tweet", "1"], ["second", "tweet"]],
                                  totalFeatureVector=[1,2,0,1,2],separatorIndexesInFeatureVector=[2],label = 0)
-        tweetGroup2 = TweetGroup(sentences=["next tweet", "tweet 4"],sentenceIds=[789,101112],totalTokenIndexes=[1,2,1,2],
-                                 totalTokens=["next", "tweet", "tweet", "4"],
+        tweetGroup2 = TweetGroup(sentences=["next tweet", "tweet 4"],sentenceIds=[789,101112],totalTokenIndexes=[[1,2],[1,2]],
+                                 totalTokens=[["next", "tweet"], ["tweet", "4"]],
                                  totalFeatureVector=[3,1,0,1,5],separatorIndexesInFeatureVector=[2],label = 1)
         
         tweetGroups = [ tweetGroup1,tweetGroup2]
@@ -163,11 +163,11 @@ class TestPredictor(unittest.TestCase):
         self.assertEqual([tweetGroup1.getLabel(),tweetGroup2.getLabel()],result)
         
     def test_predict_multiple_as_tweet_groups_in_chunks(self):
-        tweetGroup1 = TweetGroup(sentences=["tweet 1", "second tweet"],sentenceIds=[123,456],totalTokenIndexes=[1,2,1,2],
-                                 totalTokens=["tweet", "1", "second", "tweet"],
+        tweetGroup1 = TweetGroup(sentences=["tweet 1", "second tweet"],sentenceIds=[123,456],totalTokenIndexes=[[1,2],[1,2]],
+                                 totalTokens=[["tweet", "1"], ["second", "tweet"]],
                                  totalFeatureVector=[1,2,0,1,2],separatorIndexesInFeatureVector=[2],label = 0)
-        tweetGroup2 = TweetGroup(sentences=["next tweet", "tweet 4"],sentenceIds=[789,101112],totalTokenIndexes=[1,2,1,2],
-                                 totalTokens=["next", "tweet", "tweet", "4"],
+        tweetGroup2 = TweetGroup(sentences=["next tweet", "tweet 4"],sentenceIds=[789,101112],totalTokenIndexes=[[1,2],[1,2]],
+                                 totalTokens=[["next", "tweet"], ["tweet", "4"]],
                                  totalFeatureVector=[3,1,0,1,5],separatorIndexesInFeatureVector=[2],label = 1)
         
         tweetGroups = [ tweetGroup1,tweetGroup2]
@@ -176,8 +176,7 @@ class TestPredictor(unittest.TestCase):
             self.attributions_calculator_mock, self.device_to_use)
         result = predictor.predictMultipleAsTweetGroupsInChunks(tweetGroups, 1)
         self.assertEqual([tweetGroup1.getLabel(),tweetGroup2.getLabel()],result)
-
-            
+                    
 
 if __name__ == '__main__':
     unittest.main()

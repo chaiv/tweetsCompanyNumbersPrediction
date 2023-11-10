@@ -33,7 +33,7 @@ class TweetGroupDataset(Dataset):
         split = self.splits[self.splitIndexes[idx]]
         splitDf =  self.dataframe [ self.dataframe [self.tweetIdColumn].isin( split)]
         sentenceIds = split
-        sentences = splitDf [self.textColumnName]
+        sentences = splitDf [self.textColumnName].tolist()
         label = splitDf[self.classColumnName].iloc[0]
         tweetGroup = createTweetGroup(self.tokenizer,self.textEncoder,sentences,sentenceIds ,label)
         return tweetGroup

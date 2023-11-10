@@ -3,19 +3,37 @@ Created on 06.11.2023
 
 @author: vital
 '''
-allLists = [[1,2,3,4],[1,2,3], [1,2,3],[1,2,3],[1,2,3]]
-are_equal = all(len(lst) == len(allLists[0]) for lst in allLists)
-if(not are_equal):
-    print("Lists have different sizes.") 
+import torch
+import pandas as pd
+import numpy as np
+from classifier.transformer.models import Transformer
+from tweetpreprocess.DataDirHelper import DataDirHelper
+from classifier.transformer.Predictor import Predictor
+from classifier.PredictionClassMappers import BINARY_0_1
+from featureinterpretation.ImportantWordsStore import ImportantWordStore,\
+    createImportantWordStore
+from featureinterpretation.AttributionsCalculator import AttributionsCalculator
+from nlpvectors.VocabularyIDEncoder import VocabularyIDEncoder
+from tweetpreprocess.wordfiltering.DefaultWordFilter import DefaultWordFilter
+from nlpvectors.TweetTokenizer import TweetTokenizer
+from gensim.models.keyedvectors import KeyedVectors
+from nlpvectors.WordVectorsIDEncoder import WordVectorsIDEncoder
+from classifier.LSTMNN import LSTMNN
+from nlpvectors.DataframeSplitter import DataframeSplitter
+from classifier.TweetGroupDataset import TweetGroupDataset
+from classifier.ModelEvaluationHelper import createTweetGroupsAndTrueClasses,\
+    loadModel, createTweetGroupsAndTrueClassesWithoutSplitIndexes
+from nlpvectors.TweetGroup import createTweetGroup
     
-[[], [576529132651196416, 576529132651196416, 576529132651196416, 576529132651196416, 576529132651196416, 576529132651196416, 576529132651196416, 576529132651196416, 576529132651196416], [576531462842949632, 576531462842949632, 576531462842949632, 576531462842949632, 576531462842949632, 576531462842949632, 576531462842949632, 576531462842949632, 576531462842949632], [576534180621729792, 576534180621729792, 576534180621729792, 576534180621729792, 576534180621729792, 576534180621729792, 576534180621729792, 576534180621729792, 576534180621729792], [576534748559863808, 576534748559863808, 576534748559863808, 576534748559863808, 576534748559863808, 576534748559863808, 576534748559863808, 576534748559863808, 576534748559863808, 576534748559863808]]
-[[], [0, 1, 2, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14], [4, 5, 6, 7, 8, 9, 10, 11, 12], [0, 2, 6, 8, 9, 11, 12, 15, 16], [0, 1, 2, 3, 4, 5, 10, 11, 12, 13]]
-[[], ['stock', 'trend', 'now', 'lgnd', 'bioc', 'csco', 'ica', 'uslv', 'ziop', 'cldx', 'mhy', 'odp', 'juno', 'amzn'], ['interest', 'amba', 'adx', 'aal', 'amgn', 'amzn', 'aria', 'arri', 'ashr'], ['share', 'zulili', 'percent', 'fridai', 'slump', 'alltim', 'low', 'amzn', 'nile'], ['xli', 'investor', 'opinion', 'updat', 'fridai', 'march', 'intc', 'amzn', 'mcp', 'csco']]
-[[], [-0.04444375645272396, -0.00892202154097616, 0.026111843894880686, 0.002432789326687183, -0.009579485280574547, -0.005909500650051624, -0.018225532614891234, -0.07226751333223023, -0.1562118482214171], [0.0328303215189988, -0.6306866988476167, -0.041143471000337765, -0.029373730931980934, -0.0007465610338740422, -0.002517687468645576, 0.011445875195869459, -0.00026740551139709434, 0.01861669275734967], [0.11482027923010123, 0.04854082220262651, 0.11153473164602781, 0.31006988236733574, 0.17042604617171467, 1.0, -0.04454184930714969, -0.023710523785852238, -0.34605605022603414]]
-1
+word_vectors = KeyedVectors.load_word2vec_format(DataDirHelper().getDataDir()+ "companyTweets\\WordVectorsAmazonV2.txt", binary=False)
+textEncoder = WordVectorsIDEncoder(word_vectors)
+tokenizer = TweetTokenizer(DefaultWordFilter())
+model = loadModel(DataDirHelper().getDataDir()+"companyTweets\\model\\amazonRevenueLSTMN5\\tweetpredict_fold1.ckpt",word_vectors,evalMode=False)
+sentences = ['For Options$AAPL$PFE$ORCL$MRK$NLY$COP$COH$DVN$NFX$TTWO$AMZNNice bottom', 'Stocks Trending Now:  $LL $LGND $BIOC $CSCO $ICA $USLV $ZIOP $CLDX $MHYS $ODP $JUNO $AMZN ~', 'A few more of interest: $AMBA $ADXS $AAL $AMGN $AMZN $ARIA $ARRY $ASHR ', 'Shares of Zulily down another 6 percent on Friday, slumping to all-time low () $ZU $AMZN $NILE ', '$XLI Investor Opinions Updated Friday, March 13, 2015 7:03:23 PM $INTC $AMZN $MCP $CSCO ']
+sentenceIds = [576527445806870528, 576529132651196416, 576531462842949632, 576534180621729792, 576534748559863808]
+label = 1
+tweetGroup = createTweetGroup(tokenizer,textEncoder , sentences,sentenceIds,label)
+predictor = Predictor(model,tokenizer ,textEncoder,BINARY_0_1,AttributionsCalculator(model,model.embedding))
+wordScoresWrappers = predictor.calculateWordScoresOfTweetGroupsInChunks([tweetGroup],observed_class=1,chunkSize=100,n_steps=500,internal_batch_size = 100)
+print(wordScoresWrappers)
 
-[576527445806870528, 576529132651196416, 576531462842949632, 576534180621729792, 576534748559863808]
-[0, 15, 25, 35]
-[158669, 3, 190, 138, 6962, 6078, 118, 29038, 6996, 3045, 4689, 6149, 2128, 2199, 0, 158669, 259, 804, 1322, 516, 388, 0, 1424, 1405, 1072, 158669, 26, 9823, 725, 149, 2542, 805, 76, 0, 7298, 158669, 1250, 85, 548, 51, 149, 711, 39, 0, 5694, 118]
-[[], [0, 1, 2, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14], [4, 5, 6, 7, 8, 9, 10, 11, 12], [0, 2, 6, 8, 9, 11, 12, 15, 16], [0, 1, 2, 3, 4, 5, 10, 11, 12, 13]]
-[[], ['stock', 'trend', 'now', 'lgnd', 'bioc', 'csco', 'ica', 'uslv', 'ziop', 'cldx', 'mhy', 'odp', 'juno', 'amzn'], ['interest', 'amba', 'adx', 'aal', 'amgn', 'amzn', 'aria', 'arri', 'ashr'], ['share', 'zulili', 'percent', 'fridai', 'slump', 'alltim', 'low', 'amzn', 'nile'], ['xli', 'investor', 'opinion', 'updat', 'fridai', 'march', 'intc', 'amzn', 'mcp', 'csco']]
