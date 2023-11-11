@@ -7,7 +7,22 @@ from nlpvectors.AbstractTokenizer import AbstractTokenizer
 from nlpvectors.AbstractEncoder import AbstractEncoder
 from itertools import chain
 
+def split_list_on_indices(lst, indices):
+    if not indices:
+        return lst
+    
+    splitted_list = []
+    start_idx = 0
+    for idx in indices:
+        sublist = lst[start_idx:idx]
+        if sublist:
+            splitted_list.append(sublist)
+        start_idx = idx + 1
+    sublist = lst[start_idx:]
+    if sublist:
+        splitted_list.append(sublist)
 
+    return splitted_list
 
 def createTweetGroup(tokenizer: AbstractTokenizer,textEncoder : AbstractEncoder, sentences,sentenceIds,label):
     
@@ -55,11 +70,11 @@ class TweetGroup(object):
     def getSentenceIds(self):
         return self.sentenceIds
     
-    def getTokens(self):
+    def getTokens(self) -> list[list[str]]:
         return self.totalTokens
     
-    def getTokenIndexes(self):
-        return self.totalTokenIndexes 
+    def getTokenIndexes(self) -> list[list[int]]:
+        return self.totalTokenIndexes
     
     def getLabel(self):
         return self.label

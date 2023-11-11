@@ -176,6 +176,24 @@ class TestPredictor(unittest.TestCase):
             self.attributions_calculator_mock, self.device_to_use)
         result = predictor.predictMultipleAsTweetGroupsInChunks(tweetGroups, 1)
         self.assertEqual([tweetGroup1.getLabel(),tweetGroup2.getLabel()],result)
+        
+       
+    def test_calculateWordScores_of_tweetGroup_with_emptytokensbetween(self):
+        tweetGroup1 = TweetGroup(sentences=["twt 1", "second tweet","twt 2","another tweet","twt 3"],sentenceIds=[123,456,789,101,112],totalTokenIndexes=[[],[1,2],[],[1,2],[]],
+                                 totalTokens=[[], ["second", "tweet"],[],["another","tweet"],[]],
+                                 totalFeatureVector=[2,1,1,2,2,1,1,2],separatorIndexesInFeatureVector=[0,3,4,7],label = 0)
+        self.encoder_mock.getPADTokenID = MagicMock(return_value=0)
+        self.attributions_calculator_mock.attribute = MagicMock(return_value=
+            torch.tensor(
+                [
+                    [0,0.5,0.6,0,0,0.7,0.8,0]
+                ]
+                )
+            )
+        result = self.predictor.calculateWordScoresOfTweetGroups([tweetGroup1], observed_class=None, n_steps=None, internal_batch_size=None)
+        self.assertEquals(1,len(result))
+        self.assertEquals([[],[0.5, 0.6000000238418579], [],[0.699999988079071, 0.800000011920929],[]],result[0].getAttributions())    
+    
                     
 
 if __name__ == '__main__':

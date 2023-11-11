@@ -10,7 +10,7 @@ from featureinterpretation.AttributionsCalculator import AttributionsCalculator
 from nlpvectors.AbstractEncoder import AbstractEncoder
 from nlpvectors.AbstractTokenizer import AbstractTokenizer
 from featureinterpretation.WordScoresWrapper import WordScoresWrapper
-from torch.ao.quantization import observer
+from nlpvectors.TweetGroup import split_list_on_indices
 
 
 
@@ -49,65 +49,20 @@ class Predictor(object):
             print("Chunks processed",len(predictions))
         return predictions
     
-
-    def predictMultiple(self, sentences):
-        x_Tokenids = [self.textEncoder.encodeTokens(self.tokenizer.tokenize(sentence)) for sentence in sentences]
-        x_Tokenids = [torch.tensor(x, dtype=torch.long).to(self.deviceToUse) for x in x_Tokenids]
-        x = torch.nn.utils.rnn.pad_sequence(x_Tokenids, batch_first=True, padding_value=self.textEncoder.getPADTokenID())
-        with torch.no_grad():
-            y_hat = self.model(x)
-            _, predicted = torch.max(y_hat, 1)
-            predicted_classes = predicted.tolist()
-        return [self.predictionClassMapper.index_to_class(pred) for pred in predicted_classes]
-    
-    def predictMultipleInChunks(self,sentences, chunkSize):
-        predictions = []
-        for i in range(0, len(sentences), chunkSize):
-            chunk = sentences[i:i + chunkSize]
-            chunkPredictions = self.predictMultiple(chunk)
-            predictions += chunkPredictions
-            print("Chunks processed",len(predictions))
-        return predictions
-    
-    def calculateWordScoresInChunks(self, sentences: list, observed_class, chunk_size, n_steps=500, internal_batch_size=10):
-        token_indexes_lists = []
-        token_lists = []
-        attributions_lists = []
-        for i in range(0, len(sentences), chunk_size):
-            chunk = sentences[i:i + chunk_size]
-            chunk_token_indexes, chunk_token_lists, chunk_attributions = self.calculateWordScores(chunk, observed_class, n_steps, internal_batch_size)
-            token_indexes_lists +=  chunk_token_indexes
-            token_lists += chunk_token_lists
-            attributions_lists += chunk_attributions
-            print("Chunks processed",len(token_indexes_lists))
-        return token_indexes_lists, token_lists, attributions_lists
-    
-    
-    def split_list_on_indices(self,lst, indices):
-        if not indices:
-            return lst
-        
-        splitted_list = []
-        start_idx = 0
-        for idx in indices:
-            sublist = lst[start_idx:idx]
-            if sublist:
-                splitted_list.append(sublist)
-            start_idx = idx + 1
-        sublist = lst[start_idx:]
-        if sublist:
-            splitted_list.append(sublist)
-    
-        return splitted_list
-    
     def calculateWordScoresOfTweetGroup(self,attributionsForTweetGroup,tweetGroup):
         separator_indexes = tweetGroup.getSeparatorIndexesInFeatureVector()
-        attributionsForTweetGroupSplitted = self.split_list_on_indices(attributionsForTweetGroup.tolist(),separator_indexes)
+        attributionsForTweetGroupSplitted = split_list_on_indices(attributionsForTweetGroup.tolist(),separator_indexes)
+        #this is done with an iterator because if tokenizer filtered all tokens out of sentence an empty token list is present but the feature vector is built to ignore all empty tokens
+        #should feature vector ignore all empty tokens?! I would say yes because of possible noise
+        attributionsForTweetGroupSplittedIterator = iter(attributionsForTweetGroupSplitted)
         attribution_lists_for_sentences_of_wrapper = []
-        for attribution_index in range(len(attributionsForTweetGroupSplitted)):
-            numTokensOfSentence = len(tweetGroup.getTokens()[attribution_index])
-            attributionsForSentence = attributionsForTweetGroupSplitted[attribution_index][:numTokensOfSentence]
-            attribution_lists_for_sentences_of_wrapper.append(attributionsForSentence)
+        for token_list in tweetGroup.getTokens():
+            if len(token_list)>0:
+                numTokensOfSentence = len(token_list) 
+                attributionsForSentence = next(attributionsForTweetGroupSplittedIterator)[:numTokensOfSentence]
+                attribution_lists_for_sentences_of_wrapper.append(attributionsForSentence)
+            else:
+                attribution_lists_for_sentences_of_wrapper.append([])           
         return WordScoresWrapper(tweetGroup, attribution_lists_for_sentences_of_wrapper)
     
     def calculateWordScoresOfTweetGroups(self, tweetGroups : list, observed_class,n_steps=500,internal_batch_size = 10):

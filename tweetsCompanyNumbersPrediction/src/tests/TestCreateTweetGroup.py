@@ -35,6 +35,19 @@ class FakeTextEncoder(AbstractEncoder):
     def getSEPTokenID(self):
         return 2
 
+class FakeTokenizer2(AbstractTokenizer):
+    def __init__(self):
+        pass
+    
+    def tokenizeWithIndex(self, text):
+        indexes = []
+        tokens = []
+        for token in text.split(' '):
+            if(token in ['C','D','G','H']):
+                indexes.append(0)
+                tokens.append(token)
+        return indexes,tokens
+
 class TestCreateTweetGroup(unittest.TestCase):
     
     
@@ -73,3 +86,14 @@ class TestCreateTweetGroup(unittest.TestCase):
         self.assertEqual ([2], sentences_wrapper.separatorIndexesInFeatureVector)
         self.assertEqual([1, 1,2,1,1],sentences_wrapper.getFeatureVector())
         self.assertEqual(label,sentences_wrapper.getLabel())
+
+
+        
+    def test_filtered_out_tokens_by_tokenizer(self):
+        sentences = ['A B','C D','E F','G H','I J']
+        sentence_ids = [0,1,2,3]
+        label = 0
+        tweetGroup = createTweetGroup(FakeTokenizer2(), FakeTextEncoder(), sentences, sentence_ids,label)
+        print(tweetGroup.getTokens())
+        print(tweetGroup.getFeatureVector())
+        print(tweetGroup.getSeparatorIndexesInFeatureVector())
