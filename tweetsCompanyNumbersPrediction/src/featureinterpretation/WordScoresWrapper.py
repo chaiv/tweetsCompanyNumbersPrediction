@@ -22,5 +22,8 @@ class WordScoresWrapper(object):
     def getTokens(self):
         return self.tweetGroup.getTokens()
     
-    def getAttributions(self):
+    def getAttributions(self) -> list[list[float]]:
         return self.total_attributions
+    
+    def getAttributionsSum(self):
+        
