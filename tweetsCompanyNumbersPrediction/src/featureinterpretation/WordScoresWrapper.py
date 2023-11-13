@@ -26,4 +26,5 @@ class WordScoresWrapper(object):
         return self.total_attributions
     
     def getAttributionsSum(self):
+        return sum(sum(attr_list) for attr_list in self.getAttributions())
         

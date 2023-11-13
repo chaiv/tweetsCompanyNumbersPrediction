@@ -50,48 +50,51 @@ def flatten_dict_lists(data):
 
 def createImportantWordStore(wordscoreWrappers,predictions):
 
+    tweetIdColumn = "tweet_id"
+    tokenIndexColumn = "token_index"
+    tokenColumn = "token"
+    tokenAttributionColumn = "token_attribution"
+    predictionColumn = "prediction"
+    tweetAttributionColumn = "tweet_attribution"
+
+
     totalSentencesIds = []
     totalTokenIndexes = []
     totalTokens = []
-    totalAttributions = []
+    totalTokenAttributions = []
     totalPredictions = []
+    totalTweetAttributions = []
   
     for wordscoreWrapperIndex  in range(len(wordscoreWrappers)):
         
         prediction = predictions[wordscoreWrapperIndex]
         wordscoreWrapper =wordscoreWrappers[wordscoreWrapperIndex] 
         wordscore_dict =  { #copy the lists because wordscoreWrapper should not be changed
-                "id" : list(wordscoreWrapper.getSentenceIds()),
-                "token_index" : list(wordscoreWrapper.getTokenIndexes()),
-                "token" : list(wordscoreWrapper.getTokens()),
-                "attribution" : list(wordscoreWrapper.getAttributions()),
-                "prediction" : prediction
+                tweetIdColumn  : list(wordscoreWrapper.getSentenceIds()),
+                tokenIndexColumn : list(wordscoreWrapper.getTokenIndexes()),
+                tokenColumn : list(wordscoreWrapper.getTokens()),
+                tokenAttributionColumn : list(wordscoreWrapper.getAttributions()),
+                predictionColumn : prediction,
+                tweetAttributionColumn: wordscoreWrapper.getAttributionsSum()
                 }
         
         wordscore_dict_flattened = flatten_dict_lists(pad_dict_lists(wordscore_dict))
-        allLists = [wordscore_dict_flattened ["id"],wordscore_dict_flattened ["token_index"],wordscore_dict_flattened ["token"],wordscore_dict_flattened ["attribution"],wordscore_dict_flattened ["prediction"]]
-        are_equal = all(len(lst) == len(allLists[0]) for lst in allLists)
-        if are_equal:
-            print("All lists have the same size.") 
-        else: 
-            print("Lists have different sizes.") 
-        
-        
-        
-        totalSentencesIds += wordscore_dict_flattened["id"]
-        totalTokenIndexes += wordscore_dict_flattened["token_index"]
-        totalTokens += wordscore_dict_flattened["token"]
-        totalAttributions += wordscore_dict_flattened["attribution"]
-        totalPredictions += wordscore_dict_flattened["prediction"]
+        totalSentencesIds += wordscore_dict_flattened[tweetIdColumn]
+        totalTokenIndexes += wordscore_dict_flattened[tokenIndexColumn]
+        totalTokens += wordscore_dict_flattened[tokenColumn]
+        totalTokenAttributions += wordscore_dict_flattened[tokenAttributionColumn]
+        totalPredictions += wordscore_dict_flattened[predictionColumn]
+        totalTweetAttributions +=wordscore_dict_flattened[tweetAttributionColumn]
         
         
     return ImportantWordStore(
         {
-                "id" : totalSentencesIds,
-                "token_index" : totalTokenIndexes,
-                "token" : totalTokens,
-                "attribution" : totalAttributions,
-                "prediction" : totalPredictions
+                tweetIdColumn : totalSentencesIds,
+                tokenIndexColumn : totalTokenIndexes,
+                tokenColumn : totalTokens,
+                tokenAttributionColumn : totalTokenAttributions,
+                predictionColumn : totalPredictions,
+                tweetAttributionColumn: totalTweetAttributions
                 }
         )
     
@@ -107,7 +110,7 @@ class ImportantWordStore:
         transformedDict = flatten_dict_lists(pad_dict_lists(transformedDict))
         return pd.DataFrame(transformedDict)
     
-    def toDfWithFirstNSortedByAttribution(self,n,attributionColumnName = "attribution", ascending = True):
+    def toDfWithFirstNSortedByAttribution(self,n,attributionColumnName = "token_attribution", ascending = True):
         df = self.to_dataframe()
         return self.toDfWithFirstNSortedByAttributionDfParam(n,df, attributionColumnName,ascending)
     

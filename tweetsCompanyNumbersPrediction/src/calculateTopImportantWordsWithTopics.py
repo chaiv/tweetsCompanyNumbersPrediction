@@ -7,8 +7,9 @@ Created on 12.11.2023
 import pandas as pd
 from tweetpreprocess.DataDirHelper import DataDirHelper
 importantWordsDf = pd.read_csv(DataDirHelper().getDataDir()+"companyTweets\\model\\amazonRevenueLSTMN5\\importantWordsClass1Amazon.csv")
-sentenceIdColumnName = "id"
+tweetIdColumnName = "tweet_id"
 tokenColumnName = "token"
-attributionColumnName = "attribution"
-importantWordsDfSortedByAttributionAsc = importantWordsDf.sort_values(by=attributionColumnName, ascending=True)
-print(importantWordsDfSortedByAttributionAsc[[sentenceIdColumnName,tokenColumnName,attributionColumnName]].head(50))
+tokenAttributionColumnName = "token_attribution"
+tweetAttributionColumnName = "tweet_attribution"
+importantWordsDfSortedByAttributionAsc = importantWordsDf.sort_values(by=[tokenAttributionColumnName,tweetAttributionColumnName], ascending=True)
+print(importantWordsDfSortedByAttributionAsc[[tweetIdColumnName,tokenColumnName,tokenAttributionColumnName,tweetAttributionColumnName]].head(100))
