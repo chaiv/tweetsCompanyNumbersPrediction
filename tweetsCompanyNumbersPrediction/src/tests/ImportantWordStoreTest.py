@@ -3,7 +3,6 @@ Created on 17.02.2023
 
 @author: vital
 '''
-import pandas as pd
 import unittest
 from featureinterpretation.ImportantWordsStore import ImportantWordStore,\
     createImportantWordStore, flatten_dict_lists, pad_dict_lists

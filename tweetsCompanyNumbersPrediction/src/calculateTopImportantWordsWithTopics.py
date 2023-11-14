@@ -6,10 +6,13 @@ Created on 12.11.2023
 
 import pandas as pd
 from tweetpreprocess.DataDirHelper import DataDirHelper
+from featureinterpretation.ImportantWordsDataframeUtil import addUntokenizedWordColumnFromTweetDf
+tweetDf = pd.read_csv(DataDirHelper().getDataDir()+ 'companyTweets\\amazonTweetsWithNumbers.csv')
 importantWordsDf = pd.read_csv(DataDirHelper().getDataDir()+"companyTweets\\model\\amazonRevenueLSTMN5\\importantWordsClass1Amazon.csv")
 tweetIdColumnName = "tweet_id"
-tokenColumnName = "token"
+originaltokenColumnName = "original_token"
 tokenAttributionColumnName = "token_attribution"
 tweetAttributionColumnName = "tweet_attribution"
-importantWordsDfSortedByAttributionAsc = importantWordsDf.sort_values(by=[tokenAttributionColumnName,tweetAttributionColumnName], ascending=True)
-print(importantWordsDfSortedByAttributionAsc[[tweetIdColumnName,tokenColumnName,tokenAttributionColumnName,tweetAttributionColumnName]].head(100))
+importantWordsDf = importantWordsDf.sort_values(by=[tokenAttributionColumnName,tweetAttributionColumnName], ascending=False).head(100)
+importantWordsDf = addUntokenizedWordColumnFromTweetDf(tweetDf,importantWordsDf)
+importantWordsDf[[originaltokenColumnName,tokenAttributionColumnName,tweetAttributionColumnName]].to_csv(DataDirHelper().getDataDir()+"companyTweets\\model\\amazonRevenueLSTMN5\\importantWordsClass1AmazonSorted.csv")

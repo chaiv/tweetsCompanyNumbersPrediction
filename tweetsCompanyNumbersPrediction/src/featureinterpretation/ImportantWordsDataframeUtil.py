@@ -1,0 +1,12 @@
+'''
+Created on 14.11.2023
+
+@author: vital
+'''
+
+def addUntokenizedWordColumnFromTweetDf(tweetDf,importantWordsDf,tweetIdColumnName = "tweet_id",tweetColumnName = "body",tokenIndexColumnName = "token_index"):
+    merged_df = importantWordsDf.merge(tweetDf, on=tweetIdColumnName)
+    merged_df['body_words'] = merged_df[tweetColumnName].str.split()
+    merged_df['original_token'] = merged_df.apply(
+        lambda row: row['body_words'][row[tokenIndexColumnName]] if 0 <= row[tokenIndexColumnName] < len(row['body_words']) else None,axis=1)
+    return merged_df
