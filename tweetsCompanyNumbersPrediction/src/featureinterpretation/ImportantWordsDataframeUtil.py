@@ -3,7 +3,7 @@ Created on 14.11.2023
 
 @author: vital
 '''
-from exploredata.POSTagging import PartOfSpeechTagging
+from exploredata.POSTagging import PartOfSpeechTagging, POSTag
 
 def addUntokenizedWordColumnFromTweetDf(tweetDf,importantWordsDf,tweetIdColumnName = "tweet_id",tweetColumnName = "body",tokenIndexColumnName = "token_index"):
     merged_df = importantWordsDf.merge(tweetDf, on=tweetIdColumnName)
@@ -15,8 +15,9 @@ def addUntokenizedWordColumnFromTweetDf(tweetDf,importantWordsDf,tweetIdColumnNa
 
 def addPOSTagsColumn(posTagging : PartOfSpeechTagging, importantWordsDf,tweetColumnName = "body",tokenIndexColumnName = "token_index"):
     importantWordsDf['tweet_pos'] = importantWordsDf.apply(
-        lambda row:  posTagging.getPOSTags(row[tweetColumnName]) ,axis=1)
+        lambda row:  posTagging.getPOSTagsAsStrList(row[tweetColumnName]) ,axis=1)
     importantWordsDf['token_pos'] = importantWordsDf.apply(
         lambda row:  row['tweet_pos'][row[tokenIndexColumnName]] ,axis=1)
     return importantWordsDf
+
     
