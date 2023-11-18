@@ -3,7 +3,7 @@ Created on 14.11.2023
 
 @author: vital
 '''
-from exploredata.POSTagging import PartOfSpeechTagging, POSTag
+from exploredata.POSTagging import PartOfSpeechTagging
 
 def addUntokenizedWordColumnFromTweetDf(tweetDf,importantWordsDf,tweetIdColumnName = "tweet_id",tweetColumnName = "body",tokenIndexColumnName = "token_index"):
     merged_df = importantWordsDf.merge(tweetDf, on=tweetIdColumnName)

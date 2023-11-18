@@ -44,6 +44,8 @@ class TopicHeaderFinderTestCase(unittest.TestCase):
         observedTopicWords = topic_words[0]
         self.assertEqual("writer",self.topic_header_finder.calculateHeader(observedTopicWords, topicExtractor.getWordVectorsOfWords(topic_words[0])))
         self.assertEqual("writer", topicExtractor.getTopicHeaderByWord("financialnews")[1]);
+         
+        
     
     def test_with_topic_model_get_by_id(self):
         modelpath =  DataDirHelper().getDataDir()+ "companyTweets\TopicModelAAPLFirst1000"

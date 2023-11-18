@@ -3,6 +3,7 @@ Created on 29.01.2022
 
 @author: vital
 '''
+import pandas as pd
 from nlpvectors.FeatureVectorMapper import FeatureVectorMapper
 from topicmodelling.TopicHeader import AbstractTopicHeaderFinder,TopicHeaderCalculator
 
@@ -44,6 +45,10 @@ class TopicExtractor(FeatureVectorMapper,AbstractTopicHeaderFinder):
         topic_words, word_scores, topic_nums = self.topicModel.get_topics()
         return  topic_words, word_scores, topic_nums
     
+    def saveTopicsAsDataframe(self):
+        topic_words, word_scores, topic_nums = self.get_topics()
+        return pd.DataFrame({"topic_words":topic_words, })
+        
     def searchTopics(self,keywords, num_topics):
         topic_words,word_scores,topic_scores,topic_nums  = self.topicModel.search_topics(keywords, num_topics)
         return topic_words,word_scores,topic_scores,topic_nums 

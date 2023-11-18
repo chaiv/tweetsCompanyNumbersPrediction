@@ -76,7 +76,12 @@ class TopicExtractorTest(unittest.TestCase):
                 
                 ))
     
-    
+    def test_get_document_topics(self):
+        tweetDf = pd.read_csv(DataDirHelper().getDataDir()+ 'companyTweets\\CompanyTweetsAAPLFirst1000.csv')
+        doc_ids =tweetDf["tweet_id"].tolist()
+        doc_topics, doc_dist, topic_words, topic_word_scores = self.topicExtractor.get_documents_topics(doc_ids)
+        topicsDf = pd.DataFrame({"tweet_id":doc_ids,"topic_num":doc_topics.tolist(),"topic_words":topic_words.tolist()})
+        print(topicsDf)  
         
 
 if __name__ == "__main__":
