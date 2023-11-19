@@ -11,6 +11,8 @@ class TweetTokenizer(AbstractTokenizer):
     def __init__(self,wordFilter: AbstractTextFilter):
         self.wordFilter = wordFilter
         
+    def splitSentence(self,sentence):
+        return sentence.split()
 
     def tokenize(self,text):
         _, tokens  = self.tokenizeWithIndex(text)
@@ -19,7 +21,7 @@ class TweetTokenizer(AbstractTokenizer):
     def tokenizeWithIndex(self,text):
         indexes = []
         tokens = []
-        splits = text.split()
+        splits = self.splitSentence(text)
         for index in range(len(splits)): 
             filteredWord = self.wordFilter.filter(splits[index])
             if(len(filteredWord)>0):

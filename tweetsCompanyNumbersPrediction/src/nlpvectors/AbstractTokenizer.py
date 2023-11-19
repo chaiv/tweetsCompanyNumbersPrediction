@@ -7,6 +7,9 @@ Created on 24.02.2023
 class AbstractTokenizer(object):
     
 
+    def splitSentence(self,sentence):
+        pass
+
     def tokenize(self,sentence):
         pass
     
