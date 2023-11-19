@@ -5,6 +5,7 @@ Created on 15.11.2023
 '''
 import spacy
 from spacy.tokens import Doc
+from nlpvectors.AbstractTokenizer import AbstractTokenizer
 
 
 
@@ -22,13 +23,14 @@ class POSTag(object):
 
 class PartOfSpeechTagging(object):
 
-    def __init__(self):
+    def __init__(self,tokenizer: AbstractTokenizer):
+        self.tokenizer = tokenizer
         self.nlp = spacy.load('en_core_web_sm') 
         self.nlp.tokenizer = self.custom_tokenizer
     
     def custom_tokenizer(self,text):
     # Custom because otherwise spacy splits such tokens as $AMZN into two $ and AMZN
-        tokens = text.split()
+        tokens = self.tokenizer.splitSentence(text)
         return Doc(self.nlp.vocab, words=tokens)
 
     

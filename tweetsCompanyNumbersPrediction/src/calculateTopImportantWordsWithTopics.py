@@ -1,3 +1,5 @@
+from nlpvectors.TweetTokenizer import TweetTokenizer
+from tweetpreprocess.wordfiltering.DefaultWordFilter import DefaultWordFilter
 
 def addTopicsToDf(importantWordsDf, tweetIdColumnName, topicNumColumnName, topicWordsColumnName):
     topicExtractor = TopicExtractor(TopicModelCreator().load(DataDirHelper().getDataDir()+"companyTweets\\model\\amazonRevenueLSTMN5\\amazonTopicModelV2"))
@@ -31,7 +33,7 @@ topicNumColumnName = "topic_num"
 topicWordsColumnName = "topic_words"
 importantWordsDf = importantWordsDf.sort_values(by=[tokenAttributionColumnName,tweetAttributionColumnName], ascending=False).head(100)
 importantWordsDf = addUntokenizedWordColumnFromTweetDf(tweetDf,importantWordsDf)
-importantWordsDf = addPOSTagsColumn(PartOfSpeechTagging(),importantWordsDf)
+importantWordsDf = addPOSTagsColumn(PartOfSpeechTagging(TweetTokenizer(DefaultWordFilter())),importantWordsDf)
 addTopicsToDf(importantWordsDf, tweetIdColumnName, topicNumColumnName, topicWordsColumnName)
 importantWordsDf[[
     originaltokenColumnName,
