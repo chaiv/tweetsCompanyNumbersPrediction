@@ -1,12 +1,6 @@
 from nlpvectors.TweetTokenizer import TweetTokenizer
 from tweetpreprocess.wordfiltering.DefaultWordFilter import DefaultWordFilter
 
-def addTopicsToDf(importantWordsDf, tweetIdColumnName, topicNumColumnName, topicWordsColumnName):
-    topicExtractor = TopicExtractor(TopicModelCreator().load(DataDirHelper().getDataDir()+"companyTweets\\model\\amazonRevenueLSTMN5\\amazonTopicModelV2"))
-    doc_topics, doc_dist, topic_words, topic_word_scores = topicExtractor.get_documents_topics(importantWordsDf[tweetIdColumnName].tolist())
-    importantWordsDf[topicNumColumnName] = doc_topics.tolist()
-    importantWordsDf[topicWordsColumnName] = topic_words.tolist()
-
 '''
 Created on 12.11.2023
 
@@ -16,7 +10,7 @@ Created on 12.11.2023
 import pandas as pd
 from tweetpreprocess.DataDirHelper import DataDirHelper
 from featureinterpretation.ImportantWordsDataframeUtil import addUntokenizedWordColumnFromTweetDf,\
-    addPOSTagsColumn
+    addPOSTagsColumn, addTopicColumns
 from exploredata.POSTagging import PartOfSpeechTagging
 from topicmodelling.TopicModelCreator import TopicModelCreator
 from topicmodelling.TopicExtractor import TopicExtractor
@@ -34,8 +28,15 @@ topicWordsColumnName = "topic_words"
 importantWordsDf = importantWordsDf.sort_values(by=[tokenAttributionColumnName,tweetAttributionColumnName], ascending=False).head(100)
 importantWordsDf = addUntokenizedWordColumnFromTweetDf(tweetDf,importantWordsDf)
 importantWordsDf = addPOSTagsColumn(PartOfSpeechTagging(TweetTokenizer(DefaultWordFilter())),importantWordsDf)
-addTopicsToDf(importantWordsDf, tweetIdColumnName, topicNumColumnName, topicWordsColumnName)
-importantWordsDf[[
+importantWordsDf = addTopicColumns(
+    TopicExtractor(TopicModelCreator().load(DataDirHelper().getDataDir()+"companyTweets\\model\\amazonRevenueLSTMN5\\amazonTopicModelV2")),
+                importantWordsDf,
+                tweetIdColumnName, 
+                topicNumColumnName, 
+                topicWordsColumnName
+                )
+importantWordsDf[
+    [
     originaltokenColumnName,
     posTagColumnName,
     bodyColumnName,
