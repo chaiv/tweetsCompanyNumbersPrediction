@@ -60,7 +60,23 @@ class TestNearDuplicateDetector(unittest.TestCase):
         self.assertEqual(df["body"].iloc[0], originalAndduplicateTexts[0][0])
         self.assertEqual(df["body"].iloc[1], originalAndduplicateTexts[0][1])
         self.assertEqual(df["body"].iloc[4], originalAndduplicateTexts[0][2])
-
+        
+    def testGetDataframeWithoutNearDuplicates(self):
+        df = pd.DataFrame(
+                  [
+                    ("I have two apples and 2 oranges at https://google.com"),
+                    ("I have two apples and 2 oranges at https://google.com"),
+                    ("I have two apples and 2 oranges at"),
+                    ("Completely different tweet"),
+                    ("I have two apples and 2 oranges at https:///google.com")
+                  ],
+                  columns=["body"]
+                  ) 
+        dfWithoutDuplicates=NearDuplicateDetector(df).getDataframeWithoutNearDuplicates()
+        self.assertEqual(3, len(dfWithoutDuplicates))
+        self.assertEqual(df["body"].iloc[0], dfWithoutDuplicates["body"].iloc[0])
+        self.assertEqual(df["body"].iloc[2], dfWithoutDuplicates["body"].iloc[1])
+        self.assertEqual(df["body"].iloc[3], dfWithoutDuplicates["body"].iloc[2])
 
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']

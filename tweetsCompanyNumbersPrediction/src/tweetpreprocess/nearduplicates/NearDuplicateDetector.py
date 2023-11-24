@@ -13,6 +13,9 @@ class NearDuplicateDetector(object):
         self.dataframe = dataframe
         self.bodyColumnName = bodyColumnName
 
+    
+    def getDataframeWithoutNearDuplicates(self):
+        return self.dataframe.drop(self.geDuplicateRowIndexes()).reset_index(drop=True)
             
     
     def getOriginalAndDuplicateRowsText(self):
@@ -61,3 +64,5 @@ class NearDuplicateDetector(object):
                 for item in result:
                     allDuplicateRowsIndexes.add(item)  
         return allDuplicateRowsIndexes
+    
+    
