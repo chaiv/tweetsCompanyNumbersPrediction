@@ -5,7 +5,7 @@ Created on 14.11.2023
 '''
 import pandas as pd
 import unittest
-from featureinterpretation.ImportantWordsDataframeUtil import addUntokenizedWordColumnFromTweetDf
+from featureinterpretation.InterpretationDataframeUtil import addUntokenizedWordColumnFromTweetDf
 
 
 class ImportantWordsDataframeUtilTest(unittest.TestCase):

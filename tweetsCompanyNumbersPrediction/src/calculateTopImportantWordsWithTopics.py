@@ -9,7 +9,7 @@ Created on 12.11.2023
 
 import pandas as pd
 from tweetpreprocess.DataDirHelper import DataDirHelper
-from featureinterpretation.ImportantWordsDataframeUtil import addUntokenizedWordColumnFromTweetDf,\
+from featureinterpretation.InterpretationDataframeUtil import addUntokenizedWordColumnFromTweetDf,\
     addPOSTagsColumn, addTopicColumns
 from exploredata.POSTagging import PartOfSpeechTagging
 from topicmodelling.TopicModelCreator import TopicModelCreator
