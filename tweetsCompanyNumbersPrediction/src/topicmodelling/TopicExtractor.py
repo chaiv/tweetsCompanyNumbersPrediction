@@ -25,6 +25,9 @@ class TopicExtractor(FeatureVectorMapper,AbstractTopicHeaderFinder):
 
     def __init__(self, topicModel):
         self.topicModel = topicModel
+        
+    def get_documents(self):
+        return self.topicModel.documents
           
     def getDocumentVectorByTweetIndex(self,index):
         return self.topicModel.model.docvecs[index]    
@@ -45,7 +48,9 @@ class TopicExtractor(FeatureVectorMapper,AbstractTopicHeaderFinder):
         topic_words, word_scores, topic_nums = self.topicModel.get_topics()
         return  topic_words, word_scores, topic_nums
     
-        
+    def get_topic_vectors(self):
+        return self.topicModel.topic_vectors
+  
     def searchTopics(self,keywords, num_topics):
         topic_words,word_scores,topic_scores,topic_nums  = self.topicModel.search_topics(keywords, num_topics)
         return topic_words,word_scores,topic_scores,topic_nums 

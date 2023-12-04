@@ -9,13 +9,14 @@ from topicmodelling.TopicModelCreator import TopicModelCreator
 from topicmodelling.TopicEvaluation import TopicEvaluation
 from tweetpreprocess.wordfiltering.DefaultWordFilter import DefaultWordFilter
 from nlpvectors.TweetTokenizer import TweetTokenizer
+from topicmodelling.TopicExtractor import TopicExtractor
 
 
 
-class TopicEvaluationTest(unittest.TestCase,):
+class TopicEvaluationTest(unittest.TestCase):
     
     modelpath =  DataDirHelper().getDataDir()+ "companyTweets\TopicModelAAPLFirst1000V2"
-    topicEvaluation = TopicEvaluation(TopicModelCreator().load(modelpath),TweetTokenizer(DefaultWordFilter()))
+    topicEvaluation = TopicEvaluation(TopicExtractor(TopicModelCreator().load(modelpath)),TweetTokenizer(DefaultWordFilter()))
 
     def testCosineSim(self):
         self.assertEqual(
