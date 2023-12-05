@@ -50,6 +50,12 @@ class TopicExtractor(FeatureVectorMapper,AbstractTopicHeaderFinder):
     
     def get_topic_vectors(self):
         return self.topicModel.topic_vectors
+    
+    def get_document_vectors(self):
+        return self.topicModel.document_vectors
+    
+    def get_all_document_topics(self):
+        return self.topicModel.doc_top
   
     def searchTopics(self,keywords, num_topics):
         topic_words,word_scores,topic_scores,topic_nums  = self.topicModel.search_topics(keywords, num_topics)

@@ -8,6 +8,7 @@ from gensim.models import CoherenceModel
 from sklearn.metrics.pairwise import cosine_similarity
 from nlpvectors.AbstractTokenizer import AbstractTokenizer
 from topicmodelling.TopicExtractor import TopicExtractor
+from sklearn.metrics import silhouette_score
 
 class TopicEvaluation(object):
     '''
@@ -26,9 +27,18 @@ class TopicEvaluation(object):
         coherence = cm.get_coherence()
         return coherence
     
-    def get_topic_diversity(self):
-        topic_words, _, _ =self.topicModel.get_topics()
+    def get_topic_diversity(self,top_n = 20):
+        topic_words_list, _, _ =self.topicModel.get_topics()
+        top_words_per_topic = []
+        for topic_words in topic_words_list:
+            top_words_per_topic.extend([word for word in topic_words[:top_n]])
+        unique_words = set(top_words_per_topic)
+        total_words = len(top_words_per_topic)
+        topic_diversity = len(unique_words) / total_words
+        return topic_diversity
         
+    def get_silhoutte_score(self):   
+        return silhouette_score(self.topicModel.get_document_vectors(), self.topicModel.get_all_document_topics(), metric='cosine')
     
     
     

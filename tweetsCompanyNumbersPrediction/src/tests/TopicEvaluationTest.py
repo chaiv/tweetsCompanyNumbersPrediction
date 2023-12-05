@@ -25,6 +25,12 @@ class TopicEvaluationTest(unittest.TestCase):
 
     def testCoherence(self):
         self.assertEqual(0.7406706138618926,self.topicEvaluation.get_topic_coherence())
+        
+    def testTopicDiversity(self):
+        self.assertEqual(0.975,self.topicEvaluation.get_topic_diversity())
+        
+    def testSilhoutteScore(self):
+        print(self.topicEvaluation.get_silhoutte_score())
 
         
 if __name__ == "__main__":
