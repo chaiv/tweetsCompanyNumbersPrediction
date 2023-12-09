@@ -70,6 +70,7 @@ class TopicExtractor(FeatureVectorMapper,AbstractTopicHeaderFinder):
         documents, document_scores, document_ids = self.topicModel.search_documents_by_topic(topic_num, num_docs)
         return documents, document_scores, document_ids
     
+    
     def getWordVectorsOfWords(self,words):
         return self.topicModel._words2word_vectors(words)
     
