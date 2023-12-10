@@ -5,6 +5,7 @@ Created on 10.12.2023
 '''
 import unittest
 import pandas as pd
+import numpy as np 
 from topicmodelling.llmcomparison.LLMTopicsCompare import LLMTopicsCompare
 from topicmodelling.TopicExtractor import TopicExtractor
 
@@ -18,10 +19,14 @@ class TopicExtractorFake(TopicExtractor):
     
     def searchTopics(self,keywords, num_topics):
         topic_nums =[]
-        if(keywords == ["shareholder","stock"]):
-            topic_nums=[1] #must be list of list because every topic word may have multiple topic nums
-        if(keywords == ["news","ticker"]):    
-            topic_nums = [2,3]
+        if(keywords == ["shareholder"]):
+            topic_nums=np.array([1,5]) 
+        if(keywords == ["stock"]):
+            topic_nums=np.array([1])   
+        if(keywords == ["news"]):
+            topic_nums=np.array([2,3])       
+        if(keywords == ["ticker"]):
+            topic_nums=np.array([5,3])       
         if(keywords == ["oil"]):    
             topic_nums = [4]        
         return None,None,None,topic_nums 
@@ -52,7 +57,7 @@ class LLMTopicsCompareTest(unittest.TestCase):
                   columns=["tweet_id","topics"]
                 )
         topicsCompare = LLMTopicsCompare(TopicExtractorFake(),topics)
-        print(topicsCompare.calculateSimilarityScore("topics",2))
+        self.assertAlmostEqual(0.333, topicsCompare.calculateSimilarityScore("topics",2), places=3)
         
         
 

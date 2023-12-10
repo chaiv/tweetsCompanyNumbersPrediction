@@ -57,7 +57,7 @@ class TopicExtractorTest(unittest.TestCase):
 
     def testTopicExtraction(self):
         self.assertTrue(self.topicModel.getNumTopics()>0)
-        topic_words, word_scores, topic_scores, topic_nums =  self.topicModel.searchTopics(keywords=["work"], num_topics=self.topicModel.getNumTopics())
+        topic_words, word_scores, topic_scores, topic_nums =  self.topicModel.searchTopics(keywords=["work","apple"], num_topics=1)
         self.assertAlmostEqual(topic_scores[0],0.9831678519450329,3 )
         pass
     

@@ -25,22 +25,23 @@ class LLMTopicsCompare(object):
         return percentageOfTrue   
         
         
-    def calculateSimilarityScore(self, lLMTopicsColumnName,numTopicsOfTweet=3):
+    def calculateSimilarityScore(self, lLMTopicsColumnName,numTopicsToFind=3):
         tweetIds = self.llmtopicsDf[self.tweetIdColumnName].tolist()
         doc_topics, _,_,_ = self.topicExtractor.get_documents_topics(tweetIds)
         llmTopicsLists = self.llmtopicsDf[lLMTopicsColumnName].tolist()
         allSimilarities = []
         for i in range(0,len(tweetIds)):
-            tweetId = tweetIds[0]
             tweetTopics = doc_topics[i]
             llmTopics = llmTopicsLists[i].split(";")
-            _,_,_,topicIdsSimilarToLLMTopics = self.topicExtractor.searchTopics(llmTopics, numTopicsOfTweet)
             similarityFlags = []
-            for topicId in topicIdsSimilarToLLMTopics:
-                if(topicId in  tweetTopics):
-                    similarityFlags.append(True)
-                else: 
-                    similarityFlags.append(False)
+            for llmTopic in llmTopics: 
+                _,_,_,topicIdsSimilarToLLMTopics = self.topicExtractor.searchTopics([llmTopic], numTopicsToFind)
+                topicFoundFlag = False
+                for topicId in topicIdsSimilarToLLMTopics:
+                    if(topicId in  tweetTopics):
+                        topicFoundFlag = True
+                        break
+                similarityFlags.append(topicFoundFlag)      
             allSimilarities.append(similarityFlags)
         return self.calculatePercentageOfTrue(allSimilarities)
                 
