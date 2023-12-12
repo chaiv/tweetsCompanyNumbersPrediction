@@ -10,10 +10,13 @@ from tweetpreprocess.wordfiltering.DefaultWordFilter import DefaultWordFilter
 from nlpvectors.TweetTokenizer import TweetTokenizer
 from topicmodelling.TopicExtractor import TopicExtractor
 
+def main():
+    #in main function to avoid multiprocessing errors
+    topicExtractor = TopicExtractor(TopicModelCreator().load(DataDirHelper().getDataDir()+"companyTweets\\model\\amazonRevenueLSTMN5\\amazonTopicModelV2"))
+    topicEvaluation = TopicEvaluation(topicExtractor,TweetTokenizer(DefaultWordFilter()))
+    #print("Sihoutte score",topicEvaluation.get_silhoutte_score())
+    #print("Topic coherence",topicEvaluation.get_topic_coherence())
+    print("Topic diversity",topicEvaluation.get_topic_diversity())
 
-modelpath =  DataDirHelper().getDataDir()+ "companyTweets\TopicModelAAPLFirst1000V2"
-topicExtractor = TopicExtractor(TopicModelCreator().load(DataDirHelper().getDataDir()+"companyTweets\\model\\amazonRevenueLSTMN5\\amazonTopicModelV2"))
-topicEvaluation = TopicEvaluation(topicExtractor,TweetTokenizer(DefaultWordFilter()))
-#print("Sihoutte score",topicEvaluation.get_silhoutte_score())
-print("Topic coherence",topicEvaluation.get_topic_coherence())
-print("Topic diversity",topicEvaluation.get_topic_diversity())
+if __name__ == '__main__':
+    main()   
