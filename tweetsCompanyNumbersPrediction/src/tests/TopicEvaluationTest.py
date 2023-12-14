@@ -30,7 +30,7 @@ class TopicEvaluationTest(unittest.TestCase):
         self.assertEqual(0.975,self.topicEvaluation.get_topic_diversity())
         
     def testSilhoutteScore(self):
-        print(self.topicEvaluation.get_silhoutte_score())
+        self.assertEqual(0.39215955,self.topicEvaluation.get_silhoutte_score())
 
         
 if __name__ == "__main__":

@@ -23,6 +23,7 @@ class TopicEvaluation(object):
         topic_words, _, _ =self.topicModel.get_topics()
         documents = [self.tokenizer.tokenize(doc) for doc in self.topicModel.get_documents()]
         dictionary = Dictionary(documents)
+        #cm = CoherenceModel(topics=topic_words, corpus=corpus, dictionary=dictionary, coherence='u_mass') 
         cm = CoherenceModel(topics=topic_words, texts=documents, dictionary=dictionary)
         coherence = cm.get_coherence()
         return coherence

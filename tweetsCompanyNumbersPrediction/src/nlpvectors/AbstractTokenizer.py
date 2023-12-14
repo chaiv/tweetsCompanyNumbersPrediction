@@ -13,6 +13,9 @@ class AbstractTokenizer(object):
     def tokenize(self,sentence):
         pass
     
+    def tokenizeAndGetString(self,sentence):
+        pass
+    
     def tokenizeWithIndex(self,sentence):
         """
         Here not only the tokens but also the positional indexes of tokens in original text are returned. 

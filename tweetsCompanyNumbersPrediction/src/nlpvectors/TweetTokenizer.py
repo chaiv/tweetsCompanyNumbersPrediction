@@ -18,6 +18,10 @@ class TweetTokenizer(AbstractTokenizer):
         _, tokens  = self.tokenizeWithIndex(text)
         return tokens
     
+    def tokenizeAndGetString(self,sentence):
+        tokens = self.tokenize(sentence)
+        return " ".join(tokens)
+    
     def tokenizeWithIndex(self,text):
         indexes = []
         tokens = []

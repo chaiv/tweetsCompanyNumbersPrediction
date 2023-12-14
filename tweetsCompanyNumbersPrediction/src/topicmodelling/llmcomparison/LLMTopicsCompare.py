@@ -35,11 +35,10 @@ class LLMTopicsCompare(object):
             topicWords.extend(self.tokenizer.tokenize(compoundWord))
         return topicWords
         
-            
-        
-    def calculateSimilarityScore(self, lLMTopicsColumnName,numTopicsToFind=3):
+    
+    def calculateSimilarityFlags(self, lLMTopicsColumnName,numTopicsToFind=3):
         tweetIds = [int(x) for x in self.llmtopicsDf[self.tweetIdColumnName].tolist()]
-        doc_topics, _,_,_ = self.topicExtractor.get_documents_topics(tweetIds)
+        doc_topics, _,_,_ = self.topicExtractor.get_documents_topics(tweetIds,num_topics=numTopicsToFind)
         llmTopicsLists = self.llmtopicsDf[lLMTopicsColumnName].tolist()
         allSimilarities = []
         for i in range(0,len(tweetIds)):
@@ -50,10 +49,14 @@ class LLMTopicsCompare(object):
                 _,_,_,topicIdsSimilarToLLMTopics = self.topicExtractor.searchTopics([llmTopic], numTopicsToFind)
                 topicFoundFlag = False
                 for topicId in topicIdsSimilarToLLMTopics:
-                    if(topicId in  tweetTopics):
+                    if(topicId in tweetTopics):
                         topicFoundFlag = True
                         break
                 similarityFlags.append(topicFoundFlag)      
             allSimilarities.append(similarityFlags)
+        return  allSimilarities   
+        
+    def calculateSimilarityScore(self, lLMTopicsColumnName,numTopicsToFind=3):
+        allSimilarities = self.calculateSimilarityFlags(lLMTopicsColumnName,numTopicsToFind)
         return self.calculatePercentageOfTrue(allSimilarities)
                 

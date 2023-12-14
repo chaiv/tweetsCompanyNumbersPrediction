@@ -14,9 +14,10 @@ def main():
     #in main function to avoid multiprocessing errors
     topicExtractor = TopicExtractor(TopicModelCreator().load(DataDirHelper().getDataDir()+"companyTweets\\model\\amazonRevenueLSTMN5\\amazonTopicModelV2"))
     topicEvaluation = TopicEvaluation(topicExtractor,TweetTokenizer(DefaultWordFilter()))
-    #print("Sihoutte score",topicEvaluation.get_silhoutte_score())
-    #print("Topic coherence",topicEvaluation.get_topic_coherence())
-    print("Topic diversity",topicEvaluation.get_topic_diversity())
-
+    print(topicExtractor.getNumTopics())
+    print("Sihoutte score",topicEvaluation.get_silhoutte_score())
+    print("Topic coherence",topicEvaluation.get_topic_coherence())
+    print("Topic diversity 10",topicEvaluation.get_topic_diversity(top_n=10))
+    print("Topic diversity 20",topicEvaluation.get_topic_diversity(top_n=20))
 if __name__ == '__main__':
     main()   

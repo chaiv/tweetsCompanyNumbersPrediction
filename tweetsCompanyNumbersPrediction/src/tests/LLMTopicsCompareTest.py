@@ -17,7 +17,7 @@ class TopicExtractorFake(TopicExtractor):
         pass
     
     def get_documents_topics(self,tweetIds):
-        return [[1,3],[1],[2],[]],None,None,None
+        return [[1,2],[1],[2],[]],None,None,None
     
     def searchTopics(self,keywords, num_topics):
         topic_nums =[]
@@ -28,7 +28,7 @@ class TopicExtractorFake(TopicExtractor):
         if(keywords == ["new"]):
             topic_nums=np.array([2,3])       
         if(keywords == ["ticker"]):
-            topic_nums=np.array([5,3])       
+            topic_nums=np.array([1])       
         if(keywords == ["oil"]):    
             topic_nums = [4]        
         return None,None,None,topic_nums 
@@ -42,7 +42,7 @@ class LLMTopicsCompareTest(unittest.TestCase):
         self.assertEqual(0.5,topicsCompare.calculatePercentageOfTrue([[True,False],[False,True]]))
         self.assertEqual(0,topicsCompare.calculatePercentageOfTrue([[False,False],[False,False]]))
         self.assertEqual(1,topicsCompare.calculatePercentageOfTrue([[True,True],[True,True]]))
-        self.assertEqual(0.25,topicsCompare.calculatePercentageOfTrue([[True,False],[False,False]]))
+        self.assertEqual(0.25,topicsCompare.calculatePercentageOfTrue([[True,False],[False,False],[]]))
         self.assertEqual(0,topicsCompare.calculatePercentageOfTrue([]))
         self.assertEqual(0,topicsCompare.calculatePercentageOfTrue([[]]))
 
@@ -50,7 +50,7 @@ class LLMTopicsCompareTest(unittest.TestCase):
     def testSimilarityScore(self):
         topicsDf =  pd.DataFrame(
                 [
-                  (1,"shareholder;stock"),
+                  (1,"shareholder stock"),
                   (2,"news;ticker"),
                   (3,"oil"),
                   (4,"nothing"),
@@ -58,7 +58,9 @@ class LLMTopicsCompareTest(unittest.TestCase):
                   columns=["tweet_id","topics"]
                 )
         topicsCompare = LLMTopicsCompare(TopicExtractorFake(),TweetTokenizer(DefaultWordFilter()),topicsDf)
-        self.assertAlmostEqual(0.333, topicsCompare.calculateSimilarityScore("topics",2), places=3)
+        expectedSimilarityFlags = [[True,True],[False,True],[False],[]]
+        self.assertAlmostEqual( expectedSimilarityFlags, topicsCompare.calculateSimilarityFlags("topics",2), places=3)
+        self.assertAlmostEqual(0.6, topicsCompare.calculateSimilarityScore("topics",2), places=3)
         
         
 

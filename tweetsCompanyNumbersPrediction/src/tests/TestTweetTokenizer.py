@@ -27,10 +27,12 @@ class TestTweetTokenizer(unittest.TestCase):
         self.assertEqual(indexes, expected_indexes)
         self.assertEqual(tokens, expected_tokens)
         
-    def test_tokenizer(self):
+
+    def test_tokenizeAndGetString(self):
         word_filter = DefaultWordFilter()
         tokenizer = TweetTokenizer(word_filter)
-        print(tokenizer.tokenize("lx21 made $10,008  on $AAPL -Check it out!  Learn #howtotrade  $EXE $WATT $IMRS $CACH $GMO"))
+        text = "This is a tweet with some stopwords and #hashtags and @mentions"
+        self.assertEqual("tweet stopword hashtag mention", tokenizer.tokenizeAndGetString(text))
 
 if __name__ == '__main__':
     unittest.main()
