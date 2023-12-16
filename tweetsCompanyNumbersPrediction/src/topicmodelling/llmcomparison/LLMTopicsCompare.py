@@ -42,7 +42,10 @@ class LLMTopicsCompare(object):
         llmTopicsLists = self.llmtopicsDf[lLMTopicsColumnName].tolist()
         allSimilarities = []
         for i in range(0,len(tweetIds)):
-            tweetTopics = doc_topics[i]
+            if(numTopicsToFind == 1):
+                tweetTopics = [doc_topics[i]]
+            else: 
+                tweetTopics = doc_topics[i]
             llmTopics = self.getTopicWords(llmTopicsLists[i])
             similarityFlags = []
             for llmTopic in llmTopics: 

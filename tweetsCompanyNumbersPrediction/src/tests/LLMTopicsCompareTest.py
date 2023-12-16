@@ -16,7 +16,7 @@ class TopicExtractorFake(TopicExtractor):
     def __init__(self):
         pass
     
-    def get_documents_topics(self,tweetIds):
+    def get_documents_topics(self,tweetIds,num_topics):
         return [[1,2],[1],[2],[]],None,None,None
     
     def searchTopics(self,keywords, num_topics):

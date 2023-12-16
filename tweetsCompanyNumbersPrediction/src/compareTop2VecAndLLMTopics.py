@@ -13,14 +13,15 @@ from nlpvectors.TweetTokenizer import TweetTokenizer
 
 modelpath =  DataDirHelper().getDataDir()+ "companyTweets\TopicModelAAPLFirst1000V2"
 topicExtractor = TopicExtractor(TopicModelCreator().load(DataDirHelper().getDataDir()+"companyTweets\\model\\amazonRevenueLSTMN5\\amazonTopicModelV2"))
-topicsDf = pd.read_csv (DataDirHelper().getDataDir()+"companyTweets\\model\\amazonRevenueLSTMN5\\topicsChatGpt.csv")  
+topicsDf = pd.read_csv (DataDirHelper().getDataDir()+"companyTweets\\model\\amazonRevenueLSTMN5\\topicsChatGptNotCompound.csv")  
 tokenizer = TweetTokenizer(DefaultWordFilter())
 topicsCompare = LLMTopicsCompare(topicExtractor,tokenizer,topicsDf)
-print(topicsCompare.calculateSimilarityScore("topics_chat_gpt", 1))
-print(topicsCompare.calculateSimilarityScore("topics_chat_gpt", 5))
-print(topicsCompare.calculateSimilarityScore("topics_chat_gpt", 10))
-print(topicsCompare.calculateSimilarityScore("topics_chat_gpt", 20))
-print(topicsCompare.calculateSimilarityScore("topics_bard", 1))
-print(topicsCompare.calculateSimilarityScore("topics_bard", 5))
-print(topicsCompare.calculateSimilarityScore("topics_bard", 10))
-print(topicsCompare.calculateSimilarityScore("topics_bard", 20))
+
+print("ChatGPT:")
+for i in range(1,50):
+    print(topicsCompare.calculateSimilarityScore("topics_chat_gpt", i))
+
+#print(topicsCompare.calculateSimilarityScore("topics_bard", 1))
+#print(topicsCompare.calculateSimilarityScore("topics_bard", 5))
+#print(topicsCompare.calculateSimilarityScore("topics_bard", 10))
+#print(topicsCompare.calculateSimilarityScore("topics_bard", 20))
