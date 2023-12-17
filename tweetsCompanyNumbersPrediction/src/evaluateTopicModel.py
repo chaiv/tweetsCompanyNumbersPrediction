@@ -12,7 +12,7 @@ from topicmodelling.TopicExtractor import TopicExtractor
 
 def main():
     #in main function to avoid multiprocessing errors
-    topicExtractor = TopicExtractor(TopicModelCreator().load(DataDirHelper().getDataDir()+"companyTweets\\model\\amazonRevenueLSTMN5\\amazonTopicModelV2"))
+    topicExtractor = TopicExtractor(TopicModelCreator().load(DataDirHelper().getDataDir()+"companyTweets\\model\\amazonRevenueLSTMN5\\amazonTopicModelRandom15000"))
     topicEvaluation = TopicEvaluation(topicExtractor,TweetTokenizer(DefaultWordFilter()))
     print(topicExtractor.getNumTopics())
     print("Sihoutte score",topicEvaluation.get_silhoutte_score())

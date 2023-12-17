@@ -17,9 +17,13 @@ from nlpvectors.TweetTokenizer import TweetTokenizer
 #tweetsFile = "amazonTweetsWithNumbers.csv"
 #topicModelFile = "amazonTopicModelV2"
 
-tweetsFile = "CompanyTweetsTeslaWithCarSales.csv"
-topicModelFile = "teslaTopicModel"
-tweets = pd.read_csv (DataDirHelper().getDataDir()+ "companyTweets\\"+tweetsFile)  
+tweetsFile = "amazonTweetsWithNumbers.csv"
+topicModelFile = "amazonTopicModelRandom15000"
+
+#tweetsFile = "CompanyTweetsTeslaWithCarSales.csv"
+#topicModelFile = "teslaTopicModel"
+tweets = pd.read_csv (DataDirHelper().getDataDir()+ "companyTweets\\"+tweetsFile).sample(15000) 
+tweets.fillna('', inplace=True) #nan values in body columns 
 tokenizer = TweetTokenizer(DefaultWordFilter())
 documents = []
 for index, row in tweets.iterrows():
