@@ -6,15 +6,15 @@ Created on 11.03.2023
 import numpy as np
 from gensim.models import KeyedVectors
 from tweetpreprocess.DataDirHelper import DataDirHelper
-from topicmodelling.TopicModelCreator import TopicModelCreator
-from topicmodelling.TopicExtractor import TopicExtractor
+from topicmodelling.TopicModelCreator import Top2VecTopicModelCreator
+from topicmodelling.TopicExtractor import Top2VecTopicExtractor
 from nlpvectors.VocabularyCreator import PAD_TOKEN, UNK_TOKEN, SEP_TOKEN
 
 modelpath =  DataDirHelper().getDataDir()+ "companyTweets\\TopicModelAAPLFirst1000V2"
 wordVectorsPath = DataDirHelper().getDataDir()+ "companyTweets\WordVectorsAAPLFirst1000.txt"
 
 # Load the word vectors
-topicExtractor = TopicExtractor(TopicModelCreator().load(modelpath))
+topicExtractor = Top2VecTopicExtractor(Top2VecTopicModelCreator().load(modelpath))
 words = list(topicModel.getWordIndexes().keys())
 word_vectors = topicExtractor.getWordVectorsArray()
 

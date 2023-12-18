@@ -5,18 +5,18 @@ Created on 17.04.2023
 '''
 import unittest
 from tweetpreprocess.DataDirHelper import DataDirHelper
-from topicmodelling.TopicModelCreator import TopicModelCreator
+from topicmodelling.TopicModelCreator import Top2VecTopicModelCreator
 from topicmodelling.TopicEvaluation import TopicEvaluation
 from tweetpreprocess.wordfiltering.DefaultWordFilter import DefaultWordFilter
 from nlpvectors.TweetTokenizer import TweetTokenizer
-from topicmodelling.TopicExtractor import TopicExtractor
+from topicmodelling.TopicExtractor import Top2VecTopicExtractor
 
 
 
 class TopicEvaluationTest(unittest.TestCase):
     
     modelpath =  DataDirHelper().getDataDir()+ "companyTweets\TopicModelAAPLFirst1000V2"
-    topicEvaluation = TopicEvaluation(TopicExtractor(TopicModelCreator().load(modelpath)),TweetTokenizer(DefaultWordFilter()))
+    topicEvaluation = TopicEvaluation(Top2VecTopicExtractor(Top2VecTopicModelCreator().load(modelpath)),TweetTokenizer(DefaultWordFilter()))
 
     def testCosineSim(self):
         self.assertEqual(

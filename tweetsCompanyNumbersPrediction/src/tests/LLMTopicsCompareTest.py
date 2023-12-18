@@ -7,11 +7,11 @@ import unittest
 import pandas as pd
 import numpy as np 
 from topicmodelling.llmcomparison.LLMTopicsCompare import LLMTopicsCompare
-from topicmodelling.TopicExtractor import TopicExtractor
+from topicmodelling.TopicExtractor import Top2VecTopicExtractor
 from nlpvectors.TweetTokenizer import TweetTokenizer
 from tweetpreprocess.wordfiltering.DefaultWordFilter import DefaultWordFilter
 
-class TopicExtractorFake(TopicExtractor):
+class TopicExtractorFake(Top2VecTopicExtractor):
     
     def __init__(self):
         pass

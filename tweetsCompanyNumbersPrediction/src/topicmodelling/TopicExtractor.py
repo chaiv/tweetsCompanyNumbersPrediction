@@ -3,12 +3,51 @@ Created on 29.01.2022
 
 @author: vital
 '''
-import pandas as pd
 from nlpvectors.FeatureVectorMapper import FeatureVectorMapper
 from topicmodelling.TopicHeader import AbstractTopicHeaderFinder,TopicHeaderCalculator
 
 
-class TopicExtractor(FeatureVectorMapper,AbstractTopicHeaderFinder):
+
+class AbstractTopicExtractor():
+    
+    def getNumberOfTopics(self): 
+        pass 
+    
+    def getTopicWordsScoresAndIds(self):
+        pass
+    
+
+
+class BertTopicExtractor(AbstractTopicExtractor):
+    
+    def __init__(self, topicModel):
+        self.topicModel = topicModel
+        
+    def getTopicWordsScoresAndIds(self):
+        topics = self.topicModel.get_topics()
+        total_topic_words =[]
+        total_word_scores = []
+        topic_ids = []
+        for topic_id, topic_words in topics.items():
+            topic_ids.append(topic_id)
+            current_topic_words = []
+            current_word_scores=[]
+            for word, score in topic_words:
+                current_topic_words.append(word)
+                current_word_scores.append(score)
+            total_topic_words.append(current_topic_words)
+            total_word_scores.append(current_word_scores)
+        return total_topic_words,total_word_scores,topic_ids
+    
+    def getNumberOfTopics(self): 
+        topic_freq = self.topicModel.get_topic_freq()
+        total_topics = len(topic_freq) - 1 if -1 in topic_freq.Topic.values else len(topic_freq) # The total number of topics (excluding the outlier topic -1)
+        return total_topics  
+    
+
+
+
+class Top2VecTopicExtractor(FeatureVectorMapper,AbstractTopicHeaderFinder,AbstractTopicExtractor):
    
     def getTopicHeaderByWord(self,searchWord):
         topic_words,word_scores,topic_scores,topic_nums = self.searchTopics([searchWord],1)
@@ -41,10 +80,10 @@ class TopicExtractor(FeatureVectorMapper,AbstractTopicHeaderFinder):
     def getDocumentVectorSize(self):
         return self.topicModel.model.docvecs.vector_size
     
-    def getNumTopics(self): 
+    def getNumberOfTopics(self): 
         return self.topicModel.get_num_topics()
     
-    def get_topics(self):
+    def getTopicWordsScoresAndIds(self):
         topic_words, word_scores, topic_nums = self.topicModel.get_topics()
         return  topic_words, word_scores, topic_nums
     

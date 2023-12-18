@@ -10,10 +10,10 @@ Created on 12.11.2023
 import pandas as pd
 from tweetpreprocess.DataDirHelper import DataDirHelper
 from featureinterpretation.InterpretationDataframeUtil import addUntokenizedWordColumnFromTweetDf,\
-    addPOSTagsColumn, addTopicColumns
+    addPOSTagsColumn, addTopicColumns, addTopicOriginalWordsColumn
 from exploredata.POSTagging import PartOfSpeechTagging
-from topicmodelling.TopicModelCreator import TopicModelCreator
-from topicmodelling.TopicExtractor import TopicExtractor
+from topicmodelling.TopicModelCreator import Top2VecTopicModelCreator
+from topicmodelling.TopicExtractor import Top2VecTopicExtractor
 tweetDf = pd.read_csv(DataDirHelper().getDataDir()+ 'companyTweets\\amazonTweetsWithNumbers.csv')
 importantWordsDf = pd.read_csv(DataDirHelper().getDataDir()+"companyTweets\\model\\amazonRevenueLSTMN5\\importantWordsClass1Amazon.csv")
 tweetIdColumnName = "tweet_id"
@@ -29,12 +29,18 @@ importantWordsDf = importantWordsDf.sort_values(by=[tokenAttributionColumnName,t
 importantWordsDf = addUntokenizedWordColumnFromTweetDf(tweetDf,importantWordsDf)
 importantWordsDf = addPOSTagsColumn(PartOfSpeechTagging(TweetTokenizer(DefaultWordFilter())),importantWordsDf)
 importantWordsDf = addTopicColumns(
-    TopicExtractor(TopicModelCreator().load(DataDirHelper().getDataDir()+"companyTweets\\model\\amazonRevenueLSTMN5\\amazonTopicModelV2")),
+    Top2VecTopicExtractor(Top2VecTopicModelCreator().load(DataDirHelper().getDataDir()+"companyTweets\\model\\amazonRevenueLSTMN5\\amazonTopicModelV2")),
                 importantWordsDf,
                 tweetIdColumnName, 
                 topicNumColumnName, 
                 topicWordsColumnName
                 )
+
+# importantWordsDf['topic_words'] = importantWordsDf['topic_words'].apply(lambda x: ast.literal_eval(x) if isinstance(x, str) else x)
+# with open(DataDirHelper().getDataDir()+"companyTweets\\model\\amazonRevenueLSTMN5\\tokenizerLookupAmazon.csv") as json_file:
+#     tokenizerLookupDict= json.load(json_file)
+# addTopicOriginalWordsColumn(tokenizerLookupDict,importantWordsDf,topicWordsColumnName='topic_words',originalTopicWordsColumnName = 'original_topic_words')
+
 importantWordsDf[
     [
     originaltokenColumnName,

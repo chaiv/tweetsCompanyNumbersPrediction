@@ -6,7 +6,7 @@ Created on 29.01.2022
 
 from top2vec import Top2Vec
 
-class TopicModelCreator(object):
+class Top2VecTopicModelCreator(object):
     '''
     classdocs
     '''

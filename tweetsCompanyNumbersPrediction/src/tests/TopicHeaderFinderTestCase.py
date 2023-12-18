@@ -6,8 +6,8 @@ Created on 18.02.2023
 import numpy as np
 import unittest
 from topicmodelling.TopicHeader import TopicHeaderCalculator
-from topicmodelling.TopicExtractor import TopicExtractor
-from topicmodelling.TopicModelCreator import TopicModelCreator
+from topicmodelling.TopicExtractor import Top2VecTopicExtractor
+from topicmodelling.TopicModelCreator import Top2VecTopicModelCreator
 from tweetpreprocess.DataDirHelper import DataDirHelper
 
 
@@ -39,8 +39,8 @@ class TopicHeaderFinderTestCase(unittest.TestCase):
         
     def test_with_topic_model(self):
         modelpath =  DataDirHelper().getDataDir()+ "companyTweets\TopicModelAAPLFirst1000"
-        topicExtractor = TopicExtractor(TopicModelCreator().load(modelpath))    
-        topic_words, word_scores, topic_nums = topicExtractor.get_topics()
+        topicExtractor = Top2VecTopicExtractor(Top2VecTopicModelCreator().load(modelpath))    
+        topic_words, word_scores, topic_nums = topicExtractor.getTopicWordsScoresAndIds()
         observedTopicWords = topic_words[0]
         self.assertEqual("writer",self.topic_header_finder.calculateHeader(observedTopicWords, topicExtractor.getWordVectorsOfWords(topic_words[0])))
         self.assertEqual("writer", topicExtractor.getTopicHeaderByWord("financialnews")[1]);
@@ -49,7 +49,7 @@ class TopicHeaderFinderTestCase(unittest.TestCase):
     
     def test_with_topic_model_get_by_id(self):
         modelpath =  DataDirHelper().getDataDir()+ "companyTweets\TopicModelAAPLFirst1000"
-        topicExtractor = TopicExtractor(TopicModelCreator().load(modelpath)) 
+        topicExtractor = Top2VecTopicExtractor(Top2VecTopicModelCreator().load(modelpath)) 
         topic_nums, topic_header = topicExtractor.getTopicHeaderByIds([550441509175443456,550441672312512512])
         self.assertEqual(2, len(topic_nums))
         self.assertEqual(2, len(topic_header))

@@ -3,7 +3,7 @@ Created on 09.12.2023
 
 @author: vital
 '''
-from topicmodelling.TopicExtractor import TopicExtractor
+from topicmodelling.TopicExtractor import Top2VecTopicExtractor
 from itertools import chain
 import re
 from nlpvectors.AbstractTokenizer import AbstractTokenizer
@@ -13,7 +13,7 @@ class LLMTopicsCompare(object):
 
 
 
-    def __init__(self, topicExtractor: TopicExtractor,tokenizer: AbstractTokenizer,llmtopicsDf, tweetIdColumnName = "tweet_id"):
+    def __init__(self, topicExtractor: Top2VecTopicExtractor,tokenizer: AbstractTokenizer,llmtopicsDf, tweetIdColumnName = "tweet_id"):
         self.topicExtractor = topicExtractor
         self.llmtopicsDf = llmtopicsDf
         self.tweetIdColumnName = tweetIdColumnName
@@ -38,7 +38,7 @@ class LLMTopicsCompare(object):
     
     def calculateSimilarityFlags(self, lLMTopicsColumnName,numTopicsToFind=3):
         tweetIds = [int(x) for x in self.llmtopicsDf[self.tweetIdColumnName].tolist()]
-        doc_topics, _,_,_ = self.topicExtractor.get_documents_topics(tweetIds,num_topics=numTopicsToFind)
+        doc_topics, _,topic_words,_ = self.topicExtractor.get_documents_topics(tweetIds,num_topics=numTopicsToFind)
         llmTopicsLists = self.llmtopicsDf[lLMTopicsColumnName].tolist()
         allSimilarities = []
         for i in range(0,len(tweetIds)):

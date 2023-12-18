@@ -5,8 +5,8 @@ Created on 29.01.2022
 '''
 import unittest
 import pandas as pd
-from topicmodelling.TopicExtractor import TopicExtractor
-from topicmodelling.TopicModelCreator import TopicModelCreator
+from topicmodelling.TopicExtractor import Top2VecTopicExtractor
+from topicmodelling.TopicModelCreator import Top2VecTopicModelCreator
 from tweetpreprocess.TweetDataframeQuery import TweetDataframeQuery
 from tweetpreprocess.TweetQueryParams import TweetQueryParams
 from tweetpreprocess.DataDirHelper import DataDirHelper
@@ -15,7 +15,7 @@ from tweetpreprocess.DataDirHelper import DataDirHelper
 class TopicExtractorTest(unittest.TestCase):
     
     modelpath =  DataDirHelper().getDataDir()+ "companyTweets\TopicModelAAPLFirst1000"
-    topicModel = TopicExtractor(TopicModelCreator().load(modelpath))
+    topicModel = Top2VecTopicExtractor(Top2VecTopicModelCreator().load(modelpath))
     
     def testWhenFindSentencesFromTopicThenOk(self):
         documents, document_scores, document_ids = self.topicModel.search_documents_by_topic(0, 5)

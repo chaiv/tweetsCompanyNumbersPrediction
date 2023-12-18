@@ -4,7 +4,7 @@ Created on 10.01.2023
 @author: vital
 '''
 import pandas as pd
-from topicmodelling.TopicModelCreator import TopicModelCreator
+from topicmodelling.TopicModelCreator import Top2VecTopicModelCreator
 from tweetpreprocess.DataDirHelper import DataDirHelper
 from tweetpreprocess.wordfiltering.DefaultWordFilter import DefaultWordFilter
 from nlpvectors.TweetTokenizer import TweetTokenizer
@@ -28,6 +28,6 @@ tokenizer = TweetTokenizer(DefaultWordFilter())
 documents = []
 for index, row in tweets.iterrows():
     documents.append(str(row["body"]))
-model = TopicModelCreator().createModel(documents, tweets["tweet_id"].tolist(),tokenizer= tokenizer.tokenize)
+model = Top2VecTopicModelCreator().createModel(documents, tweets["tweet_id"].tolist(),tokenizer= tokenizer.tokenize)
 model.save(DataDirHelper().getDataDir()+ "companyTweets\\"+topicModelFile)
 

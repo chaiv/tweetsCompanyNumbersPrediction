@@ -14,8 +14,8 @@ from tweetpreprocess.TweetTextFilterTransformer import TweetTextFilterTransforme
 from tweetpreprocess.DataDirHelper import DataDirHelper
 from tweetpreprocess.FiguresIncreaseDecreaseClassCalculator import FiguresIncreaseDecreaseClassCalculator
 from tweetpreprocess.FiguresPercentChangeCalculator import FiguresPercentChangeCalculator
-from topicmodelling.TopicExtractor import TopicExtractor
-from topicmodelling.TopicModelCreator import TopicModelCreator
+from topicmodelling.TopicExtractor import Top2VecTopicExtractor
+from topicmodelling.TopicModelCreator import Top2VecTopicModelCreator
 from nlpvectors.FeatureDataframeCreator import FeatureDataframeCreator
 
 class FeatureDataframePipeline(object):
@@ -38,7 +38,7 @@ class FeatureDataframePipeline(object):
         tweetsWithNumbers = TweetNumbersConnector(postTSPColumn = self.postTSPColumnName,valueColumn="class").getTweetsWithNumbers(tweetsSubselect, numbersWithClasses)
         return tweetsWithNumbers
     def createDoc2VecFeaturesDf(self, tweetsWithNumbersDf,topicModelPath):
-        mapper = TopicExtractor(TopicModelCreator().load(topicModelPath))
+        mapper = Top2VecTopicExtractor(Top2VecTopicModelCreator().load(topicModelPath))
         featuresDf = FeatureDataframeCreator(mapper,classColumnName="class").createFeatureDataframe(tweetsWithNumbersDf)
         return featuresDf
     
