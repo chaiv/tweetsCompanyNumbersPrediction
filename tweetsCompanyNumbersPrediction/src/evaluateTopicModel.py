@@ -18,7 +18,7 @@ def main():
     topicExtractor = BertTopicExtractor(BERTopic.load(DataDirHelper().getDataDir()+ "companyTweets\\amazonTopicModelBertRandom15000"))
     topicEvaluation = TopicEvaluation(topicExtractor,TweetTokenizer(DefaultWordFilter()))
     print(topicExtractor.getNumberOfTopics())
-    #print("Sihoutte score",topicEvaluation.get_silhoutte_score())
+    #print("Sihoutte score",topicEvaluation.get_silhoutte_score()) #
     print("Topic coherence",topicEvaluation.get_topic_coherence())
     print("Topic diversity 10",topicEvaluation.get_topic_diversity(top_n=10))
     print("Topic diversity 20",topicEvaluation.get_topic_diversity(top_n=20))
