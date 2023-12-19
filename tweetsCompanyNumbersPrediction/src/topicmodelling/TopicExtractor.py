@@ -16,12 +16,18 @@ class AbstractTopicExtractor():
     def getTopicWordsScoresAndIds(self):
         pass
     
-
+    def get_documents(self):
+        pass
 
 class BertTopicExtractor(AbstractTopicExtractor):
     
-    def __init__(self, topicModel):
+    def __init__(self, topicModel,tweetsDf,tweetBodyColumn = "body"):
         self.topicModel = topicModel
+        self.tweetsDf = tweetsDf
+        self.tweetBodyColumn = tweetBodyColumn
+        
+    def get_documents(self):
+        return self.tweetsDf[self.tweetBodyColumn].tolist()
         
     def getTopicWordsScoresAndIds(self):
         topics = self.topicModel.get_topics()
@@ -43,6 +49,11 @@ class BertTopicExtractor(AbstractTopicExtractor):
         topic_freq = self.topicModel.get_topic_freq()
         total_topics = len(topic_freq) - 1 if -1 in topic_freq.Topic.values else len(topic_freq) # The total number of topics (excluding the outlier topic -1)
         return total_topics  
+    
+    def get_documents_topics(self, doc_ids,num_topics = 1):
+        pass
+    
+
     
 
 

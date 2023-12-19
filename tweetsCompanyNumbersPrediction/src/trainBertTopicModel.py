@@ -12,11 +12,11 @@ from nlpvectors.TweetTokenizer import TweetTokenizer
 
 
 tweetsFile = "amazonTweetsWithNumbers.csv"
-topicModelFile = "amazonTopicModelBertRandom15000"
+topicModelFile = "amazonTopicModelBert"
 
 #tweetsFile = "CompanyTweetsTeslaWithCarSales.csv"
 #topicModelFile = "teslaTopicModel"
-tweets = pd.read_csv (DataDirHelper().getDataDir()+ "companyTweets\\"+tweetsFile).sample(15000) 
+tweets = pd.read_csv (DataDirHelper().getDataDir()+ "companyTweets\\"+tweetsFile)
 tweets.fillna('', inplace=True) #nan values in body columns 
 tokenizer = TweetTokenizer(DefaultWordFilter())
 documents = []
