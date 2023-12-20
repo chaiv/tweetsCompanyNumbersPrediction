@@ -5,6 +5,9 @@ Created on 29.01.2022
 '''
 from nlpvectors.FeatureVectorMapper import FeatureVectorMapper
 from topicmodelling.TopicHeader import AbstractTopicHeaderFinder,TopicHeaderCalculator
+from nlpvectors.AbstractTokenizer import AbstractTokenizer
+from tweetpreprocess.DataDirHelper import DataDirHelper
+from bertopic._bertopic import BERTopic
 
 
 
@@ -18,16 +21,22 @@ class AbstractTopicExtractor():
     
     def get_documents(self):
         pass
+    
+    def getDocumentTopicWordsTopicScoresAndTopicIds(self,doc_ids):
+        pass
 
 class BertTopicExtractor(AbstractTopicExtractor):
     
-    def __init__(self, topicModel,tweetsDf,tweetBodyColumn = "body"):
-        self.topicModel = topicModel
-        self.tweetsDf = tweetsDf
-        self.tweetBodyColumn = tweetBodyColumn
+    def __init__(self, topicModelPath,tokenizer: AbstractTokenizer , tweetIdTopicIdMappingDf,tweetIdColumn = "tweet_id",topicIdColumn = "topic_id"):
+        self.topicModelPath = topicModelPath
+        self.tweetIdTopicIdMappingDf = tweetIdTopicIdMappingDf
+        self.topicIdColumn = topicIdColumn
+        self.topicModel = BERTopic.load(topicModelPath)
+        self.tweetIdColumn = tweetIdColumn
+        self.tokenizer = tokenizer
         
     def get_documents(self):
-        return self.tweetsDf[self.tweetBodyColumn].tolist()
+        pass
         
     def getTopicWordsScoresAndIds(self):
         topics = self.topicModel.get_topics()
@@ -50,8 +59,22 @@ class BertTopicExtractor(AbstractTopicExtractor):
         total_topics = len(topic_freq) - 1 if -1 in topic_freq.Topic.values else len(topic_freq) # The total number of topics (excluding the outlier topic -1)
         return total_topics  
     
-    def get_documents_topics(self, doc_ids,num_topics = 1):
-        pass
+    def getDocumentTopicWordsTopicScoresAndTopicIds(self,doc_ids):
+        total_topic_words =[]
+        total_word_scores = []
+        topic_ids = []
+        for doc_id in doc_ids: 
+            topicId =  self.tweetIdTopicIdMappingDf[self.tweetIdTopicIdMappingDf [self.tweetIdColumn] ==doc_id].iloc[0][self.topicIdColumn]
+            topic_words = self.topicModel.get_topic(topicId)
+            current_topic_words = []
+            current_word_scores=[]
+            for word, score in topic_words:
+                current_topic_words.append(word)
+                current_word_scores.append(score)
+            topic_ids.append(topicId)
+            total_topic_words.append(current_topic_words)
+            total_word_scores.append(current_word_scores)
+        return total_topic_words,total_word_scores,topic_ids    
     
 
     
@@ -127,6 +150,8 @@ class Top2VecTopicExtractor(FeatureVectorMapper,AbstractTopicHeaderFinder,Abstra
     def getWordVectorsArray(self):
         return self.topicModel.word_vectors
     
+    def getDocumentTopicWordsTopicScoresAndTopicIds(self,doc_ids):
+        pass
     
     
         

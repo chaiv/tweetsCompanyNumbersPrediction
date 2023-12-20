@@ -19,4 +19,4 @@ topicsCompare = LLMTopicsCompare(topicExtractor,tokenizer,topicsDf)
 
 print("ChatGPT:")
 for i in range(1,20):
-    print(topicsCompare.calculateSimilarityScore("topics_chat_gpt", i))
+    print(topicsCompare.calculateSimilarityScoreTop2Vec("topics_chat_gpt", i))

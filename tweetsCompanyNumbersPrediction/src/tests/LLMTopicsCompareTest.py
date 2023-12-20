@@ -59,8 +59,8 @@ class LLMTopicsCompareTest(unittest.TestCase):
                 )
         topicsCompare = LLMTopicsCompare(TopicExtractorFake(),TweetTokenizer(DefaultWordFilter()),topicsDf)
         expectedSimilarityFlags = [[True,True],[False,True],[False],[]]
-        self.assertAlmostEqual( expectedSimilarityFlags, topicsCompare.calculateSimilarityFlags("topics",2), places=3)
-        self.assertAlmostEqual(0.6, topicsCompare.calculateSimilarityScore("topics",2), places=3)
+        self.assertAlmostEqual( expectedSimilarityFlags, topicsCompare.calculateSimilarityFlagsForTop2Vec("topics",2), places=3)
+        self.assertAlmostEqual(0.6, topicsCompare.calculateSimilarityScoreTop2Vec("topics",2), places=3)
         
         
 

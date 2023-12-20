@@ -11,15 +11,14 @@ from tweetpreprocess.wordfiltering.DefaultWordFilter import DefaultWordFilter
 from nlpvectors.TweetTokenizer import TweetTokenizer
 from topicmodelling.TopicExtractor import Top2VecTopicExtractor,\
     BertTopicExtractor
-from bertopic import BERTopic
 def main():
     #in main function to avoid multiprocessing errors
     #topicExtractor = Top2VecTopicExtractor(Top2VecTopicModelCreator().load(DataDirHelper().getDataDir()+"companyTweets\\model\\amazonRevenueLSTMN5\\amazonTopicModelRandom15000"))
     #topicExtractor = Top2VecTopicExtractor(Top2VecTopicModelCreator().load(DataDirHelper().getDataDir()+"companyTweets\\appleTopicModel"))
-    tweets = pd.read_csv (DataDirHelper().getDataDir()+ "companyTweets\\amazonTweetsWithNumbers.csv").head(15000) 
+    tweets = pd.read_csv (DataDirHelper().getDataDir()+ "companyTweets\\amazonTweetsWithNumbers.csv")
     tweets.fillna('', inplace=True) #nan values in body columns 
     topicExtractor = BertTopicExtractor(
-        BERTopic.load(DataDirHelper().getDataDir()+ "companyTweets\\amazonTopicModelBert"),
+        DataDirHelper().getDataDir()+ "companyTweets\\amazonTopicModelBert",
         tweets
         )
     topicEvaluation = TopicEvaluation(topicExtractor,TweetTokenizer(DefaultWordFilter()))

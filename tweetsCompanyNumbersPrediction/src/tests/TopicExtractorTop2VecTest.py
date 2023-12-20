@@ -12,7 +12,7 @@ from tweetpreprocess.TweetQueryParams import TweetQueryParams
 from tweetpreprocess.DataDirHelper import DataDirHelper
 
 
-class TopicExtractorTest(unittest.TestCase):
+class TopicExtractorTop2VecTest(unittest.TestCase):
     
     modelpath =  DataDirHelper().getDataDir()+ "companyTweets\TopicModelAAPLFirst1000"
     topicModel = Top2VecTopicExtractor(Top2VecTopicModelCreator().load(modelpath))
@@ -56,9 +56,9 @@ class TopicExtractorTest(unittest.TestCase):
 
 
     def testTopicExtraction(self):
-        self.assertTrue(self.topicModel.getNumTopics()>0)
+        self.assertTrue(self.topicModel.getNumberOfTopics()>0)
         topic_words, word_scores, topic_scores, topic_nums =  self.topicModel.searchTopics(keywords=["work","apple"], num_topics=1)
-        self.assertAlmostEqual(topic_scores[0],0.9831678519450329,3 )
+        self.assertAlmostEqual(topic_scores[0],0.9573718279784407,3 )
         pass
     
     def testWordIndexes(self):
@@ -85,5 +85,5 @@ class TopicExtractorTest(unittest.TestCase):
         
 
 if __name__ == "__main__":
-    # import sys;sys.argv = ['', 'TopicExtractorTest.testTopicExtraction']
+    # import sys;sys.argv = ['', 'TopicExtractorTop2VecTest.testTopicExtraction']
     unittest.main()

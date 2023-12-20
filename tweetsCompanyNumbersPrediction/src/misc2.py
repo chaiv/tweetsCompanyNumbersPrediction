@@ -1,9 +1,11 @@
 import pandas as pd
 from tweetpreprocess.DataDirHelper import DataDirHelper
+from bertopic import BERTopic
+from topicmodelling.TopicExtractor import BertTopicExtractor
 
-
-tweets = pd.read_csv (DataDirHelper().getDataDir()+ "companyTweets\\CompanyTweetsAAPLFirst1000.csv")
-
-index = tweets .index[tweets ['tweet_id'] ==550443857595600896]
-print(index)
-print(tweets.iloc[index]['tweet_id'])
+tweets = pd.read_csv (DataDirHelper().getDataDir()+ "companyTweets\\amazonTweetsWithNumbers.csv")
+tweets.fillna('', inplace=True) #nan values in body columns 
+topicExtractor = BertTopicExtractor(
+        BERTopic.load(DataDirHelper().getDataDir()+ "companyTweets\\amazonTopicModelBert"),
+        tweets
+        )

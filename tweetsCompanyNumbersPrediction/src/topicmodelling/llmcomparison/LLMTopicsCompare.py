@@ -36,7 +36,7 @@ class LLMTopicsCompare(object):
         return topicWords
         
     
-    def calculateSimilarityFlags(self, lLMTopicsColumnName,numTopicsToFind=3):
+    def calculateSimilarityFlagsForTop2Vec(self, lLMTopicsColumnName,numTopicsToFind=3):
         tweetIds = [int(x) for x in self.llmtopicsDf[self.tweetIdColumnName].tolist()]
         doc_topics, _,topic_words,_ = self.topicExtractor.get_documents_topics(tweetIds,num_topics=numTopicsToFind)
         llmTopicsLists = self.llmtopicsDf[lLMTopicsColumnName].tolist()
@@ -57,9 +57,16 @@ class LLMTopicsCompare(object):
                         break
                 similarityFlags.append(topicFoundFlag)      
             allSimilarities.append(similarityFlags)
-        return  allSimilarities   
+        return  allSimilarities  
+    
+    def calculateSimilarityFlags(self,lLMTopicsColumnName,numTopicsToFind=3):
+        tweetIds = [int(x) for x in self.llmtopicsDf[self.tweetIdColumnName].tolist()]
         
-    def calculateSimilarityScore(self, lLMTopicsColumnName,numTopicsToFind=3):
-        allSimilarities = self.calculateSimilarityFlags(lLMTopicsColumnName,numTopicsToFind)
+        
+        pass
+     
+        
+    def calculateSimilarityScoreTop2Vec(self, lLMTopicsColumnName,numTopicsToFind=3):
+        allSimilarities = self.calculateSimilarityFlagsForTop2Vec(lLMTopicsColumnName,numTopicsToFind)
         return self.calculatePercentageOfTrue(allSimilarities)
                 

@@ -9,7 +9,7 @@ from tweetpreprocess.DataDirHelper import DataDirHelper
 import pandas as pd
 from nlpvectors.DataframeSplitter import DataframeSplitter
 
-class Test(unittest.TestCase):
+class TopicExtractorBertTest(unittest.TestCase):
 
 
     def testDfWithGroupedTweets(self):
@@ -20,5 +20,5 @@ class Test(unittest.TestCase):
         
 
 if __name__ == "__main__":
-    #import sys;sys.argv = ['', 'Test.testName']
+    #import sys;sys.argv = ['', 'TopicExtractorBertTest.testName']
     unittest.main()

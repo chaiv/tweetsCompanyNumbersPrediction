@@ -38,8 +38,8 @@ class TopicEvaluation(object):
         topic_diversity = len(unique_words) / total_words
         return topic_diversity
         
-    #def get_silhoutte_score(self):   
-    #    return silhouette_score(self.topicModel.get_document_vectors(), self.topicModel.get_all_document_topics(), metric='cosine')
+    def get_silhoutte_score(self):   
+        return silhouette_score(self.topicModel.get_document_vectors(), self.topicModel.get_all_document_topics(), metric='cosine')
     
     
     
