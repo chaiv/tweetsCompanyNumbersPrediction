@@ -12,11 +12,9 @@ from nlpvectors.TweetTokenizer import TweetTokenizer
 
 
 tweetsFile = "amazonTweetsWithNumbers.csv"
-topicModelFile = "amazonTopicModelBertFirst1000"
-
-#tweetsFile = "CompanyTweetsTeslaWithCarSales.csv"
-#topicModelFile = "teslaTopicModel"
-tweets = pd.read_csv (DataDirHelper().getDataDir()+ "companyTweets\\"+tweetsFile).head(1000)
+topicModelFile = "amazonTopicModelBert"
+tweetIdTopicIdMappingFile = "amazonBertTopicMapping.csv"
+tweets = pd.read_csv (DataDirHelper().getDataDir()+ "companyTweets\\"+tweetsFile)
 tweets.fillna('', inplace=True) #nan values in body columns 
 tokenizer = TweetTokenizer(DefaultWordFilter())
 documents = []
@@ -27,5 +25,5 @@ topic_model = BERTopic(vectorizer_model=vectorizer_model,top_n_words=10)
 topics, probs =topic_model.fit_transform(documents)
 tweetIds = tweets["tweet_id"].to_list()
 tweetIdTopicIdDf = pd.DataFrame({'tweet_id': tweetIds, 'topic_id': topics})
-tweetIdTopicIdDf.to_csv(DataDirHelper().getDataDir()+ "companyTweets\\amazonBertTopicMappingFirst1000.csv")
+tweetIdTopicIdDf.to_csv(DataDirHelper().getDataDir()+ "companyTweets\\"+tweetIdTopicIdMappingFile)
 topic_model.save(DataDirHelper().getDataDir()+ "companyTweets\\"+topicModelFile)

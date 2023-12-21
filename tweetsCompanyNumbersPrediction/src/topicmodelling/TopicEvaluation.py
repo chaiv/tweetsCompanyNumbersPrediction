@@ -19,14 +19,20 @@ class TopicEvaluation(object):
         self.topicModel = topicModel
         self.tokenizer = tokenizer
     
-    def get_topic_coherence(self):
+
+    
+    def get_topic_coherence_with_extern_documents(self,documents):
         topic_words, _, _ =self.topicModel.getTopicWordsScoresAndIds()
-        documents = [self.tokenizer.tokenize(doc) for doc in self.topicModel.get_documents()]
+        documents = [self.tokenizer.tokenize(doc) for doc in documents]
         dictionary = Dictionary(documents)
         #cm = CoherenceModel(topics=topic_words, corpus=corpus, dictionary=dictionary, coherence='u_mass') 
         cm = CoherenceModel(topics=topic_words, texts=documents, dictionary=dictionary)
         coherence = cm.get_coherence()
         return coherence
+    
+    def get_topic_coherence(self):
+        return self.get_topic_coherence_with_extern_documents(self.topicModel.get_documents());
+        
     
     def get_topic_diversity(self,top_n = 20):
         topic_words_list, _, _ =self.topicModel.getTopicWordsScoresAndIds()

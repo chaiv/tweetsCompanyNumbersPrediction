@@ -3,7 +3,8 @@ Created on 09.12.2023
 
 @author: vital
 '''
-from topicmodelling.TopicExtractor import Top2VecTopicExtractor
+from topicmodelling.TopicExtractor import Top2VecTopicExtractor,\
+    AbstractTopicExtractor
 from itertools import chain
 import re
 from nlpvectors.AbstractTokenizer import AbstractTokenizer
@@ -13,7 +14,7 @@ class LLMTopicsCompare(object):
 
 
 
-    def __init__(self, topicExtractor: Top2VecTopicExtractor,tokenizer: AbstractTokenizer,llmtopicsDf, tweetIdColumnName = "tweet_id"):
+    def __init__(self, topicExtractor: AbstractTopicExtractor,tokenizer: AbstractTokenizer,llmtopicsDf, tweetIdColumnName = "tweet_id"):
         self.topicExtractor = topicExtractor
         self.llmtopicsDf = llmtopicsDf
         self.tweetIdColumnName = tweetIdColumnName
@@ -28,8 +29,6 @@ class LLMTopicsCompare(object):
     
     
     def getTopicWords(self,llmTopicsStr):
-        #splitBySemicolonAndBlankAndRemoveEmptyStringsRegex = r'[; ]+'
-        #llmTopics = re.split(splitBySemicolonAndBlankAndRemoveEmptyStringsRegex ,llmTopicsStr)
         topicWords = []
         for compoundWord in llmTopicsStr.split(";"):
             topicWords.extend(self.tokenizer.tokenize(compoundWord))
@@ -59,11 +58,19 @@ class LLMTopicsCompare(object):
             allSimilarities.append(similarityFlags)
         return  allSimilarities  
     
-    def calculateSimilarityFlags(self,lLMTopicsColumnName,numTopicsToFind=3):
+    def calculateSimilarityFlagsForBert(self,lLMTopicsColumnName):
         tweetIds = [int(x) for x in self.llmtopicsDf[self.tweetIdColumnName].tolist()]
-        
-        
-        pass
+        topic_words,total_word_scores,topic_ids = self.topicExtractor.getDocumentTopicWordsTopicScoresAndTopicIds(tweetIds)
+        llmTopicsLists = self.llmtopicsDf[lLMTopicsColumnName].tolist() 
+        allSimilarities = []
+        for i in range(0,len(tweetIds)):
+            llmTopics = self.getTopicWords(llmTopicsLists[i])
+            similarityFlags = []
+            for llmTopic in llmTopics: 
+                topicFoundFlag = llmTopic in topic_words[i]
+                similarityFlags.append(topicFoundFlag)      
+            allSimilarities.append(similarityFlags)
+        return  allSimilarities 
      
         
     def calculateSimilarityScoreTop2Vec(self, lLMTopicsColumnName,numTopicsToFind=3):

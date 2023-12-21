@@ -37,6 +37,8 @@ class BertTopicExtractor(AbstractTopicExtractor):
         
     def get_documents(self):
         pass
+    
+    
         
     def getTopicWordsScoresAndIds(self):
         topics = self.topicModel.get_topics()
