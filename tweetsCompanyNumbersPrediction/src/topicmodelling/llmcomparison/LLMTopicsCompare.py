@@ -72,8 +72,12 @@ class LLMTopicsCompare(object):
             allSimilarities.append(similarityFlags)
         return  allSimilarities 
      
-        
+     
     def calculateSimilarityScoreTop2Vec(self, lLMTopicsColumnName,numTopicsToFind=3):
         allSimilarities = self.calculateSimilarityFlagsForTop2Vec(lLMTopicsColumnName,numTopicsToFind)
+        return self.calculatePercentageOfTrue(allSimilarities)
+        
+    def calculateSimilarityScoreBert(self, lLMTopicsColumnName):
+        allSimilarities = self.calculateSimilarityFlagsForBert(lLMTopicsColumnName)
         return self.calculatePercentageOfTrue(allSimilarities)
                 
