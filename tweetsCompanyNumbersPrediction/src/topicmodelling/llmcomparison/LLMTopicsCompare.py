@@ -8,17 +8,22 @@ from topicmodelling.TopicExtractor import Top2VecTopicExtractor,\
 from itertools import chain
 import re
 from nlpvectors.AbstractTokenizer import AbstractTokenizer
-
+from nlpvectors.AbstractEncoder import AbstractEncoder
+import numpy as np
+from sklearn.metrics.pairwise import cosine_similarity
 
 class LLMTopicsCompare(object):
 
 
 
-    def __init__(self, topicExtractor: AbstractTopicExtractor,tokenizer: AbstractTokenizer,llmtopicsDf, tweetIdColumnName = "tweet_id"):
+    def __init__(self, topicExtractor: AbstractTopicExtractor,tokenizer: AbstractTokenizer,
+                 encoder: AbstractEncoder,
+                 llmtopicsDf, tweetIdColumnName = "tweet_id"):
         self.topicExtractor = topicExtractor
         self.llmtopicsDf = llmtopicsDf
         self.tweetIdColumnName = tweetIdColumnName
         self.tokenizer = tokenizer
+        self.encoder = encoder
         
     def calculatePercentageOfTrue(self,allSimilarities: list[list[bool]]):
         allSimilaritiesFlattened = list(chain.from_iterable(allSimilarities))
@@ -80,4 +85,42 @@ class LLMTopicsCompare(object):
     def calculateSimilarityScoreBert(self, lLMTopicsColumnName):
         allSimilarities = self.calculateSimilarityFlagsForBert(lLMTopicsColumnName)
         return self.calculatePercentageOfTrue(allSimilarities)
+    
+    
+    def getTopicIdsAndEmbeddings(self,firstNTopicWords = 10):
+        topic_words_lists,total_word_scores,topic_ids = self.topicExtractor.getTopicWordsScoresAndIds()
+        topic_embeddings = []
+        for i in range(0,len(topic_ids)): 
+            topic_words_first_n = topic_words_lists[i][:firstNTopicWords]
+            word_embeddings = self.encoder.encodeTokens(topic_words_first_n)
+            topic_embeddings.append(np.mean(word_embeddings, axis=0))
+        return topic_ids,topic_embeddings
+    
+    
+    def calculateSimilarity(self, lLMTopicsColumnName):
+        allSimilarities = self.calculateSimilarityFlags(lLMTopicsColumnName)
+        return self.calculatePercentageOfTrue(allSimilarities)
+    
+    def calculateSimilarityFlags(self,lLMTopicsColumnName,firstNTopicWords = 10,firstKTopics=3):
+        tweetIds = [int(x) for x in self.llmtopicsDf[self.tweetIdColumnName].tolist()]
+        _,_,_,tweet_topic_ids = self.topicExtractor.getDocumentTopicWordsTopicScoresAndTopicIds(self,tweetIds)
+        topic_ids,topic_embeddings = self.getTopicEmbeddingsDict(firstNTopicWords) 
+        llmTopicsLists = self.llmtopicsDf[lLMTopicsColumnName].tolist() 
+        allSimilarities = []
+        for i in range(0,len(tweetIds)):
+            llmTopics = self.getTopicWords(llmTopicsLists[i])
+            similarityFlags = []
+            for llmTopic in llmTopics: 
+                llmTopicEmbedding =self.encoder.encodeTokens([llmTopic])
+                similarities = cosine_similarity(llmTopicEmbedding, topic_embeddings)[0]
+                similarity_sorted_indices = np.argsort(similarities)[::-1]
+                mostSimilarTopicIds = [topic_ids[idx] for idx in similarity_sorted_indices[:firstKTopics]]
+                similarityFlags.append(tweet_topic_ids[i] in mostSimilarTopicIds)  
+            allSimilarities.append(similarityFlags)
+        return  allSimilarities            
+                
+                
+        
+        
+        
                 

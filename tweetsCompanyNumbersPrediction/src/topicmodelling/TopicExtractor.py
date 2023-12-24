@@ -78,7 +78,7 @@ class BertTopicExtractor(AbstractTopicExtractor):
             total_word_scores.append(current_word_scores)
         return total_topic_words,total_word_scores,topic_ids    
     
-
+    
     
 
 
