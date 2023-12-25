@@ -11,15 +11,19 @@ from topicmodelling.TopicExtractor import Top2VecTopicExtractor,\
 from topicmodelling.llmcomparison.LLMTopicsCompare import LLMTopicsCompare
 from tweetpreprocess.wordfiltering.DefaultWordFilter import DefaultWordFilter
 from nlpvectors.TweetTokenizer import TweetTokenizer
+from gensim.models.keyedvectors import KeyedVectors
+from nlpvectors.WordVectorsEncoder import WordVectorsEncoder
 
 
 tokenizer = TweetTokenizer(DefaultWordFilter())
+word_vectors = KeyedVectors.load_word2vec_format(DataDirHelper().getDataDir()+ "companyTweets\\WordVectorsAmazonV2.txt", binary=False)
+textEncoder = WordVectorsEncoder(word_vectors)
 topicExtractor = BertTopicExtractor(
         DataDirHelper().getDataDir()+ "companyTweets\\amazonTopicModelBert",
         tokenizer,
         pd.read_csv (DataDirHelper().getDataDir()+ "companyTweets\\amazonBertTopicMapping.csv")
         )
 topicsDf = pd.read_csv (DataDirHelper().getDataDir()+"companyTweets\\model\\amazonRevenueLSTMN5\\topicsChatGptNotCompound.csv")  
-topicsCompare = LLMTopicsCompare(topicExtractor,tokenizer,topicsDf)
+topicsCompare = LLMTopicsCompare(topicExtractor,tokenizer,textEncoder,topicsDf)
 print("ChatGPT:")
-print(topicsCompare.calculateSimilarityScoreBert("topics_chat_gpt"))
+print(topicsCompare.calculateSimilarity("topics_chat_gpt",firstKTopics=100))

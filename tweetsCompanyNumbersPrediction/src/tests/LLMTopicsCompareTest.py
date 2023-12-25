@@ -38,29 +38,32 @@ class LLMTopicsCompareTest(unittest.TestCase):
 
 
     def testcalculatePercentageOfTrue(self):
-        topicsCompare = LLMTopicsCompare(None,None,None)
+        topicsCompare = LLMTopicsCompare(None,None,None,None)
         self.assertEqual(0.5,topicsCompare.calculatePercentageOfTrue([[True,False],[False,True]]))
         self.assertEqual(0,topicsCompare.calculatePercentageOfTrue([[False,False],[False,False]]))
         self.assertEqual(1,topicsCompare.calculatePercentageOfTrue([[True,True],[True,True]]))
         self.assertEqual(0.25,topicsCompare.calculatePercentageOfTrue([[True,False],[False,False],[]]))
         self.assertEqual(0,topicsCompare.calculatePercentageOfTrue([]))
         self.assertEqual(0,topicsCompare.calculatePercentageOfTrue([[]]))
+        
+    def testMostSimilarEmbeddingIndexes(self):
+        topicsCompare = LLMTopicsCompare(None,None,None,None)
+        allEmbeddings = np.array([
+            [0,1,2],
+            [0,0,0],
+            [1,1,1],
+            [4,0,1],
+            [1,1,2]
+            ])
+        mostSimilarEmbeddingIndexes1 = topicsCompare.getMostSimilarEmbeddingIndexes(allEmbeddings, np.array([[1,1,1]]), 3)
+        self.assertEqual(2,mostSimilarEmbeddingIndexes1[0])
+        self.assertEqual(4,mostSimilarEmbeddingIndexes1[1])
+        self.assertEqual(0,mostSimilarEmbeddingIndexes1[2])
+        mostSimilarEmbeddingIndexes2 = topicsCompare.getMostSimilarEmbeddingIndexes(allEmbeddings,  np.array([[4,0,0]]), 1)
+        self.assertEqual(3,mostSimilarEmbeddingIndexes2[0])
+        
 
-
-    def testSimilarityScore(self):
-        topicsDf =  pd.DataFrame(
-                [
-                  (1,"shareholder stock"),
-                  (2,"news;ticker"),
-                  (3,"oil"),
-                  (4,"nothing"),
-                  ],
-                  columns=["tweet_id","topics"]
-                )
-        topicsCompare = LLMTopicsCompare(TopicExtractorFake(),TweetTokenizer(DefaultWordFilter()),topicsDf)
-        expectedSimilarityFlags = [[True,True],[False,True],[False],[]]
-        self.assertAlmostEqual( expectedSimilarityFlags, topicsCompare.calculateSimilarityFlagsForTop2Vec("topics",2), places=3)
-        self.assertAlmostEqual(0.6, topicsCompare.calculateSimilarityScoreTop2Vec("topics",2), places=3)
+    
         
         
 

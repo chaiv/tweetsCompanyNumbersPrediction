@@ -8,6 +8,9 @@ from nlpvectors.AbstractEncoder import AbstractEncoder
 from nlpvectors.VocabularyCreator import PAD_TOKEN, UNK_TOKEN, SEP_TOKEN
 
 class WordVectorsIDEncoder(AbstractEncoder):
+    '''
+    Returns Ids of word vectors of word vectors dictionary. This is needed if word vector mbeddings are passed as weights to pytorch model and need to be accessed via id. 
+    '''
     
     def __init__(self, word_vectors : KeyedVectors):
         self.word_vectors = word_vectors
