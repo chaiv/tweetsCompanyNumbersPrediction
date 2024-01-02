@@ -50,8 +50,8 @@ class LLMTopicsCompare(object):
         return topic_ids,topic_embeddings
     
     
-    def calculateSimilarity(self, lLMTopicsColumnName,firstNTopicWords = 10,firstKTopics=3):
-        allSimilarities = self.calculateSimilarityFlags(lLMTopicsColumnName,firstNTopicWords,firstKTopics)
+    def calculateSimilarity(self, lLMTopicsColumnName,firstNTopicWords = 10,firstKTopics=3,meanLLMTopicEmbedding = True):
+        allSimilarities = self.calculateSimilarityFlags(lLMTopicsColumnName,firstNTopicWords,firstKTopics,meanLLMTopicEmbedding)
         return self.calculatePercentageOfTrue(allSimilarities)
     
     def getMostSimilarEmbeddingIndexes(self, allEmbedings, embedding,firstNEmbeddings):
@@ -59,7 +59,26 @@ class LLMTopicsCompare(object):
         similarity_sorted_indices = np.argsort(similarities)[::-1]
         return similarity_sorted_indices[:firstNEmbeddings]
     
-    def calculateSimilarityFlags(self,lLMTopicsColumnName,firstNTopicWords = 10,firstKTopics=3):
+    
+    def calculateSimilarityForExactTopicWords(self, lLMTopicsColumnName):
+        return self.calculatePercentageOfTrue(self.calculateSimilarityFlagsForExactTopicWords(lLMTopicsColumnName))
+    
+    def calculateSimilarityFlagsForExactTopicWords(self,lLMTopicsColumnName):
+        tweetIds = [int(x) for x in self.llmtopicsDf[self.tweetIdColumnName].tolist()]
+        topic_words,total_word_scores,topic_ids = self.topicExtractor.getDocumentTopicWordsTopicScoresAndTopicIds(tweetIds)
+        llmTopicsLists = self.llmtopicsDf[lLMTopicsColumnName].tolist() 
+        allSimilarities = []
+        for i in range(0,len(tweetIds)):
+            llmTopics = self.getTopicWords(llmTopicsLists[i])
+            similarityFlags = []
+            for llmTopic in llmTopics: 
+                topicFoundFlag = llmTopic in topic_words[i]
+                similarityFlags.append(topicFoundFlag)      
+            allSimilarities.append(similarityFlags)
+        return  allSimilarities 
+    
+    
+    def calculateSimilarityFlags(self,lLMTopicsColumnName,firstNTopicWords = 10,firstKTopics=3,meanLLMTopicEmbedding = True):
         tweetIds = [int(x) for x in self.llmtopicsDf[self.tweetIdColumnName].tolist()]
         _,_,tweet_topic_ids = self.topicExtractor.getDocumentTopicWordsTopicScoresAndTopicIds(tweetIds)
         topic_ids,topic_embeddings = self.getTopicIdsAndEmbeddings(firstNTopicWords) 
@@ -68,14 +87,15 @@ class LLMTopicsCompare(object):
         for i in range(0,len(tweetIds)):
             llmTopics = self.getTopicWords(llmTopicsLists[i])
             similarityFlags = []
-            # for llmTopic in llmTopics: 
-            #     llmTopicEmbedding =self.encoder.encodeTokens([llmTopic])
-            #     mostSimilarTopicIds = [topic_ids[idx] for idx in self.getMostSimilarEmbeddingIndexes(topic_embeddings,llmTopicEmbedding,firstKTopics)]
-            #     similarityFlags.append(tweet_topic_ids[i] in mostSimilarTopicIds)
-            #allSimilarities.append(similarityFlags)
-            llmTopicsEmbedding =[np.mean(self.encoder.encodeTokens(llmTopics),axis=0)]
-            mostSimilarTopicIds = [topic_ids[idx] for idx in self.getMostSimilarEmbeddingIndexes(topic_embeddings,llmTopicsEmbedding,firstKTopics)]
-            similarityFlags.append(tweet_topic_ids[i] in mostSimilarTopicIds)
+            if(meanLLMTopicEmbedding):
+                for llmTopic in llmTopics: 
+                    llmTopicEmbedding =self.encoder.encodeTokens([llmTopic])
+                    mostSimilarTopicIds = [topic_ids[idx] for idx in self.getMostSimilarEmbeddingIndexes(topic_embeddings,llmTopicEmbedding,firstKTopics)]
+                    similarityFlags.append(tweet_topic_ids[i] in mostSimilarTopicIds)
+            else:
+                llmTopicsEmbedding =[np.mean(self.encoder.encodeTokens(llmTopics),axis=0)]
+                mostSimilarTopicIds = [topic_ids[idx] for idx in self.getMostSimilarEmbeddingIndexes(topic_embeddings,llmTopicsEmbedding,firstKTopics)]
+                similarityFlags.append(tweet_topic_ids[i] in mostSimilarTopicIds)
             allSimilarities.append(similarityFlags)
         return  allSimilarities            
                 

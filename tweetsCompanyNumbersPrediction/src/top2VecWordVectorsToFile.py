@@ -15,7 +15,7 @@ wordVectorsPath = DataDirHelper().getDataDir()+ "companyTweets\WordVectorsAAPLFi
 
 # Load the word vectors
 topicExtractor = Top2VecTopicExtractor(Top2VecTopicModelCreator().load(modelpath))
-words = list(topicModel.getWordIndexes().keys())
+words = list(topicExtractor.getWordIndexes().keys())
 word_vectors = topicExtractor.getWordVectorsArray()
 
 # Add the PAD and UNK tokens

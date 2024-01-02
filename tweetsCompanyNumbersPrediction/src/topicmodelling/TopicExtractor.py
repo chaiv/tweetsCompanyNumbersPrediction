@@ -153,7 +153,8 @@ class Top2VecTopicExtractor(FeatureVectorMapper,AbstractTopicHeaderFinder,Abstra
         return self.topicModel.word_vectors
     
     def getDocumentTopicWordsTopicScoresAndTopicIds(self,doc_ids):
-        pass
+        doc_topics, doc_dist, topic_words, topic_word_scores = self.get_documents_topics(doc_ids,num_topics = 1)
+        return topic_words,topic_word_scores,doc_topics
     
     
         

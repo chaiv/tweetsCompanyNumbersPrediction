@@ -23,7 +23,9 @@ topicExtractor = BertTopicExtractor(
         tokenizer,
         pd.read_csv (DataDirHelper().getDataDir()+ "companyTweets\\amazonBertTopicMapping.csv")
         )
+#topicExtractor = Top2VecTopicExtractor(Top2VecTopicModelCreator().load(DataDirHelper().getDataDir()+ "companyTweets\\model\\amazonRevenueLSTMN5\\amazonTopicModelV2"))
 topicsDf = pd.read_csv (DataDirHelper().getDataDir()+"companyTweets\\model\\amazonRevenueLSTMN5\\topicsChatGptNotCompound.csv")  
 topicsCompare = LLMTopicsCompare(topicExtractor,tokenizer,textEncoder,topicsDf)
-print("ChatGPT:")
-print(topicsCompare.calculateSimilarity("topics_chat_gpt",firstKTopics=100))
+#print(topicsCompare.calculateSimilarityForExactTopicWords("topics_chat_gpt"))
+for i in range(0,10):
+    print(i,",",topicsCompare.calculateSimilarity("topics_chat_gpt",firstKTopics=i))
