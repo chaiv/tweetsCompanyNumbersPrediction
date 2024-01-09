@@ -88,14 +88,14 @@ class LLMTopicsCompare(object):
             llmTopics = self.getTopicWords(llmTopicsLists[i])
             similarityFlags = []
             if(meanLLMTopicEmbedding):
+                llmTopicsEmbedding =[np.mean(self.encoder.encodeTokens(llmTopics),axis=0)]
+                mostSimilarTopicIds = [topic_ids[idx] for idx in self.getMostSimilarEmbeddingIndexes(topic_embeddings,llmTopicsEmbedding,firstKTopics)]
+                similarityFlags.append(tweet_topic_ids[i] in mostSimilarTopicIds)
+            else:
                 for llmTopic in llmTopics: 
                     llmTopicEmbedding =self.encoder.encodeTokens([llmTopic])
                     mostSimilarTopicIds = [topic_ids[idx] for idx in self.getMostSimilarEmbeddingIndexes(topic_embeddings,llmTopicEmbedding,firstKTopics)]
                     similarityFlags.append(tweet_topic_ids[i] in mostSimilarTopicIds)
-            else:
-                llmTopicsEmbedding =[np.mean(self.encoder.encodeTokens(llmTopics),axis=0)]
-                mostSimilarTopicIds = [topic_ids[idx] for idx in self.getMostSimilarEmbeddingIndexes(topic_embeddings,llmTopicsEmbedding,firstKTopics)]
-                similarityFlags.append(tweet_topic_ids[i] in mostSimilarTopicIds)
             allSimilarities.append(similarityFlags)
         return  allSimilarities            
                 

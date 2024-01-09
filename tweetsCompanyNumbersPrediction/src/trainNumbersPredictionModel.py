@@ -28,7 +28,7 @@ if  __name__ == "__main__":
     #word_vectors = KeyedVectors.load_word2vec_format(DataDirHelper().getDataDir()+ "companyTweets\\WordVectorsAAPLFirst1000.txt", binary=False) 
     df = pd.read_csv(DataDirHelper().getDataDir()+"companyTweets\\amazonTweetsWithNumbers.csv")
     df.fillna('', inplace=True) #nan values in body columns 
-    word_vectors = KeyedVectors.load_word2vec_format(DataDirHelper().getDataDir()+ "companyTweets\\WordVectorsAmazonV2.txt", binary=False)
+    word_vectors = KeyedVectors.load_word2vec_format(DataDirHelper().getDataDir()+ "companyTweets\\WordVectorsTesla.txt", binary=False)
     textEncoder = WordVectorsIDEncoder(word_vectors)
     tokenizer = TweetTokenizer(DefaultWordFilter())
     pad_token_idx = textEncoder.getPADTokenID()
@@ -46,7 +46,7 @@ if  __name__ == "__main__":
     kfold_splits = 3
     kfold_cross_val = KFold(n_splits=kfold_splits, shuffle=True, random_state=1337)
     for fold, (train_idx, test_idx) in enumerate(kfold_cross_val.split(tweetSplits)):
-        np.save(DataDirHelper().getDataDir() + f'companyTweets\\model\\test_idx_fold{fold}.npy', test_idx) #save test indexes for later classification metrics
+        np.save(DataDirHelper().getDataDir() + f'companyTweets\\model\\teslaCarSalesLSTM5\\test_idx_fold{fold}.npy', test_idx) #save test indexes for later classification metrics
         train_idx, val_idx = train_test_split(train_idx, random_state=1337, test_size=0.3)
         # print("Train classes",splitter.getClassCountsOfSplitsByIndexes(df,tweetSplits,train_idx))
         # print("Val classes", splitter.getClassCountsOfSplitsByIndexes(df,tweetSplits,val_idx))
@@ -68,7 +68,7 @@ if  __name__ == "__main__":
             test_data=test_data, 
             loggerPath=DataDirHelper().getDataDir() + 'companyTweets\\modellogs', 
             loggerName="tweetpredict", 
-            checkpointPath=DataDirHelper().getDataDir() + 'companyTweets\\model', 
+            checkpointPath=DataDirHelper().getDataDir() + 'companyTweets\\model\\teslaCarSalesLSTM5', 
             checkpointName=f"tweetpredict_fold{fold}"
             )
         
