@@ -13,28 +13,23 @@ class TweetGroupToDataframe(object):
 
 
     def __init__(self, 
-                 tweetIdsColumn = "tweet_ids",
                  tweetSentencesColumn = "tweet_sentences",
-                 tweetGroupLabelColumn = "label",
-                 
+                 tweetGroupLabelColumn = "label"
                  ):
-        pass
+        self.tweetSentencesColumn = tweetSentencesColumn 
+        self.tweetGroupLabelColumn = tweetGroupLabelColumn
      
      
     def createTweetGroupDataframe(self, tweetGroups: list[TweetGroup]):   
-        combinedSentencesIds = []
         labels = []
-        tweetGroupIds = []
         combinedSentences = []
-        for tweetGroup in tweetGroups: 
-            combinedSentencesIds.append(";".join(tweetGroup.getSentenceIds()))
+        for i in range(0,len(tweetGroups)):
+            tweetGroup = tweetGroups[i] 
             labels.append(tweetGroup.getLabel())
             combinedSentences.append(";".join(tweetGroup.getSentences()))
         return pd.DataFrame(
             {
-                
-                
-                
-                
+                self.tweetSentencesColumn : combinedSentences,
+                self.tweetGroupLabelColumn : labels
                 }
             )
