@@ -61,6 +61,9 @@ class TweetGroup(object):
         self.separatorIndexesInFeatureVector = separatorIndexesInFeatureVector
         self.label = label
         
+    def getSentences(self):
+        return self.sentences
+        
     def getFeatureVector(self):
         return self.totalFeatureVector
     
