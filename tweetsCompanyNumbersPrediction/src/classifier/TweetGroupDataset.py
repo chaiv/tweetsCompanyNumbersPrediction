@@ -36,6 +36,7 @@ class TweetGroupDataset(Dataset):
         sentences = splitDf [self.textColumnName].tolist()
         label = splitDf[self.classColumnName].iloc[0]
         tweetGroup = createTweetGroup(self.tokenizer,self.textEncoder,sentences,sentenceIds ,label)
+        print(idx)
         return tweetGroup
 
     def __getitem__(self, idx):
