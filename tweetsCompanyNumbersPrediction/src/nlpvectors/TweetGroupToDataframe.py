@@ -14,7 +14,7 @@ class TweetGroupToDataframe(object):
 
     def __init__(self, 
                  tweetSentencesColumn = "tweet_sentences",
-                 tweetGroupLabelColumn = "label"
+                 tweetGroupLabelColumn = "class"
                  ):
         self.tweetSentencesColumn = tweetSentencesColumn 
         self.tweetGroupLabelColumn = tweetGroupLabelColumn
