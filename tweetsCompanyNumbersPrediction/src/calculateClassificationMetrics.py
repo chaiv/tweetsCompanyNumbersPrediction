@@ -21,12 +21,12 @@ from classifier.BinaryClassificationMetricsPlots import BinaryClassificationMetr
 from classifier.ModelEvaluationHelper import loadModel,\
     createTweetGroupsAndTrueClasses
 
-word_vectors = KeyedVectors.load_word2vec_format(DataDirHelper().getDataDir()+ "companyTweets\\WordVectorsAmazonV2.txt", binary=False)
+word_vectors = KeyedVectors.load_word2vec_format(DataDirHelper().getDataDir()+ "companyTweets\\WordVectorsTesla.txt", binary=False)
 textEncoder = WordVectorsIDEncoder(word_vectors)
 tokenizer = TweetTokenizer(DefaultWordFilter())
-model = loadModel(DataDirHelper().getDataDir()+"companyTweets\\model\\amazonRevenueLSTMN5\\tweetpredict_fold1.ckpt",word_vectors)
-df = pd.read_csv(DataDirHelper().getDataDir()+ 'companyTweets\\amazonTweetsWithNumbers.csv')
-testSplitIndexes = np.load(DataDirHelper().getDataDir()+"companyTweets\\model\\amazonRevenueLSTMN5\\test_idx_fold1.npy")
+model = loadModel(DataDirHelper().getDataDir()+"companyTweets\\model\\teslaCarSalesLSTM5\\tweetpredict_fold1.ckpt",word_vectors)
+df = pd.read_csv(DataDirHelper().getDataDir()+ 'companyTweets\\CompanyTweetsTeslaWithCarSales.csv')
+testSplitIndexes = np.load(DataDirHelper().getDataDir()+"companyTweets\\model\\teslaCarSalesLSTM5\\test_idx_fold1.npy")
 tweetGroups,trueClasses = createTweetGroupsAndTrueClasses(
         df,
         5,
