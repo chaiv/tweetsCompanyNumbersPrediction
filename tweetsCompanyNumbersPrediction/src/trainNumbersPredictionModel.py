@@ -18,6 +18,7 @@ from nlpvectors.WordVectorsIDEncoder import WordVectorsIDEncoder
 from classifier.LSTMNN import LSTMNN
 from classifier.Trainer import Trainer
 from classifier.TweetGroupDataset import TweetGroupDataset
+from tweetpreprocess.EqualClassSampler import EqualClassSampler
 
 
 torch.set_float32_matmul_precision('medium') #needed for quicker cuda 
@@ -26,9 +27,12 @@ if  __name__ == "__main__":
      
     #df = pd.read_csv(DataDirHelper().getDataDir()+"companyTweets\\CompanyTweetsAAPLFirst1000WithNumbers.csv") 
     #word_vectors = KeyedVectors.load_word2vec_format(DataDirHelper().getDataDir()+ "companyTweets\\WordVectorsAAPLFirst1000.txt", binary=False) 
-    df = pd.read_csv(DataDirHelper().getDataDir()+"companyTweets\\amazonTweetsWithNumbers.csv")
+    #df = pd.read_csv(DataDirHelper().getDataDir()+"companyTweets\\amazonTweetsWithNumbers.csv")
+    df = pd.read_csv(DataDirHelper().getDataDir()+"companyTweets\\CompanyTweetsTeslaWithCarSales.csv")
     df.fillna('', inplace=True) #nan values in body columns 
-    word_vectors = KeyedVectors.load_word2vec_format(DataDirHelper().getDataDir()+ "companyTweets\\WordVectorsAmazonV2.txt", binary=False)
+    df = EqualClassSampler().getDfWithEqualNumberOfClassSamples(df)
+    #word_vectors = KeyedVectors.load_word2vec_format(DataDirHelper().getDataDir()+ "companyTweets\\WordVectorsAmazonV2.txt", binary=False)
+    word_vectors = KeyedVectors.load_word2vec_format(DataDirHelper().getDataDir()+ "companyTweets\\WordVectorsTesla.txt", binary=False)
     textEncoder = WordVectorsIDEncoder(word_vectors)
     tokenizer = TweetTokenizer(DefaultWordFilter())
     pad_token_idx = textEncoder.getPADTokenID()
