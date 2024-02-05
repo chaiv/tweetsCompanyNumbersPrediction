@@ -31,6 +31,7 @@ if  __name__ == "__main__":
     df = pd.read_csv(DataDirHelper().getDataDir()+"companyTweets\\CompanyTweetsTeslaWithCarSales.csv")
     df.fillna('', inplace=True) #nan values in body columns 
     df = EqualClassSampler().getDfWithEqualNumberOfClassSamples(df)
+    print(TweetDataframeExplore(df).getClassDistribution())
     #word_vectors = KeyedVectors.load_word2vec_format(DataDirHelper().getDataDir()+ "companyTweets\\WordVectorsAmazonV2.txt", binary=False)
     word_vectors = KeyedVectors.load_word2vec_format(DataDirHelper().getDataDir()+ "companyTweets\\WordVectorsTesla.txt", binary=False)
     textEncoder = WordVectorsIDEncoder(word_vectors)
