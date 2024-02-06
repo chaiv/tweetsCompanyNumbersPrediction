@@ -53,9 +53,9 @@ if  __name__ == "__main__":
     for fold, (train_idx, test_idx) in enumerate(kfold_cross_val.split(tweetSplits)):
         np.save(DataDirHelper().getDataDir() + f'companyTweets\\model\\teslaCarSalesLSTM5\\test_idx_fold{fold}.npy', test_idx) #save test indexes for later classification metrics
         train_idx, val_idx = train_test_split(train_idx, random_state=1337, test_size=0.3)
-        # print("Train classes",splitter.getClassCountsOfSplitsByIndexes(df,tweetSplits,train_idx))
-        # print("Val classes", splitter.getClassCountsOfSplitsByIndexes(df,tweetSplits,val_idx))
-        # print("Test classes", splitter.getClassCountsOfSplitsByIndexes(df,tweetSplits,test_idx))
+        print("Train classes",splitter.getClassCountsOfSplitsByIndexes(df,tweetSplits,train_idx))
+        print("Val classes", splitter.getClassCountsOfSplitsByIndexes(df,tweetSplits,val_idx))
+        print("Test classes", splitter.getClassCountsOfSplitsByIndexes(df,tweetSplits,test_idx))
         train_data = TweetGroupDataset(dataframe=df,splits = tweetSplits, splitIndexes= train_idx, tokenizer=tokenizer, textEncoder=textEncoder)
         val_data = TweetGroupDataset(dataframe=df,splits = tweetSplits, splitIndexes = val_idx, tokenizer=tokenizer, textEncoder=textEncoder)
         test_data = TweetGroupDataset(dataframe=df,splits = tweetSplits, splitIndexes = test_idx, tokenizer=tokenizer, textEncoder=textEncoder)

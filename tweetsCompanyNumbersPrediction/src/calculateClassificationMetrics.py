@@ -20,13 +20,16 @@ from classifier.TweetGroupDataset import TweetGroupDataset
 from classifier.BinaryClassificationMetricsPlots import BinaryClassificationMetricsPlots
 from classifier.ModelEvaluationHelper import loadModel,\
     createTweetGroupsAndTrueClasses
+from collections import Counter
+from tweetpreprocess.EqualClassSampler import EqualClassSampler
 
 word_vectors = KeyedVectors.load_word2vec_format(DataDirHelper().getDataDir()+ "companyTweets\\WordVectorsTesla.txt", binary=False)
 textEncoder = WordVectorsIDEncoder(word_vectors)
 tokenizer = TweetTokenizer(DefaultWordFilter())
-model = loadModel(DataDirHelper().getDataDir()+"companyTweets\\model\\teslaCarSalesLSTM5\\tweetpredict_fold1.ckpt",word_vectors)
+model = loadModel(DataDirHelper().getDataDir()+"companyTweets\\model\\teslaCarSalesLSTM5\\tweetpredict_fold0.ckpt",word_vectors)
 df = pd.read_csv(DataDirHelper().getDataDir()+ 'companyTweets\\CompanyTweetsTeslaWithCarSales.csv')
-testSplitIndexes = np.load(DataDirHelper().getDataDir()+"companyTweets\\model\\teslaCarSalesLSTM5\\test_idx_fold1.npy")
+#df = EqualClassSampler().getDfWithEqualNumberOfClassSamples(df) otherwise splits would be wrong when working with whole df
+testSplitIndexes = np.load(DataDirHelper().getDataDir()+"companyTweets\\model\\teslaCarSalesLSTM5\\test_idx_fold0.npy")
 tweetGroups,trueClasses = createTweetGroupsAndTrueClasses(
         df,
         5,
@@ -36,6 +39,8 @@ tweetGroups,trueClasses = createTweetGroupsAndTrueClasses(
         )
 predictor = Predictor(model,tokenizer,textEncoder ,BINARY_0_1 ,None)
 prediction_classes = predictor.predictMultipleAsTweetGroupsInChunks(tweetGroups, 1000)
+print("true_classes counts ",', '.join(f"{item}: {count}" for item, count in Counter(trueClasses).items()))
+print("prediction_classes counts ",', '.join(f"{item}: {count}" for item, count in Counter(prediction_classes).items()))
 metrics = BinaryClassificationMetrics() 
 plots = BinaryClassificationMetricsPlots(metrics)
 print(metrics.classification_report(trueClasses, prediction_classes))
