@@ -28,7 +28,7 @@ textEncoder = WordVectorsIDEncoder(word_vectors)
 tokenizer = TweetTokenizer(DefaultWordFilter())
 model = loadModel(DataDirHelper().getDataDir()+"companyTweets\\model\\teslaCarSalesLSTM5\\tweetpredict_fold0.ckpt",word_vectors)
 df = pd.read_csv(DataDirHelper().getDataDir()+ 'companyTweets\\CompanyTweetsTeslaWithCarSales.csv')
-#df = EqualClassSampler().getDfWithEqualNumberOfClassSamples(df) otherwise splits would be wrong when working with whole df
+df = EqualClassSampler().getDfWithEqualNumberOfClassSamples(df) #otherwise splits would be wrong when working with whole df
 testSplitIndexes = np.load(DataDirHelper().getDataDir()+"companyTweets\\model\\teslaCarSalesLSTM5\\test_idx_fold0.npy")
 tweetGroups,trueClasses = createTweetGroupsAndTrueClasses(
         df,
