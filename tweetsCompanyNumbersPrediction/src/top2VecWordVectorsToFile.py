@@ -10,8 +10,11 @@ from topicmodelling.TopicModelCreator import Top2VecTopicModelCreator
 from topicmodelling.TopicExtractor import Top2VecTopicExtractor
 from nlpvectors.VocabularyCreator import PAD_TOKEN, UNK_TOKEN, SEP_TOKEN
 
-modelpath =  DataDirHelper().getDataDir()+ "companyTweets\\teslaTopicModel"
-wordVectorsPath = DataDirHelper().getDataDir()+ "companyTweets\\teslaWordVectors.txt"
+#modelpath =  DataDirHelper().getDataDir()+ "companyTweets\\teslaTopicModel"
+#wordVectorsPath = DataDirHelper().getDataDir()+ "companyTweets\\teslaWordVectors.txt"
+
+modelpath =  DataDirHelper().getDataDir()+ "companyTweets\\appleTopicModel"
+wordVectorsPath = DataDirHelper().getDataDir()+ "companyTweets\\appleWordVectors.txt"
 
 # Load the word vectors
 topicExtractor = Top2VecTopicExtractor(Top2VecTopicModelCreator().load(modelpath))

@@ -47,11 +47,14 @@ if  __name__ == "__main__":
     #     ) #https://discuss.pytorch.org/t/solved-assertion-srcindex-srcselectdimsize-failed-on-gpu-for-torch-cat/1804/13
     
     splitter = DataframeSplitter()
-    tweetSplits = splitter.getSplitIds(df, 5) #how many tweets should be trained as one sample
+    splitSize = 20
+    tweetSplits = splitter.getSplitIds(df, splitSize) #how many tweets should be trained as one sample
     kfold_splits = 3
     kfold_cross_val = KFold(n_splits=kfold_splits, shuffle=True, random_state=1337)
     for fold, (train_idx, test_idx) in enumerate(kfold_cross_val.split(tweetSplits)):
-        np.save(DataDirHelper().getDataDir() + f'companyTweets\\model\\teslaCarSalesLSTM5\\test_idx_fold{fold}.npy', test_idx) #save test indexes for later classification metrics
+        #testIdxPath = DataDirHelper().getDataDir() + f'companyTweets\\model\\amazonRevenueLSTMN20\\test_idx_fold{fold}.npy'
+        testIdxPath = DataDirHelper().getDataDir() + f'companyTweets\\model\\teslaCarSalesLSTM20\\test_idx_fold{fold}.npy'
+        np.save(testIdxPath, test_idx) #save test indexes for later classification metrics
         train_idx, val_idx = train_test_split(train_idx, random_state=1337, test_size=0.3)
         print("Train classes",splitter.getClassCountsOfSplitsByIndexes(df,tweetSplits,train_idx))
         print("Val classes", splitter.getClassCountsOfSplitsByIndexes(df,tweetSplits,val_idx))
@@ -62,6 +65,8 @@ if  __name__ == "__main__":
         print("len(train_data)", len(train_data))
         print("len(val_data)", len(val_data))
         print("len(test_data)", len(test_data))
+        modelPath = DataDirHelper().getDataDir() + 'companyTweets\\model\\teslaCarSalesLSTM20'
+        #modelPath = DataDirHelper().getDataDir() + 'companyTweets\\model\\amazonRevenueLSTMN20'
         Trainer().train(
             batch_size=100, 
             epochs=10, 
@@ -73,7 +78,7 @@ if  __name__ == "__main__":
             test_data=test_data, 
             loggerPath=DataDirHelper().getDataDir() + 'companyTweets\\modellogs', 
             loggerName="tweetpredict", 
-            checkpointPath=DataDirHelper().getDataDir() + 'companyTweets\\model\\teslaCarSalesLSTM5', 
+            checkpointPath=modelPath, 
             checkpointName=f"tweetpredict_fold{fold}"
             )
         

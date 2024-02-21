@@ -3,7 +3,6 @@ Created on 09.03.2023
 
 @author: vital
 '''
-import torch
 import pandas as pd
 import numpy as np
 from tweetpreprocess.DataDirHelper import DataDirHelper
@@ -14,25 +13,28 @@ from nlpvectors.TweetTokenizer import TweetTokenizer
 from classifier.BinaryClassificationMetrics import BinaryClassificationMetrics
 from gensim.models import KeyedVectors
 from nlpvectors.WordVectorsIDEncoder import WordVectorsIDEncoder
-from classifier.LSTMNN import LSTMNN
-from nlpvectors.DataframeSplitter import DataframeSplitter
-from classifier.TweetGroupDataset import TweetGroupDataset
 from classifier.BinaryClassificationMetricsPlots import BinaryClassificationMetricsPlots
 from classifier.ModelEvaluationHelper import loadModel,\
     createTweetGroupsAndTrueClasses
 from collections import Counter
 from tweetpreprocess.EqualClassSampler import EqualClassSampler
 
-word_vectors = KeyedVectors.load_word2vec_format(DataDirHelper().getDataDir()+ "companyTweets\\WordVectorsTesla.txt", binary=False)
+word_vectors = KeyedVectors.load_word2vec_format(DataDirHelper().getDataDir()+ "companyTweets\\WordVectorsAmazonV2.txt", binary=False)
+#word_vectors = KeyedVectors.load_word2vec_format(DataDirHelper().getDataDir()+ "companyTweets\\WordVectorsTesla.txt", binary=False)
 textEncoder = WordVectorsIDEncoder(word_vectors)
 tokenizer = TweetTokenizer(DefaultWordFilter())
-model = loadModel(DataDirHelper().getDataDir()+"companyTweets\\model\\teslaCarSalesLSTM5\\tweetpredict_fold0.ckpt",word_vectors)
-df = pd.read_csv(DataDirHelper().getDataDir()+ 'companyTweets\\CompanyTweetsTeslaWithCarSales.csv')
+modelPath = DataDirHelper().getDataDir()+"companyTweets\\model\\amazonRevenueLSTMN10\\tweetpredict_fold0.ckpt"
+#modelPath = DataDirHelper().getDataDir()+"companyTweets\\model\\teslaCarSalesLSTM20\\tweetpredict_fold0.ckpt"
+model = loadModel(modelPath,word_vectors)
+df = pd.read_csv(DataDirHelper().getDataDir()+"companyTweets\\amazonTweetsWithNumbers.csv")
+#df = pd.read_csv(DataDirHelper().getDataDir()+ 'companyTweets\\CompanyTweetsTeslaWithCarSales.csv')
 df = EqualClassSampler().getDfWithEqualNumberOfClassSamples(df) #otherwise splits would be wrong when working with whole df
-testSplitIndexes = np.load(DataDirHelper().getDataDir()+"companyTweets\\model\\teslaCarSalesLSTM5\\test_idx_fold0.npy")
+testIdxPath = DataDirHelper().getDataDir() + f'companyTweets\\model\\amazonRevenueLSTMN10\\test_idx_fold0.npy'
+#testIdxPath = DataDirHelper().getDataDir() + f'companyTweets\\model\\teslaCarSalesLSTM20\\test_idx_fold{fold}.npy'
+testSplitIndexes = np.load(testIdxPath)
 tweetGroups,trueClasses = createTweetGroupsAndTrueClasses(
         df,
-        5,
+        10,
         testSplitIndexes,
         tokenizer,
         textEncoder
