@@ -19,22 +19,39 @@ from classifier.ModelEvaluationHelper import loadModel,\
 from collections import Counter
 from tweetpreprocess.EqualClassSampler import EqualClassSampler
 
-word_vectors = KeyedVectors.load_word2vec_format(DataDirHelper().getDataDir()+ "companyTweets\\WordVectorsAmazonV2.txt", binary=False)
+from PredictionModelPath import AMAZON_5
+from PredictionModelPath import AMAZON_10
+from PredictionModelPath import AMAZON_20
+from PredictionModelPath import APPLE_5
+from PredictionModelPath import APPLE_10
+from PredictionModelPath import APPLE_20
+from PredictionModelPath import TESLA_5
+from PredictionModelPath import TESLA_10
+from PredictionModelPath import TESLA_20
+
+
+#word_vectors = KeyedVectors.load_word2vec_format(DataDirHelper().getDataDir()+ "companyTweets\\WordVectorsAmazonV2.txt", binary=False)
+predictionModelPath = TESLA_20
+
+word_vectors = KeyedVectors.load_word2vec_format(predictionModelPath.getWordVectorsPath(), binary=False)
 #word_vectors = KeyedVectors.load_word2vec_format(DataDirHelper().getDataDir()+ "companyTweets\\WordVectorsTesla.txt", binary=False)
 textEncoder = WordVectorsIDEncoder(word_vectors)
 tokenizer = TweetTokenizer(DefaultWordFilter())
-modelPath = DataDirHelper().getDataDir()+"companyTweets\\model\\amazonRevenueLSTMN10\\tweetpredict_fold0.ckpt"
+modelPath = predictionModelPath.getModelPath()+"\\tweetpredict_fold0.ckpt"
+#modelPath = DataDirHelper().getDataDir()+"companyTweets\\model\\amazonRevenueLSTMN10\\tweetpredict_fold0.ckpt"
 #modelPath = DataDirHelper().getDataDir()+"companyTweets\\model\\teslaCarSalesLSTM20\\tweetpredict_fold0.ckpt"
 model = loadModel(modelPath,word_vectors)
-df = pd.read_csv(DataDirHelper().getDataDir()+"companyTweets\\amazonTweetsWithNumbers.csv")
+df = pd.read_csv(predictionModelPath.getDataframePath())
+#df = pd.read_csv(DataDirHelper().getDataDir()+"companyTweets\\amazonTweetsWithNumbers.csv")
 #df = pd.read_csv(DataDirHelper().getDataDir()+ 'companyTweets\\CompanyTweetsTeslaWithCarSales.csv')
 df = EqualClassSampler().getDfWithEqualNumberOfClassSamples(df) #otherwise splits would be wrong when working with whole df
-testIdxPath = DataDirHelper().getDataDir() + f'companyTweets\\model\\amazonRevenueLSTMN10\\test_idx_fold0.npy'
+testIdxPath = predictionModelPath.getModelPath()+'\\test_idx_fold0.npy'
+#testIdxPath = DataDirHelper().getDataDir() + f'companyTweets\\model\\amazonRevenueLSTMN10\\test_idx_fold0.npy'
 #testIdxPath = DataDirHelper().getDataDir() + f'companyTweets\\model\\teslaCarSalesLSTM20\\test_idx_fold{fold}.npy'
 testSplitIndexes = np.load(testIdxPath)
 tweetGroups,trueClasses = createTweetGroupsAndTrueClasses(
         df,
-        10,
+        predictionModelPath.getTweetGroupSize(),
         testSplitIndexes,
         tokenizer,
         textEncoder

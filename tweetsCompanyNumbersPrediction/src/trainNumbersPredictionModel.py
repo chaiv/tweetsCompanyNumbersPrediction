@@ -28,12 +28,14 @@ if  __name__ == "__main__":
     #df = pd.read_csv(DataDirHelper().getDataDir()+"companyTweets\\CompanyTweetsAAPLFirst1000WithNumbers.csv") 
     #word_vectors = KeyedVectors.load_word2vec_format(DataDirHelper().getDataDir()+ "companyTweets\\WordVectorsAAPLFirst1000.txt", binary=False) 
     #df = pd.read_csv(DataDirHelper().getDataDir()+"companyTweets\\amazonTweetsWithNumbers.csv")
-    df = pd.read_csv(DataDirHelper().getDataDir()+"companyTweets\\CompanyTweetsTeslaWithCarSales.csv")
+    #df = pd.read_csv(DataDirHelper().getDataDir()+"companyTweets\\CompanyTweetsTeslaWithCarSales.csv")
+    df = pd.read_csv(DataDirHelper().getDataDir()+"companyTweets\\CompanyTweetsAppleWithIPhoneSales.csv") 
     df.fillna('', inplace=True) #nan values in body columns 
     df = EqualClassSampler().getDfWithEqualNumberOfClassSamples(df)
     print(TweetDataframeExplore(df).getClassDistribution())
     #word_vectors = KeyedVectors.load_word2vec_format(DataDirHelper().getDataDir()+ "companyTweets\\WordVectorsAmazonV2.txt", binary=False)
-    word_vectors = KeyedVectors.load_word2vec_format(DataDirHelper().getDataDir()+ "companyTweets\\WordVectorsTesla.txt", binary=False)
+    #word_vectors = KeyedVectors.load_word2vec_format(DataDirHelper().getDataDir()+ "companyTweets\\WordVectorsTesla.txt", binary=False)
+    word_vectors = KeyedVectors.load_word2vec_format(DataDirHelper().getDataDir()+ "companyTweets\\wordVectorsApple.txt", binary=False)
     textEncoder = WordVectorsIDEncoder(word_vectors)
     tokenizer = TweetTokenizer(DefaultWordFilter())
     pad_token_idx = textEncoder.getPADTokenID()
@@ -47,13 +49,14 @@ if  __name__ == "__main__":
     #     ) #https://discuss.pytorch.org/t/solved-assertion-srcindex-srcselectdimsize-failed-on-gpu-for-torch-cat/1804/13
     
     splitter = DataframeSplitter()
-    splitSize = 20
+    splitSize = 5
     tweetSplits = splitter.getSplitIds(df, splitSize) #how many tweets should be trained as one sample
     kfold_splits = 3
     kfold_cross_val = KFold(n_splits=kfold_splits, shuffle=True, random_state=1337)
     for fold, (train_idx, test_idx) in enumerate(kfold_cross_val.split(tweetSplits)):
         #testIdxPath = DataDirHelper().getDataDir() + f'companyTweets\\model\\amazonRevenueLSTMN20\\test_idx_fold{fold}.npy'
-        testIdxPath = DataDirHelper().getDataDir() + f'companyTweets\\model\\teslaCarSalesLSTM20\\test_idx_fold{fold}.npy'
+        #testIdxPath = DataDirHelper().getDataDir() + f'companyTweets\\model\\teslaCarSalesLSTM20\\test_idx_fold{fold}.npy'
+        testIdxPath = DataDirHelper().getDataDir() + f'companyTweets\\model\\appleIphoneSalesLSTM5\\test_idx_fold{fold}.npy'
         np.save(testIdxPath, test_idx) #save test indexes for later classification metrics
         train_idx, val_idx = train_test_split(train_idx, random_state=1337, test_size=0.3)
         print("Train classes",splitter.getClassCountsOfSplitsByIndexes(df,tweetSplits,train_idx))
@@ -65,7 +68,8 @@ if  __name__ == "__main__":
         print("len(train_data)", len(train_data))
         print("len(val_data)", len(val_data))
         print("len(test_data)", len(test_data))
-        modelPath = DataDirHelper().getDataDir() + 'companyTweets\\model\\teslaCarSalesLSTM20'
+        modelPath = DataDirHelper().getDataDir() + 'companyTweets\\model\\appleIphoneSalesLSTM5'
+        #modelPath = DataDirHelper().getDataDir() + 'companyTweets\\model\\teslaCarSalesLSTM20'
         #modelPath = DataDirHelper().getDataDir() + 'companyTweets\\model\\amazonRevenueLSTMN20'
         Trainer().train(
             batch_size=100, 
