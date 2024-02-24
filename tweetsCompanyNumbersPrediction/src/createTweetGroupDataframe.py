@@ -14,22 +14,24 @@ from gensim.models import KeyedVectors
 from nlpvectors.WordVectorsIDEncoder import WordVectorsIDEncoder
 from tweetpreprocess.wordfiltering.DefaultWordFilter import DefaultWordFilter
 from nlpvectors.TweetTokenizer import TweetTokenizer
+from PredictionModelPath import AMAZON_20
 
-tweetDf = pd.read_csv(DataDirHelper().getDataDir()+"companyTweets\\amazonTweetsWithNumbers.csv")
-tweetDf.fillna('', inplace=True) #nan values in body columns 
-word_vectors = KeyedVectors.load_word2vec_format(DataDirHelper().getDataDir()+ "companyTweets\\WordVectorsAmazonV2.txt", binary=False)
+predictionModelPath = AMAZON_20
+
+
+word_vectors = KeyedVectors.load_word2vec_format(predictionModelPath.getWordVectorsPath(), binary=False)
 textEncoder = WordVectorsIDEncoder(word_vectors)
 tokenizer = TweetTokenizer(DefaultWordFilter())
-df = pd.read_csv(DataDirHelper().getDataDir()+ 'companyTweets\\amazonTweetsWithNumbers.csv')
+df = pd.read_csv(predictionModelPath.getDataframePath())
 df.fillna('', inplace=True)
-testSplitIndexes = np.load(DataDirHelper().getDataDir()+"companyTweets\\model\\amazonRevenueLSTMN5\\test_idx_fold1.npy")
+testSplitIndexes = np.load(predictionModelPath.getModelPath()+'\\test_idx_fold0.npy')
 tweetGroups,trueClasses = createTweetGroupsAndTrueClasses(
         df,
-        5,
+        predictionModelPath.getTweetGroupSize(),
         testSplitIndexes,
         tokenizer,
         textEncoder
         )
 tweetGroupToDataframe = TweetGroupToDataframe()
 tweetGroupDf = tweetGroupToDataframe.createTweetGroupDataframe(tweetGroups)
-tweetGroupDf.to_csv(DataDirHelper().getDataDir()+"companyTweets\\model\\amazonRevenueLSTMN5\\tweetGroups_at_5.csv")
+tweetGroupDf.to_csv(predictionModelPath.getModelPath()+"\\tweetGroups_at_"+str(predictionModelPath.getTweetGroupSize())+".csv")
