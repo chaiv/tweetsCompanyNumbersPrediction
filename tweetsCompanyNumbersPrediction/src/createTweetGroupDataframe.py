@@ -14,7 +14,10 @@ from gensim.models import KeyedVectors
 from nlpvectors.WordVectorsIDEncoder import WordVectorsIDEncoder
 from tweetpreprocess.wordfiltering.DefaultWordFilter import DefaultWordFilter
 from nlpvectors.TweetTokenizer import TweetTokenizer
-from PredictionModelPath import AMAZON_20
+from PredictionModelPath import AMAZON_20, TESLA_5
+from collections import Counter
+from tweetpreprocess.EqualClassSampler import EqualClassSampler
+
 
 predictionModelPath = AMAZON_20
 
@@ -24,6 +27,7 @@ textEncoder = WordVectorsIDEncoder(word_vectors)
 tokenizer = TweetTokenizer(DefaultWordFilter())
 df = pd.read_csv(predictionModelPath.getDataframePath())
 df.fillna('', inplace=True)
+df = EqualClassSampler().getDfWithEqualNumberOfClassSamples(df)
 testSplitIndexes = np.load(predictionModelPath.getModelPath()+'\\test_idx_fold0.npy')
 tweetGroups,trueClasses = createTweetGroupsAndTrueClasses(
         df,
@@ -32,6 +36,7 @@ tweetGroups,trueClasses = createTweetGroupsAndTrueClasses(
         tokenizer,
         textEncoder
         )
+print("true_classes counts ",', '.join(f"{item}: {count}" for item, count in Counter(trueClasses).items()))
 tweetGroupToDataframe = TweetGroupToDataframe()
 tweetGroupDf = tweetGroupToDataframe.createTweetGroupDataframe(tweetGroups)
 tweetGroupDf.to_csv(predictionModelPath.getModelPath()+"\\tweetGroups_at_"+str(predictionModelPath.getTweetGroupSize())+".csv")
