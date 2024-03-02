@@ -19,7 +19,7 @@ from classifier.ModelEvaluationHelper import loadModel,\
 from collections import Counter
 from tweetpreprocess.EqualClassSampler import EqualClassSampler
 
-from PredictionModelPath import AMAZON_5
+from PredictionModelPath import AMAZON_5, MICROSOFT_5
 from PredictionModelPath import AMAZON_10
 from PredictionModelPath import AMAZON_20
 from PredictionModelPath import APPLE_5
@@ -29,7 +29,7 @@ from PredictionModelPath import TESLA_5
 from PredictionModelPath import TESLA_10
 from PredictionModelPath import TESLA_20
 
-predictionModelPath = TESLA_20
+predictionModelPath =  APPLE_10
 
 word_vectors = KeyedVectors.load_word2vec_format(predictionModelPath.getWordVectorsPath(), binary=False)
 textEncoder = WordVectorsIDEncoder(word_vectors)

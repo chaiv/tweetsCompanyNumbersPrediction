@@ -20,13 +20,13 @@ from classifier.Trainer import Trainer
 from classifier.TweetGroupDataset import TweetGroupDataset
 from tweetpreprocess.EqualClassSampler import EqualClassSampler
 from PredictionModelPath import AMAZON_10, AMAZON_20, APPLE_10, APPLE_5,\
-    TESLA_20
+    TESLA_20, MICROSOFT_5, MICROSOFT_10
 
 
 torch.set_float32_matmul_precision('medium') #needed for quicker cuda 
 
 if  __name__ == "__main__":
-    predictionModelPath = TESLA_20
+    predictionModelPath = APPLE_10  
 
     df = pd.read_csv(predictionModelPath.getDataframePath()) 
     df.fillna('', inplace=True) #nan values in body columns 
