@@ -14,12 +14,12 @@ from gensim.models import KeyedVectors
 from nlpvectors.WordVectorsIDEncoder import WordVectorsIDEncoder
 from tweetpreprocess.wordfiltering.DefaultWordFilter import DefaultWordFilter
 from nlpvectors.TweetTokenizer import TweetTokenizer
-from PredictionModelPath import AMAZON_20, TESLA_5
+from PredictionModelPath import AMAZON_REVENUE_20, TESLA_CAR_SALES_5
 from collections import Counter
 from tweetpreprocess.EqualClassSampler import EqualClassSampler
 
 
-predictionModelPath = AMAZON_20
+predictionModelPath = AMAZON_REVENUE_20
 
 
 word_vectors = KeyedVectors.load_word2vec_format(predictionModelPath.getWordVectorsPath(), binary=False)
