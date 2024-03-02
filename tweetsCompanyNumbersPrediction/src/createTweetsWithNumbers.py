@@ -7,10 +7,15 @@ import pandas as pd
 from tweetpreprocess.DataDirHelper import DataDirHelper
 from pipeline.FeatureDataframePipeline import FeatureDataframePipeline
 from tweetpreprocess.TweetQueryParams import TweetQueryParams
+from PredictionModelPath import MICROSOFT_GROSS_PROFIT_20
+
+
+predictionModelPath = MICROSOFT_GROSS_PROFIT_20 
+
 
 tweets = pd.read_csv (DataDirHelper().getDataDir()+ "companyTweets\CompanyTweets.csv")
-numbers = pd.read_csv (DataDirHelper().getDataDir()+ "companyTweets\\microsoftEPS.csv")
-textfiltetedTweetsWithNumbers = FeatureDataframePipeline().createTweetWithNumbersDf(tweets,numbers,TweetQueryParams(companyName="MSFT"))
+numbers = pd.read_csv (predictionModelPath.getFinancialNumbersPath())
+textfiltetedTweetsWithNumbers = FeatureDataframePipeline().createTweetWithNumbersDf(tweets,numbers,TweetQueryParams(companyName=predictionModelPath.getNasdaqTag()))
 print(textfiltetedTweetsWithNumbers)
-textfiltetedTweetsWithNumbers.to_csv(DataDirHelper().getDataDir()+"companyTweets\CompanyTweetsMicrosoftWithEps.csv")
+textfiltetedTweetsWithNumbers.to_csv(predictionModelPath.getDataframePath())
 

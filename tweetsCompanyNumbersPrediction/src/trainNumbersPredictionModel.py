@@ -19,14 +19,15 @@ from classifier.LSTMNN import LSTMNN
 from classifier.Trainer import Trainer
 from classifier.TweetGroupDataset import TweetGroupDataset
 from tweetpreprocess.EqualClassSampler import EqualClassSampler
-from PredictionModelPath import AMAZON_10, AMAZON_20, APPLE_10, APPLE_5,\
-    TESLA_20, MICROSOFT_5, MICROSOFT_10
+from PredictionModelPath import AMAZON_REVENUE_10, AMAZON_REVENUE_20, APPLE_IPHONE_SALES_10, APPLE_IPHONE_SALES_5,\
+    TESLA_CAR_SALES_20, MICROSOFT_EPS_5, MICROSOFT_EPS_10,\
+    MICROSOFT_GROSS_PROFIT_20
 
 
 torch.set_float32_matmul_precision('medium') #needed for quicker cuda 
 
 if  __name__ == "__main__":
-    predictionModelPath = APPLE_10  
+    predictionModelPath = MICROSOFT_GROSS_PROFIT_20 
 
     df = pd.read_csv(predictionModelPath.getDataframePath()) 
     df.fillna('', inplace=True) #nan values in body columns 
