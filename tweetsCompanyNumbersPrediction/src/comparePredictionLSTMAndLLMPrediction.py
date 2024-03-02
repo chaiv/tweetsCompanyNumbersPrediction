@@ -6,11 +6,15 @@ Created on 27.01.2024
 import pandas as pd
 from tweetpreprocess.DataDirHelper import DataDirHelper
 from classifier.BinaryClassificationMetrics import BinaryClassificationMetrics
+from PredictionModelPath import AMAZON_20
 
-tweetGroupDf = pd.read_csv(DataDirHelper().getDataDir()+"companyTweets\\model\\amazonRevenueLSTMN5\\tweetGroups_at_5_first_N.csv")
+
+predictionModelPath = AMAZON_20
+
+tweetGroupDf = pd.read_csv(
+    predictionModelPath.getModelPath()+"\\tweetGroups_at_"+str(predictionModelPath.getTweetGroupSize())+"_first_N.csv")
 true_classes = tweetGroupDf["class"].tolist()
-
-with open(DataDirHelper().getDataDir()+"companyTweets\\model\\amazonRevenueLSTMN5\\tweetGroups_at_5_predicted_chatgpt.txt", 'r') as file:
+with open(predictionModelPath.getModelPath()+"\\tweetGroups_at_"+str(predictionModelPath.getTweetGroupSize())+"_predicted_chatgpt.txt", 'r') as file:
     content = ''.join(line.strip() for line in file)
 llm_prediction_classes = [float(num) for num in content.split(',') if num.strip()]
 metrics = BinaryClassificationMetrics() 
