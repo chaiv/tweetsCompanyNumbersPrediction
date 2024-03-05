@@ -73,7 +73,17 @@ MICROSOFT_GROSS_PROFIT_20 = PredictionModelPath(
     DataDirHelper().getDataDir()+ "companyTweets\\wordVectorsMicrosoft.txt",
     DataDirHelper().getDataDir() + "companyTweets\\model\\microsoftGrossProfitLSTM20",
     DataDirHelper().getDataDir() + "companyTweets\\microsoftTopicModel",
-    10
+    20
+    ) 
+
+MICROSOFT_XBOX_USERS_20 = PredictionModelPath(
+      "MSFT",
+    DataDirHelper().getDataDir()+"companyTweets\\CompanyTweetsMicrosoftWithXboxUsers.csv",
+    DataDirHelper().getDataDir()+"companyTweets\\microsoftXboxUsers.csv",
+    DataDirHelper().getDataDir()+ "companyTweets\\wordVectorsMicrosoft.txt",
+    DataDirHelper().getDataDir() + "companyTweets\\model\\microsoftXboxUsersLSTM20",
+    DataDirHelper().getDataDir() + "companyTweets\\microsoftTopicModel",
+    20
     ) 
     
 APPLE_IPHONE_SALES_5 = PredictionModelPath(

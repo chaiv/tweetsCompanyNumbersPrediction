@@ -7,10 +7,11 @@ import pandas as pd
 from tweetpreprocess.DataDirHelper import DataDirHelper
 from pipeline.FeatureDataframePipeline import FeatureDataframePipeline
 from tweetpreprocess.TweetQueryParams import TweetQueryParams
-from PredictionModelPath import MICROSOFT_GROSS_PROFIT_20
+from PredictionModelPath import MICROSOFT_GROSS_PROFIT_20,\
+    MICROSOFT_XBOX_USERS_20
 
 
-predictionModelPath = MICROSOFT_GROSS_PROFIT_20 
+predictionModelPath = MICROSOFT_XBOX_USERS_20
 
 
 tweets = pd.read_csv (DataDirHelper().getDataDir()+ "companyTweets\CompanyTweets.csv")
