@@ -21,17 +21,18 @@ from classifier.TweetGroupDataset import TweetGroupDataset
 from tweetpreprocess.EqualClassSampler import EqualClassSampler
 from PredictionModelPath import AMAZON_REVENUE_10, AMAZON_REVENUE_20, APPLE_IPHONE_SALES_10, APPLE_IPHONE_SALES_5,\
     TESLA_CAR_SALES_20, MICROSOFT_EPS_5, MICROSOFT_EPS_10,\
-    MICROSOFT_GROSS_PROFIT_20, MICROSOFT_XBOX_USERS_20
+    MICROSOFT_GROSS_PROFIT_20, MICROSOFT_XBOX_USERS_20, MICROSOFT_XBOX_USERS_10
+from tweetpreprocess.LoadTweetDataframe import LoadTweetDataframe
 
 
 torch.set_float32_matmul_precision('medium') #needed for quicker cuda 
 
 if  __name__ == "__main__":
-    predictionModelPath = MICROSOFT_XBOX_USERS_20
+    predictionModelPath = APPLE_IPHONE_SALES_10
 
     df = pd.read_csv(predictionModelPath.getDataframePath()) 
     df.fillna('', inplace=True) #nan values in body columns 
-    df = EqualClassSampler().getDfWithEqualNumberOfClassSamples(df)
+    df = LoadTweetDataframe(predictionModelPath).readDataframe()
     print(TweetDataframeExplore(df).getClassDistribution())
     word_vectors = KeyedVectors.load_word2vec_format(predictionModelPath.getWordVectorsPath(), binary=False)
     textEncoder = WordVectorsIDEncoder(word_vectors)

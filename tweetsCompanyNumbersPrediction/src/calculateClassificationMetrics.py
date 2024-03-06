@@ -20,7 +20,7 @@ from collections import Counter
 from tweetpreprocess.EqualClassSampler import EqualClassSampler
 
 from PredictionModelPath import AMAZON_REVENUE_5, MICROSOFT_EPS_5,\
-    MICROSOFT_GROSS_PROFIT_20
+    MICROSOFT_GROSS_PROFIT_20, MICROSOFT_XBOX_USERS_20, MICROSOFT_XBOX_USERS_10
 from PredictionModelPath import AMAZON_REVENUE_10
 from PredictionModelPath import AMAZON_REVENUE_20
 from PredictionModelPath import APPLE_IPHONE_SALES_5
@@ -29,17 +29,17 @@ from PredictionModelPath import APPLE__IPHONE_SALES_20
 from PredictionModelPath import TESLA_CAR_SALES_5
 from PredictionModelPath import TESLA_CAR_SALES_10
 from PredictionModelPath import TESLA_CAR_SALES_20
+from tweetpreprocess.LoadTweetDataframe import LoadTweetDataframe
 
-predictionModelPath =  MICROSOFT_GROSS_PROFIT_20 
-
+predictionModelPath =  APPLE_IPHONE_SALES_10
+fold = 0
 word_vectors = KeyedVectors.load_word2vec_format(predictionModelPath.getWordVectorsPath(), binary=False)
 textEncoder = WordVectorsIDEncoder(word_vectors)
 tokenizer = TweetTokenizer(DefaultWordFilter())
-modelPath = predictionModelPath.getModelPath()+"\\tweetpredict_fold0.ckpt"
+modelPath = predictionModelPath.getModelPath()+"\\tweetpredict_fold"+str(fold)+".ckpt"
 model = loadModel(modelPath,word_vectors)
-df = pd.read_csv(predictionModelPath.getDataframePath())
-df = EqualClassSampler().getDfWithEqualNumberOfClassSamples(df) #otherwise splits would be wrong when working with whole df
-testIdxPath = predictionModelPath.getModelPath()+'\\test_idx_fold0.npy'
+df = LoadTweetDataframe(predictionModelPath).readDataframe()
+testIdxPath = predictionModelPath.getModelPath()+'\\test_idx_fold'+str(fold)+'.npy'
 testSplitIndexes = np.load(testIdxPath)
 tweetGroups,trueClasses = createTweetGroupsAndTrueClasses(
         df,
