@@ -18,7 +18,6 @@ from tweetpreprocess.wordfiltering.DefaultWordFilter import DefaultWordFilter
 from nlpvectors.TweetTokenizer import TweetTokenizer
 from gensim.models.keyedvectors import KeyedVectors
 from nlpvectors.WordVectorsIDEncoder import WordVectorsIDEncoder
-from classifier.LSTMNN import LSTMNN
 from nlpvectors.DataframeSplitter import DataframeSplitter
 from classifier.TweetGroupDataset import TweetGroupDataset
 from classifier.ModelEvaluationHelper import createTweetGroupsAndTrueClasses,\

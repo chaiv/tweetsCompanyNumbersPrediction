@@ -9,7 +9,7 @@ from tweetpreprocess.DataDirHelper import DataDirHelper
 class PredictionModelPath(object):
 
     def __init__(self, 
-                 nasdaqTag : str, 
+                 nasdaqTag : list[str], 
                  tweetDataframePath : str, 
                  financialNumbersPath : str, 
                  wordvectorsPath : str, 
@@ -52,7 +52,7 @@ class PredictionModelPath(object):
         return self.isEqualSamplesForEachClass 
     
 MICROSOFT_EPS_5 = PredictionModelPath(
-    "MSFT",
+    ["MSFT"],
     DataDirHelper().getDataDir()+"companyTweets\\CompanyTweetsMicrosoftWithEps.csv",
     DataDirHelper().getDataDir()+"companyTweets\\microsoftEps.csv",
     DataDirHelper().getDataDir()+ "companyTweets\\wordVectorsMicrosoft.txt",
@@ -63,7 +63,7 @@ MICROSOFT_EPS_5 = PredictionModelPath(
     ) 
 
 MICROSOFT_EPS_10 = PredictionModelPath(
-      "MSFT",
+    ["MSFT"],
     DataDirHelper().getDataDir()+"companyTweets\\CompanyTweetsMicrosoftWithEps.csv",
     DataDirHelper().getDataDir()+"companyTweets\\microsoftEps.csv",
     DataDirHelper().getDataDir()+ "companyTweets\\wordVectorsMicrosoft.txt",
@@ -74,7 +74,7 @@ MICROSOFT_EPS_10 = PredictionModelPath(
     ) 
 
 MICROSOFT_GROSS_PROFIT_20 = PredictionModelPath(
-      "MSFT",
+    ["MSFT"],
     DataDirHelper().getDataDir()+"companyTweets\\CompanyTweetsMicrosoftWithEps.csv",
     DataDirHelper().getDataDir()+"companyTweets\\microsoftGrossProfit.csv",
     DataDirHelper().getDataDir()+ "companyTweets\\wordVectorsMicrosoft.txt",
@@ -86,18 +86,18 @@ MICROSOFT_GROSS_PROFIT_20 = PredictionModelPath(
 
 
 MICROSOFT_XBOX_USERS_10 = PredictionModelPath(
-      "MSFT",
+    ["MSFT"],
     DataDirHelper().getDataDir()+"companyTweets\\CompanyTweetsMicrosoftWithXboxUsers.csv",
     DataDirHelper().getDataDir()+"companyTweets\\microsoftXboxUsers.csv",
     DataDirHelper().getDataDir()+ "companyTweets\\wordVectorsMicrosoft.txt",
-    DataDirHelper().getDataDir() + "companyTweets\\model\\microsoftXboxUsersLSTM20",
+    DataDirHelper().getDataDir() + "companyTweets\\model\\microsoftXboxUsersLSTM10",
     DataDirHelper().getDataDir() + "companyTweets\\microsoftTopicModel",
-    False,
+    True,
     10
     ) 
 
 MICROSOFT_XBOX_USERS_20 = PredictionModelPath(
-      "MSFT",
+    ["MSFT"],
     DataDirHelper().getDataDir()+"companyTweets\\CompanyTweetsMicrosoftWithXboxUsers.csv",
     DataDirHelper().getDataDir()+"companyTweets\\microsoftXboxUsers.csv",
     DataDirHelper().getDataDir()+ "companyTweets\\wordVectorsMicrosoft.txt",
@@ -108,7 +108,7 @@ MICROSOFT_XBOX_USERS_20 = PredictionModelPath(
     ) 
     
 APPLE_IPHONE_SALES_5 = PredictionModelPath(
-    "AAPL",
+    ["AAPL"],
     DataDirHelper().getDataDir()+"companyTweets\\CompanyTweetsAppleWithIPhoneSales.csv",
     DataDirHelper().getDataDir()+"companyTweets\\appleIphoneSales.csv",
     DataDirHelper().getDataDir()+ "companyTweets\\wordVectorsApple.txt",
@@ -119,7 +119,7 @@ APPLE_IPHONE_SALES_5 = PredictionModelPath(
     )
 
 AMAZON_REVENUE_5 = PredictionModelPath(
-    "AMZN",
+    ["AMZN"],
     DataDirHelper().getDataDir()+"companyTweets\\amazonTweetsWithNumbers.csv",
     DataDirHelper().getDataDir()+"companyTweets\\amazonQuarterRevenue.csv",
     DataDirHelper().getDataDir()+ "companyTweets\\WordVectorsAmazonV2.txt",
@@ -130,7 +130,7 @@ AMAZON_REVENUE_5 = PredictionModelPath(
     )
 
 TESLA_CAR_SALES_5 = PredictionModelPath(
-    "TSLA",
+    ["TSLA"],
     DataDirHelper().getDataDir()+"companyTweets\\CompanyTweetsTeslaWithCarSales.csv",
     DataDirHelper().getDataDir()+"companyTweets\\teslaCarSales.csv",
     DataDirHelper().getDataDir()+ "companyTweets\\WordVectorsTesla.txt",
@@ -141,7 +141,7 @@ TESLA_CAR_SALES_5 = PredictionModelPath(
     )
 
 APPLE_IPHONE_SALES_10 = PredictionModelPath(
-    "AAPL",
+    ["AAPL"],
     DataDirHelper().getDataDir()+"companyTweets\\CompanyTweetsAppleWithIPhoneSales.csv",
     DataDirHelper().getDataDir()+"companyTweets\\appleIphoneSales.csv",
     DataDirHelper().getDataDir()+ "companyTweets\\wordVectorsApple.txt",
@@ -152,7 +152,7 @@ APPLE_IPHONE_SALES_10 = PredictionModelPath(
     )
 
 AMAZON_REVENUE_10 = PredictionModelPath(
-    "AMZN",
+    ["AMZN"],
     DataDirHelper().getDataDir()+"companyTweets\\amazonTweetsWithNumbers.csv",
     DataDirHelper().getDataDir()+"companyTweets\\amazonQuarterRevenue.csv",
     DataDirHelper().getDataDir()+ "companyTweets\\WordVectorsAmazonV2.txt",
@@ -163,7 +163,7 @@ AMAZON_REVENUE_10 = PredictionModelPath(
     )
 
 TESLA_CAR_SALES_10 = PredictionModelPath(
-    "TSLA",
+    ["TSLA"],
     DataDirHelper().getDataDir()+"companyTweets\\CompanyTweetsTeslaWithCarSales.csv",
     DataDirHelper().getDataDir()+"companyTweets\\teslaCarSales.csv",
     DataDirHelper().getDataDir()+ "companyTweets\\WordVectorsTesla.txt",
@@ -176,7 +176,7 @@ TESLA_CAR_SALES_10 = PredictionModelPath(
 
 
 APPLE__IPHONE_SALES_20 = PredictionModelPath(
-    "AAPL",
+    ["AAPL"],
     DataDirHelper().getDataDir()+"companyTweets\\CompanyTweetsAppleWithIPhoneSales.csv",
     DataDirHelper().getDataDir()+"companyTweets\\appleIphoneSales.csv",
     DataDirHelper().getDataDir()+ "companyTweets\\wordVectorsApple.txt",
@@ -187,7 +187,7 @@ APPLE__IPHONE_SALES_20 = PredictionModelPath(
     )
 
 AMAZON_REVENUE_20 = PredictionModelPath(
-    "AMZN",
+    ["AMZN"],
     DataDirHelper().getDataDir()+"companyTweets\\amazonTweetsWithNumbers.csv",
     DataDirHelper().getDataDir()+"companyTweets\\amazonQuarterRevenue.csv",
     DataDirHelper().getDataDir()+ "companyTweets\\WordVectorsAmazonV2.txt",
@@ -198,7 +198,7 @@ AMAZON_REVENUE_20 = PredictionModelPath(
     )
 
 TESLA_CAR_SALES_20 = PredictionModelPath(
-    "TSLA",
+    ["TSLA"],
     DataDirHelper().getDataDir()+"companyTweets\\CompanyTweetsTeslaWithCarSales.csv",
     DataDirHelper().getDataDir()+"companyTweets\\teslaCarSales.csv",
     DataDirHelper().getDataDir()+ "companyTweets\\WordVectorsTesla.txt",
@@ -207,5 +207,17 @@ TESLA_CAR_SALES_20 = PredictionModelPath(
     True,
     20
     )
+
+GOOGLE_SE_MARKET_SHARE_10 = PredictionModelPath(
+    ["GOOG"], 
+    DataDirHelper().getDataDir()+"companyTweets\\CompanyTweetsGoogleWithSEMarketShare.csv",
+    DataDirHelper().getDataDir()+"companyTweets\\googleSEMarketShare.csv",
+    DataDirHelper().getDataDir()+ "companyTweets\\WordVectorsGoogle.txt",
+    DataDirHelper().getDataDir() + 'companyTweets\\model\\googleWithSEMarketShareLSTM10',
+    DataDirHelper().getDataDir() + "companyTweets\\googleTopicModel",
+    True,
+    10
+    )
+
 
         

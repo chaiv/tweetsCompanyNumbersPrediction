@@ -18,17 +18,20 @@ from nlpvectors.WordVectorsIDEncoder import WordVectorsIDEncoder
 from classifier.LSTMNN import LSTMNN
 from classifier.Trainer import Trainer
 from classifier.TweetGroupDataset import TweetGroupDataset
-from tweetpreprocess.EqualClassSampler import EqualClassSampler
+from tweetpreprocess.EqualClassSampler imp
+ort EqualClassSampler
 from PredictionModelPath import AMAZON_REVENUE_10, AMAZON_REVENUE_20, APPLE_IPHONE_SALES_10, APPLE_IPHONE_SALES_5,\
     TESLA_CAR_SALES_20, MICROSOFT_EPS_5, MICROSOFT_EPS_10,\
-    MICROSOFT_GROSS_PROFIT_20, MICROSOFT_XBOX_USERS_20, MICROSOFT_XBOX_USERS_10
+    MICROSOFT_GROSS_PROFIT_20, MICROSOFT_XBOX_USERS_20, MICROSOFT_XBOX_USERS_10,\
+    GOOGLE_SE_MARKET_SHARE_10
 from tweetpreprocess.LoadTweetDataframe import LoadTweetDataframe
+from classifier.CreateClassifierModel import CreateClassifierModel
 
 
 torch.set_float32_matmul_precision('medium') #needed for quicker cuda 
 
 if  __name__ == "__main__":
-    predictionModelPath = APPLE_IPHONE_SALES_10
+    predictionModelPath = GOOGLE_SE_MARKET_SHARE_10
 
     df = pd.read_csv(predictionModelPath.getDataframePath()) 
     df.fillna('', inplace=True) #nan values in body columns 
@@ -40,7 +43,7 @@ if  __name__ == "__main__":
     pad_token_idx = textEncoder.getPADTokenID()
     vocab_size = textEncoder.getVocabularyLength()
     
-    model =LSTMNN(emb_size = 300,word_vectors = word_vectors)
+    model =CreateClassifierModel(word_vectors = word_vectors).createModel()
 
     # model = Transformer(
     #     embeddings= Word2VecTransformerEmbedding(word_vectors =  torch.tensor(word_vectors.vectors), emb_size=emb_size,pad_token_id = textEncoder.getPADTokenID()),
@@ -64,7 +67,6 @@ if  __name__ == "__main__":
         print("len(train_data)", len(train_data))
         print("len(val_data)", len(val_data))
         print("len(test_data)", len(test_data))
-        modelPath = predictionModelPath.getModelPath()
         Trainer().train(
             batch_size=100, 
             epochs=10, 
@@ -76,7 +78,7 @@ if  __name__ == "__main__":
             test_data=test_data, 
             loggerPath=DataDirHelper().getDataDir() + 'companyTweets\\modellogs', 
             loggerName="tweetpredict", 
-            checkpointPath=modelPath, 
+            checkpointPath=predictionModelPath.getModelPath(), 
             checkpointName=f"tweetpredict_fold{fold}"
             )
         

@@ -10,10 +10,11 @@ from tweetpreprocess.DataDirHelper import DataDirHelper
 from classifier.LSTMNN import LSTMNN
 from nlpvectors.DataframeSplitter import DataframeSplitter
 from classifier.TweetGroupDataset import TweetGroupDataset
+from classifier.CreateClassifierModel import CreateClassifierModel
 
 
 def loadModel(path,wordVectors,evalMode=True):
-    model = LSTMNN(300,wordVectors)
+    model = CreateClassifierModel(word_vectors = wordVectors).createModel()
     # model = Transformer(
     #         embeddings= Word2VecTransformerEmbedding(word_vectors =  torch.tensor(word_vectors.vectors), emb_size=300,pad_token_id = encoder.getPADTokenID()),
     #         lr=1e-4, n_outputs=2, vocab_size=encoder.getVocabularyLength(),channels= 300

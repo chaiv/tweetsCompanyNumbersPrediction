@@ -20,7 +20,8 @@ from collections import Counter
 from tweetpreprocess.EqualClassSampler import EqualClassSampler
 
 from PredictionModelPath import AMAZON_REVENUE_5, MICROSOFT_EPS_5,\
-    MICROSOFT_GROSS_PROFIT_20, MICROSOFT_XBOX_USERS_20, MICROSOFT_XBOX_USERS_10
+    MICROSOFT_GROSS_PROFIT_20, MICROSOFT_XBOX_USERS_20, MICROSOFT_XBOX_USERS_10,\
+    GOOGLE_SE_MARKET_SHARE_10
 from PredictionModelPath import AMAZON_REVENUE_10
 from PredictionModelPath import AMAZON_REVENUE_20
 from PredictionModelPath import APPLE_IPHONE_SALES_5
@@ -31,8 +32,8 @@ from PredictionModelPath import TESLA_CAR_SALES_10
 from PredictionModelPath import TESLA_CAR_SALES_20
 from tweetpreprocess.LoadTweetDataframe import LoadTweetDataframe
 
-predictionModelPath =  APPLE_IPHONE_SALES_10
-fold = 0
+predictionModelPath =  GOOGLE_SE_MARKET_SHARE_10
+fold = 1
 word_vectors = KeyedVectors.load_word2vec_format(predictionModelPath.getWordVectorsPath(), binary=False)
 textEncoder = WordVectorsIDEncoder(word_vectors)
 tokenizer = TweetTokenizer(DefaultWordFilter())
