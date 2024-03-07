@@ -33,7 +33,7 @@ from PredictionModelPath import TESLA_CAR_SALES_20
 from tweetpreprocess.LoadTweetDataframe import LoadTweetDataframe
 
 predictionModelPath =  GOOGLE_SE_MARKET_SHARE_10
-fold = 1
+fold = 0
 word_vectors = KeyedVectors.load_word2vec_format(predictionModelPath.getWordVectorsPath(), binary=False)
 textEncoder = WordVectorsIDEncoder(word_vectors)
 tokenizer = TweetTokenizer(DefaultWordFilter())

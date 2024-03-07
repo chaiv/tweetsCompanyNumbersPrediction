@@ -208,6 +208,17 @@ TESLA_CAR_SALES_20 = PredictionModelPath(
     20
     )
 
+GOOGLE_SE_MARKET_SHARE_5 = PredictionModelPath(
+    ["GOOG"], 
+    DataDirHelper().getDataDir()+"companyTweets\\CompanyTweetsGoogleWithSEMarketShare.csv",
+    DataDirHelper().getDataDir()+"companyTweets\\googleSEMarketShare.csv",
+    DataDirHelper().getDataDir()+ "companyTweets\\WordVectorsGoogle.txt",
+    DataDirHelper().getDataDir() + 'companyTweets\\model\\googleWithSEMarketShareLSTM5',
+    DataDirHelper().getDataDir() + "companyTweets\\googleTopicModel",
+    True,
+    5
+    )
+
 GOOGLE_SE_MARKET_SHARE_10 = PredictionModelPath(
     ["GOOG"], 
     DataDirHelper().getDataDir()+"companyTweets\\CompanyTweetsGoogleWithSEMarketShare.csv",
@@ -217,6 +228,17 @@ GOOGLE_SE_MARKET_SHARE_10 = PredictionModelPath(
     DataDirHelper().getDataDir() + "companyTweets\\googleTopicModel",
     True,
     10
+    )
+
+GOOGLE_SE_MARKET_SHARE_20 = PredictionModelPath(
+    ["GOOG"], 
+    DataDirHelper().getDataDir()+"companyTweets\\CompanyTweetsGoogleWithSEMarketShare.csv",
+    DataDirHelper().getDataDir()+"companyTweets\\googleSEMarketShare.csv",
+    DataDirHelper().getDataDir()+ "companyTweets\\WordVectorsGoogle.txt",
+    DataDirHelper().getDataDir() + 'companyTweets\\model\\googleWithSEMarketShareLSTM20',
+    DataDirHelper().getDataDir() + "companyTweets\\googleTopicModel",
+    True,
+    20
     )
 
 

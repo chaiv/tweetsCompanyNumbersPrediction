@@ -27,7 +27,7 @@ class BinaryClassificationMetricsTest(unittest.TestCase):
         y_pred = [0, 0, 0, 1, 1, 1]
         mcc = BinaryClassificationMetrics().calculate_mcc(y_true, y_pred)
         self.assertAlmostEqual(mcc, 0.3333333333333333, places=5)
-
+        
 
     def test_calculate_metrics(self):
         y_true = [0, 1, 0, 1, 1, 0]
