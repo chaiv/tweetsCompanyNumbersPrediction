@@ -3,7 +3,6 @@ Created on 08.02.2023
 
 @author: vital
 '''
-from classifier.transformer.models import Transformer
 import torch
 from classifier.PredictionClassMapper import PredictionClassMapper
 from featureinterpretation.AttributionsCalculator import AttributionsCalculator
@@ -17,7 +16,7 @@ from nlpvectors.TweetGroup import split_list_on_indices
 class Predictor(object):
 
     def __init__(self, 
-                 model: Transformer, 
+                 model, 
                  tokenizer: AbstractTokenizer,
                  textEncoder : AbstractEncoder,
                  predictionClassMapper: PredictionClassMapper,

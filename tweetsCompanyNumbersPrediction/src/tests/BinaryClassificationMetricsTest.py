@@ -9,6 +9,8 @@ from classifier.BinaryClassificationMetrics import BinaryClassificationMetrics
 
 class BinaryClassificationMetricsTest(unittest.TestCase):
     
+
+    
     def test_roc_auc(self):
         y_true = [0, 1, 0, 1, 1, 0]
         y_pred = [0, 0, 0, 1, 1, 1]

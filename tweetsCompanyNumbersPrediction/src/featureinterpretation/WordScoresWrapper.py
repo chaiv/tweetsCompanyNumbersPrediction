@@ -11,7 +11,8 @@ class WordScoresWrapper(object):
         self.tweetGroup = tweetGroup
         self.total_attributions = total_attributions
         
-
+    def getTweetGroup(self):
+        return self.tweetGroup
     
     def getSentenceIds(self):
         return self.tweetGroup.getSentenceIds()
