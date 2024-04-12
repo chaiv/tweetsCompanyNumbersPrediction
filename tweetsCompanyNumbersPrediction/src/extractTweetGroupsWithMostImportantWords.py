@@ -23,6 +23,7 @@ from tweetpreprocess.LoadTweetDataframe import LoadTweetDataframe
 from classifier.PredictionClassMappers import BINARY_0_1
 from classifier.transformer.Predictor import Predictor
 from featureinterpretation.AttributionsCalculator import AttributionsCalculator
+from featureinterpretation.TokenScoresSort import TokenScoresSort
 
 
 predictionModelPath =  AMAZON_REVENUE_10
@@ -47,7 +48,23 @@ predictor = Predictor(model,tokenizer ,textEncoder,BINARY_0_1,AttributionsCalcul
 prediction_classes = predictor.predictMultipleAsTweetGroupsInChunks(tweetGroups,1000)
 wordScoresWrappers = predictor.calculateWordScoresOfTweetGroupsInChunks(tweetGroups,observed_class=1,chunkSize=100,n_steps=500,internal_batch_size = 100)
 
+tweetGroupColumn = "tweet_group"
+labelColumn = "label"
+tokensColumn = "tokens"
+scoresColumn = "scores"
+
+tweetGroupsLists = []
+labelsLists = []
+tokensLists = []
+scoresLists = []
+
+sorter = TokenScoresSort()
+
+
 for wordScoreWrapper in wordScoresWrappers:
+    labelsLists.append(wordScoreWrapper.getTweetGroup().getLabel())
+    tweetGroupsLists.append(";".join(wordScoreWrapper.getTweetGroup().getSentences()))
+
     
 
 

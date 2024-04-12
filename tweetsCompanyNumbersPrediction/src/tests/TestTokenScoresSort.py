@@ -9,34 +9,50 @@ from featureinterpretation.TokenScoresSort import TokenScoresSort
 
 class TestTokenScoresSort(unittest.TestCase):
     
-
-    def test_sorting_basic(self):
-        sorter = TokenScoresSort()
+    def setUp(self):
+        self.sorter = TokenScoresSort()
+        
+    def test_sorted_tokens_and_scores_desc(self):
         tokens = ["apple", "banana", "cherry"]
         scores = [3, 1, 2]
-        expected = [("banana", 1), ("cherry", 2), ("apple", 3)]
-        self.assertEqual(sorter.getSortedTokensWithScoresAsc(tokens, scores), expected)
+        expected_tokens = ["apple", "cherry", "banana"]
+        expected_scores = [3,2,1]
+        sorted_tokens, sorted_scores = self.sorter.getSortedTokensAndScoresDesc(tokens, scores)
+        self.assertEqual(sorted_tokens, expected_tokens)
+        self.assertEqual(sorted_scores, expected_scores)
 
-    def test_sorting_with_negative_scores(self):
-        sorter = TokenScoresSort()
+    def test_sorted_tokens_and_scores(self):
+        tokens = ["apple", "banana", "cherry"]
+        scores = [3, 1, 2]
+        expected_tokens = ["banana", "cherry", "apple"]
+        expected_scores = [1, 2, 3]
+        sorted_tokens, sorted_scores = self.sorter.getSortedTokensAndScoresAsc(tokens, scores)
+        self.assertEqual(sorted_tokens, expected_tokens)
+        self.assertEqual(sorted_scores, expected_scores)
+
+    def test_sorted_tokens_and_scores_with_negative_scores(self):
         tokens = ["dog", "cat", "bird"]
         scores = [0, -2, 5]
-        expected = [("cat", -2), ("dog", 0), ("bird", 5)]
-        self.assertEqual(sorter.getSortedTokensWithScoresAsc(tokens, scores), expected)
+        expected_tokens = ["cat", "dog", "bird"]
+        expected_scores = [-2, 0, 5]
+        sorted_tokens, sorted_scores = self.sorter.getSortedTokensAndScoresAsc(tokens, scores)
+        self.assertEqual(sorted_tokens, expected_tokens)
+        self.assertEqual(sorted_scores, expected_scores)
 
-    def test_sorting_with_same_scores(self):
-        sorter = TokenScoresSort()
+    def test_sorted_tokens_and_scores_same_scores(self):
         tokens = ["one", "two", "three"]
         scores = [7, 7, 7]
-        expected = [("one", 7), ("two", 7), ("three", 7)]  # Stability of sort depends on sort implementation
-        self.assertEqual(sorter.getSortedTokensWithScoresAsc(tokens, scores), expected)
+        expected_tokens = ["one", "two", "three"]
+        expected_scores = [7, 7, 7]
+        sorted_tokens, sorted_scores = self.sorter.getSortedTokensAndScoresAsc(tokens, scores)
+        self.assertEqual(sorted_tokens, expected_tokens)
+        self.assertEqual(sorted_scores, expected_scores)
 
-    def test_invalid_input_length_mismatch(self):
-        sorter = TokenScoresSort()
+    def test_input_length_mismatch_error(self):
         tokens = ["short"]
         scores = [1, 2]
         with self.assertRaises(ValueError):
-            sorter.getSortedTokensWithScoresAsc(tokens, scores)
+            self.sorter.getSortedTokensAndScoresAsc(tokens, scores)
 
 # To run the tests
 if __name__ == '__main__':
