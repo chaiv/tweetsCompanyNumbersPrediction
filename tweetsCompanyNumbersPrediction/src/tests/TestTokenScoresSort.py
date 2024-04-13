@@ -12,6 +12,15 @@ class TestTokenScoresSort(unittest.TestCase):
     def setUp(self):
         self.sorter = TokenScoresSort()
         
+    def test_sorted_tokens_and_scores_from_sublists_desc(self):
+        tokens = [["apple", "banana"], ["cherry"]]
+        scores = [[0.3,0.1 ], [0.2]]
+        expected_tokens = ["apple", "cherry", "banana"]
+        expected_scores = [0.3,0.2,0.1]
+        sorted_tokens, sorted_scores = self.sorter.getSortedTokensAndScoresDescFromListOfLists(tokens, scores)
+        self.assertEqual(sorted_tokens, expected_tokens)
+        self.assertEqual(sorted_scores, expected_scores)
+        
     def test_sorted_tokens_and_scores_desc(self):
         tokens = ["apple", "banana", "cherry"]
         scores = [3, 1, 2]
