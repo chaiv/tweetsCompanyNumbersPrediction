@@ -18,7 +18,13 @@ class TokenScoresSort(object):
         scores_flattened = [item for sublist in tokenScores for item in sublist]
         return self.getSortedTokensAndScoresDesc( tokens_flattened, scores_flattened )
     
-    
+    def getSortedTokensAndScoresAscFromListOfLists(self,tokens : list[list[str]], tokenScores: list[list[float]]):
+        sorted_tokens_asc, sorted_scores_asc = self.getSortedTokensAndScoresDescFromListOfLists(tokens,tokenScores)
+        sorted_tokens_asc.reverse()
+        sorted_scores_asc.reverse()
+        return  sorted_tokens_asc, sorted_scores_asc
+        
+
     def getSortedTokensAndScoresDesc(self, tokens, tokenScores):
         sorted_tokens_asc, sorted_scores_asc = self.getSortedTokensAndScoresAsc(tokens, tokenScores)
         sorted_tokens_asc.reverse()

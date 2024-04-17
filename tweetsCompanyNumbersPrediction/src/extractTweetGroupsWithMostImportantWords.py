@@ -53,8 +53,12 @@ for tweetGroup in tweetGroups:
         tweetGroups0Label.append(tweetGroup)
 
 
-observedTweetGroups = tweetGroups1Label[:100]
-observed_class=1
+observed_class=0
+tweetGroupsAmount = 100
+if observed_class==1:
+    observedTweetGroups = tweetGroups1Label[:tweetGroupsAmount]
+else: 
+    observedTweetGroups = tweetGroups0Label[:tweetGroupsAmount]
 
 predictor = Predictor(model,tokenizer ,textEncoder,BINARY_0_1,AttributionsCalculator(model,model.embedding))
 prediction_classes = predictor.predictMultipleAsTweetGroupsInChunks(observedTweetGroups,1000)
@@ -78,17 +82,16 @@ sorter = TokenScoresSort()
 for wordScoreWrapper in wordScoresWrappers:
     labelLists.append(wordScoreWrapper.getTweetGroup().getLabel())
     tweetGroupLists.append(";".join(wordScoreWrapper.getTweetGroup().getSentences()))
-    sorted_tokens, sorted_scores = sorter.getSortedTokensAndScoresDescFromListOfLists(wordScoreWrapper.getTokens(), wordScoreWrapper.getAttributions())
+    sorted_tokens, sorted_scores = sorter.getSortedTokensAndScoresAscFromListOfLists(wordScoreWrapper.getTokens(), wordScoreWrapper.getAttributions())
     tokensSortedByScoreLists.append(sorted_tokens)
     scoreSortedByScoreLists.append(sorted_scores)
 
 
 tweetGroupsWithMostImportantWordsDf = pd.DataFrame({
-    
     tweetGroupColumn: tweetGroupLists,
     labelColumn: labelLists,
     tokensColumn : tokensSortedByScoreLists,
-    scoresColumn : scoreSortedByScoreLists ,
+    #scoresColumn : scoreSortedByScoreLists ,
     lstmLabel : prediction_classes,
     chatGptLabel : [None] * len(labelLists),
     chatGpttokens: [None] * len(labelLists)

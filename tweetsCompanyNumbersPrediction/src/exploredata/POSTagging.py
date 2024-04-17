@@ -47,3 +47,11 @@ class PartOfSpeechTagging(object):
                 POSTag(token.text,token.pos_)
                 )  
         return posTags
+    
+    def getPOSTagOfToken(self,sentence,token)-> POSTag:
+        posTags = self.getPOSTags(sentence)
+        for posTag in posTags:
+            if token.lower() in posTag.getToken().lower(): #in check because of the spacy tokenizer tokenizing special characters wrong, i.e AMZN;Sold and not Sold
+                return posTag
+        raise ValueError("No token in sentence",sentence,token)
+    

@@ -19,3 +19,8 @@ class TestPOSTagging(unittest.TestCase):
         sentence = "$AMZN - Amazon to Produce Original Movies for Theaters, Prime Instant Video "
         tags = self.tagger.getPOSTags(sentence)
         print(tags)
+        
+    def test_get_tag_of_token(self):
+        sentence = "$AMZN - Amazon to Produce Original Movies for Theaters, Prime Instant Video "
+        tag = self.tagger.getPOSTagOfToken(sentence,"Amazon")
+        self.assertEquals("PROPN",tag.getPosTag())
