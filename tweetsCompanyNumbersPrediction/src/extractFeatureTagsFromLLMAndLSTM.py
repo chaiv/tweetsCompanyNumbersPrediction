@@ -9,7 +9,8 @@ from tweetpreprocess.wordfiltering.DefaultWordFilter import DefaultWordFilter
 from exploredata.POSTagging import PartOfSpeechTagging
 from PredictionModelPath import AMAZON_REVENUE_10
 from collections import Counter
-
+import json
+import ast
 tagger = PartOfSpeechTagging(TweetTokenizer(DefaultWordFilter()))
 
 predictionModelPath =  AMAZON_REVENUE_10
@@ -32,8 +33,23 @@ for index, row in tweetGroupsWithMostImportantWordsDf.iterrows():
         posTag = tagger.getPOSTagOfToken(row["tweet_group"], token) 
         pos_freq.update([posTag.getPosTag()])
 print(pos_freq)
+
+
+tweetGroupsWithMostImportantWordsDf['tokens_sorted'] = tweetGroupsWithMostImportantWordsDf['tokens_sorted'].apply(ast.literal_eval)
+
+with open(predictionModelPath.getModelPath()+"\\tokensDictionary.json") as json_file:
+    tokenizerLookupDict= json.load(json_file)
+    
+for index, row in tweetGroupsWithMostImportantWordsDf.iterrows():
+    tokens = []
+    for token in row["tokens_sorted"]:
+        if token in tokenizerLookupDict:
+            tokens.append(tokenizerLookupDict[token]) 
+    for token in tokens:
+        sentence =  row["tweet_group"]
+        if token in sentence: 
+            posTag = tagger.getPOSTagOfToken(row["tweet_group"], token) 
+            pos_freq.update([posTag.getPosTag()])
+print(pos_freq)
     
 
-
-
-#print(tweetGroupsWithMostImportantWordsDf["chatgpt_tokens"])
