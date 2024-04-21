@@ -23,16 +23,30 @@ from classifier.TweetGroupDataset import TweetGroupDataset
 from classifier.ModelEvaluationHelper import createTweetGroupsAndTrueClasses,\
     loadModel, createTweetGroupsAndTrueClassesWithoutSplitIndexes
 from nlpvectors.TweetGroup import createTweetGroup
+from PredictionModelPath import AMAZON_REVENUE_5
+from featureinterpretation.TokenScoresSort import TokenScoresSort
+
+predictionModelPath =  AMAZON_REVENUE_5
     
-word_vectors = KeyedVectors.load_word2vec_format(DataDirHelper().getDataDir()+ "companyTweets\\WordVectorsAmazonV2.txt", binary=False)
+word_vectors = KeyedVectors.load_word2vec_format(predictionModelPath.getWordVectorsPath(), binary=False)
 textEncoder = WordVectorsIDEncoder(word_vectors)
 tokenizer = TweetTokenizer(DefaultWordFilter())
-model = loadModel(DataDirHelper().getDataDir()+"companyTweets\\model\\amazonRevenueLSTMN5\\tweetpredict_fold1.ckpt",word_vectors,evalMode=False)
-sentences = ['For Options$AAPL$PFE$ORCL$MRK$NLY$COP$COH$DVN$NFX$TTWO$AMZNNice bottom', 'Stocks Trending Now:  $LL $LGND $BIOC $CSCO $ICA $USLV $ZIOP $CLDX $MHYS $ODP $JUNO $AMZN ~', 'A few more of interest: $AMBA $ADXS $AAL $AMGN $AMZN $ARIA $ARRY $ASHR ', 'Shares of Zulily down another 6 percent on Friday, slumping to all-time low () $ZU $AMZN $NILE ', '$XLI Investor Opinions Updated Friday, March 13, 2015 7:03:23 PM $INTC $AMZN $MCP $CSCO ']
-sentenceIds = [576527445806870528, 576529132651196416, 576531462842949632, 576534180621729792, 576534748559863808]
+model = loadModel(predictionModelPath.getModelPath()+"\\tweetpredict_fold1.ckpt",word_vectors,evalMode=False)
+sentences = [
+    '$AMZN acquisitions & #onlineactivity could be compromised - @Amazon refuses to implement #SecureWeb on all sites #privacyconcerns', 
+    '$OIL Company Profile Updated Sunday, April 5, 2015 7:15:51 PM $PFE $YUM $AMZN $GLUU', 
+    'Cash Flow Analysis for Retailers 1. $WMT 2. $AMZN 3. $TGT Complete Details: #MarketTrends', 
+    '$AMZN Recent News Sunday, April 5, 2015 7:08:11 PM $GILD $BMY $IYE $SLX', 
+    '$MTD Current Updates Sunday, April 5, 2015 7:02:20 PM $GSK $SPY $AMZN $JNK'
+    ]
+sentenceIds = [1, 2, 3, 4, 5]
 label = 1
 tweetGroup = createTweetGroup(tokenizer,textEncoder , sentences,sentenceIds,label)
 predictor = Predictor(model,tokenizer ,textEncoder,BINARY_0_1,AttributionsCalculator(model,model.embedding))
 wordScoresWrappers = predictor.calculateWordScoresOfTweetGroupsInChunks([tweetGroup],observed_class=1,chunkSize=100,n_steps=500,internal_batch_size = 100)
-print(wordScoresWrappers)
+sorter = TokenScoresSort()
+sorted_tokens, sorted_scores = sorter.getSortedTokensAndScoresAscFromListOfLists(wordScoresWrappers[0].getTokens(),wordScoresWrappers[0].getAttributions())
+print(predictor.predictMultipleAsTweetGroups([tweetGroup]))
+print(sorted_tokens)
+print(sorted_scores)
 
