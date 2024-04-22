@@ -31,6 +31,10 @@ class TokenScoresSort(object):
         sorted_scores_asc.reverse()
         return sorted_tokens_asc, sorted_scores_asc
     
+    def getAsSingleList(self,tokens, tokenScores):
+        return list(zip(tokens, tokenScores))
+    
+    
     def getSortedTokensAndScoresAsc(self, tokens, tokenScores):
         #return sorted tokens and token Scores lists sorted ascending by token scores
         if len(tokens) != len(tokenScores):
