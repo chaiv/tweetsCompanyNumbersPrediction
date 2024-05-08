@@ -31,9 +31,13 @@ for index, row in tweetGroupsWithMostImportantWordsDf.iterrows():
             tokens.append(token)
     for token in tokens: 
         posTag = tagger.getPOSTagOfToken(row["tweet_group"], token) 
+        if posTag.getPosTag() == 'ADV':
+            print(token)
         pos_freq.update([posTag.getPosTag()])
 print(pos_freq)
 
+
+pos_freq = Counter()
 
 tweetGroupsWithMostImportantWordsDf['tokens_sorted'] = tweetGroupsWithMostImportantWordsDf['tokens_sorted'].apply(ast.literal_eval)
 
@@ -49,6 +53,8 @@ for index, row in tweetGroupsWithMostImportantWordsDf.iterrows():
         sentence =  row["tweet_group"]
         if token in sentence: 
             posTag = tagger.getPOSTagOfToken(row["tweet_group"], token) 
+            if posTag.getPosTag() == 'ADV':
+                print(token)
             pos_freq.update([posTag.getPosTag()])
 print(pos_freq)
     

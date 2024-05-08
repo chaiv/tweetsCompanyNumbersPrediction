@@ -45,6 +45,7 @@ class TokenizedWordsLookup(object):
                 originalWords.append(self.getOriginalWord(token))
             else: 
                 originalWords.append(None)
+        return originalWords
             
 
     
