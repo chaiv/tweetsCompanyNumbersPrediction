@@ -113,13 +113,27 @@ class TweetDataframeExplore(object):
             entity_freq.update([entity.text for entity in doc.ents])
         return entity_freq
     
+    def getPOSFrequencies(self, pos_tags):
+        nlp = spacy.load('en_core_web_sm', disable=['parser', 'ner'])
+        noun_freq = Counter()
+        i = 0
+        for doc in nlp.pipe(self.dataframe[self.bodyColumnName]):
+            print(i := i + 1)
+            noun_freq.update([token.text.lower() for token in doc if token.pos_ in  pos_tags])
+        return noun_freq
+    
+    def getMostFrequentNouns(self, firstN):
+        noun_freq = self.getPOSFrequencies({'NOUN', 'PROPN'})
+        return noun_freq.most_common(firstN)
+    
+    def getMostFrequentWordsNamedEntities(self,firstN):
+        entity_freq = self.getNamedEntitiesFrequences()        
+        return entity_freq.most_common(firstN)
+    
     def printValueCounts(self,valueCounts):
         for value, count in valueCounts.items():
             print(f"{value} : {count}")
 
-    def getMostFrequentWordsNamedEntities(self,firstN):
-        entity_freq = self.getNamedEntitiesFrequences()        
-        return entity_freq.most_common(firstN)
     
     def getLeastFrequentWordNamedEntities(self,firstN):
         entity_freq = self.getNamedEntitiesFrequences()  
