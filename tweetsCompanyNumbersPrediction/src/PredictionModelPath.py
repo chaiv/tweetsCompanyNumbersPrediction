@@ -173,7 +173,16 @@ TESLA_CAR_SALES_10 = PredictionModelPath(
     10
     )
 
-
+APPLE__EPS_10 = PredictionModelPath(
+    ["AAPL"],
+    DataDirHelper().getDataDir()+"companyTweets\\CompanyTweetsAppleWithEps.csv",
+    DataDirHelper().getDataDir()+"companyTweets\\appleEps.csv",
+    DataDirHelper().getDataDir()+ "companyTweets\\wordVectorsApple.txt",
+    DataDirHelper().getDataDir() + "companyTweets\\model\\appleEpsLSTM10",
+    DataDirHelper().getDataDir() + "companyTweets\\appleTopicModel",
+    True,
+    10
+    )
 
 APPLE__IPHONE_SALES_20 = PredictionModelPath(
     ["AAPL"],
