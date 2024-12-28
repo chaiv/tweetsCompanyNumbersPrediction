@@ -156,7 +156,9 @@ class DataframeExplorePlots(object):
         dateColumnDf, valColumnDf,min_val,max_val,average = self.dataframeExplore.getSentimentPolarityPerTweet()
         return self.createValPerTweetDatePlot(dateColumnDf, valColumnDf,min_val,max_val,average,'Tweet Date','Sentiment Polarity','Sentiment Polarity over Time')
 
-     
+    
+
+    
         
 
 df =  pd.read_csv(DataDirHelper().getDataDir()+ 'companyTweets\\CompanyTweets.csv')
@@ -170,13 +172,14 @@ print(len(dfGoogle),len(dfApple),len(dfMicrosoft),len(dfAmazon),len(dfTesla))
 dataframeExplore = TweetDataframeExplore(df)
 plots = DataframeExplorePlots(dataframeExplore)
 
+
 #plots.createSentimentLabelNumbersPlot()
 #print(TweetDataframeExplore(dfMicrosoft).printOriginalAndNearDuplicateRowsText())
 #plots.createPOSCountsPlot()
 #dataframeExplore.printValueCounts(dataframeExplore.getMostFrequentWriters(100))
 #plots.createExactAndNearDuplicatesPlot()
 #print(TweetDataframeExplore(df).getMostFrequentWordsNamedEntities(100))
-print(TweetDataframeExplore(df).getMostFrequentNouns(100))
+#print(TweetDataframeExplore(df).getMostFrequentNouns(100))
 #plots.createWrittenNumbersPlot()
 #plots.createCompanyTweetNumbersPlot()
 #plots.createTweetsPerDayPlot() 

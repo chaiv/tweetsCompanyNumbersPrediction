@@ -126,6 +126,10 @@ class TweetDataframeExplore(object):
         noun_freq = self.getPOSFrequencies({'NOUN', 'PROPN'})
         return noun_freq.most_common(firstN)
     
+    def getMostFrequentVerbs(self, firstN):
+        noun_freq = self.getPOSFrequencies({'VERB'})
+        return noun_freq.most_common(firstN)
+    
     def getMostFrequentWordsNamedEntities(self,firstN):
         entity_freq = self.getNamedEntitiesFrequences()        
         return entity_freq.most_common(firstN)
