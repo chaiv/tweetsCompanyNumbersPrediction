@@ -179,7 +179,11 @@ plots = DataframeExplorePlots(dataframeExplore)
 #dataframeExplore.printValueCounts(dataframeExplore.getMostFrequentWriters(100))
 #plots.createExactAndNearDuplicatesPlot()
 #print(TweetDataframeExplore(df).getMostFrequentWordsNamedEntities(100))
+<<<<<<< HEAD
 #print(TweetDataframeExplore(df).getMostFrequentNouns(100))
+=======
+print(TweetDataframeExplore(df).getMostFrequentVerbs(100))
+>>>>>>> branch 'master' of https://github.com/chaiv/tweetsCompanyNumbersPrediction.git
 #plots.createWrittenNumbersPlot()
 #plots.createCompanyTweetNumbersPlot()
 #plots.createTweetsPerDayPlot() 
