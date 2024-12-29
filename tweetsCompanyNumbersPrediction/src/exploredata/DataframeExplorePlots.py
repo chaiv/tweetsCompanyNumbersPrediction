@@ -42,16 +42,18 @@ class DataframeExplorePlots(object):
         
         
     def createHistPlot(self,counts,min_val,max_val,average,xLabel,yLabel,title):
-        plt.hist(counts, bins=20, color='c', edgecolor='black')
-        plt.axvline(min_val, color='red', linestyle='dashed', linewidth=2)
-        plt.axvline(average, color='green', linestyle='dashed', linewidth=2)
-        plt.axvline(max_val, color='blue', linestyle='dashed', linewidth=2)
-        plt.text(min_val+ 0.03,plt.ylim()[1] - 0.03 * plt.ylim()[1], f'Min: {min_val:.2f}', color='red', fontsize=10, va='center')
-        plt.text(average+ 0.03,plt.ylim()[1] + 0.03 * plt.ylim()[1], f'Average: {average:.2f}', color='green', fontsize=10, va='center')
-        plt.text(max_val+ 0.03,plt.ylim()[1] - 0.03 * plt.ylim()[1], f'Max: {max_val:.2f}', color='blue', fontsize=10, va='center')
-        plt.xlabel(xLabel)
-        plt.ylabel(yLabel)
-        plt.title(title)
+        plt.hist(counts, bins=20, color='lightgray', edgecolor='black')
+        plt.axvline(min_val, color='black', linestyle='dashed', linewidth=2)
+        plt.axvline(average, color='black', linestyle='dashed', linewidth=2)
+        plt.axvline(max_val, color='black', linestyle='dashed', linewidth=2)
+        y_max = plt.ylim()[1]
+        offset = 0.05 * y_max  # Adjust the text position slightly above the line
+        plt.text(min_val,y_max + offset, f'Min: {min_val:.2f}', color='black', fontsize=16, fontname='Times New Roman', va='center')
+        plt.text(average,y_max + offset, f'Average: {average:.2f}', color='black', fontsize=16, fontname='Times New Roman', va='center')
+        plt.text(max_val,y_max + offset, f'Max: {max_val:.2f}', color='black', fontsize=16, fontname='Times New Roman', va='center')
+        plt.xlabel(xLabel,fontsize=16, fontname='Times New Roman')
+        plt.ylabel(yLabel,fontsize=16, fontname='Times New Roman')
+        #plt.title(title,fontsize=16, fontname='Times New Roman')
         plt.show()
         
         
@@ -179,12 +181,9 @@ plots = DataframeExplorePlots(dataframeExplore)
 #dataframeExplore.printValueCounts(dataframeExplore.getMostFrequentWriters(100))
 #plots.createExactAndNearDuplicatesPlot()
 #print(TweetDataframeExplore(df).getMostFrequentWordsNamedEntities(100))
-<<<<<<< HEAD
 #print(TweetDataframeExplore(df).getMostFrequentNouns(100))
-=======
-print(TweetDataframeExplore(df).getMostFrequentVerbs(100))
->>>>>>> branch 'master' of https://github.com/chaiv/tweetsCompanyNumbersPrediction.git
-#plots.createWrittenNumbersPlot()
+#print(TweetDataframeExplore(df).getMostFrequentVerbs(100))
+plots.createWrittenNumbersPlot()
 #plots.createCompanyTweetNumbersPlot()
 #plots.createTweetsPerDayPlot() 
 #plots.createNumberOfWordsPlot()
