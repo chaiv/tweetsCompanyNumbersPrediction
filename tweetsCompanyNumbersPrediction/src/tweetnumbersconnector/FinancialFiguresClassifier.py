@@ -6,7 +6,7 @@ Created on 17.12.2024
 
 import pandas as pd
 
-class FinancialFiguresClassifier:
+class FinancialFiguresMultiClassClassifier:
     def __init__(self, classes, percentChangeDfColumn = 'percent_change', classColumnName = "multi_class"):
         """
         Initialize the classifier with user-defined classes and their percent ranges.

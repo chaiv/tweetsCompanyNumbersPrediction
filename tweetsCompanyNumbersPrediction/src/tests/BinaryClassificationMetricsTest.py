@@ -9,7 +9,15 @@ from classifier.BinaryClassificationMetrics import BinaryClassificationMetrics
 
 class BinaryClassificationMetricsTest(unittest.TestCase):
     
-
+    
+    def test_classification_report(self):
+        y_true = [0, 0, 1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+        y_pred = [0, 1, 1, 1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0]
+        classificationReport = BinaryClassificationMetrics().classification_report(y_true, y_pred)
+        mcc = BinaryClassificationMetrics().calculate_mcc(y_true, y_pred)
+        print(classificationReport)
+        print(mcc)
+    
     
     def test_roc_auc(self):
         y_true = [0, 1, 0, 1, 1, 0]

@@ -31,10 +31,10 @@ class FeatureDataframePipeline(object):
         self.postTSPColumnName = postTSPColumnName
     
     
-    def createTweetWithNumbersDf(self,allTweetsDf,numbersDf,tweetQueryParams): 
+    def createTweetWithNumbersDf(self,allTweetsDf,numbersDf,tweetQueryParams,classCalculator): 
         tweetsSubselect = TweetDataframeSorter(postTSPColumnName=self.postTSPColumnName).sortByPostTSPAsc(TweetDataframeQuery().query(allTweetsDf,tweetQueryParams))
         numbersDfWithTSP = DateToTimestampDataframeTransformer(dateToTSP=DateTSPConverter(dateFormat= self.numbersDfDateFormat)).addTimestampColumns(numbersDf)
-        numbersWithClasses =  FiguresIncreaseDecreaseClassCalculator().getFiguresWithClasses(FiguresPercentChangeCalculator ().getFiguresWithClasses(numbersDfWithTSP))
+        numbersWithClasses =  classCalculator.getFiguresWithClasses(numbersDfWithTSP)
         tweetsWithNumbers = TweetNumbersConnector(postTSPColumn = self.postTSPColumnName,valueColumn="class").getTweetsWithNumbers(tweetsSubselect, numbersWithClasses)
         return tweetsWithNumbers
     def createDoc2VecFeaturesDf(self, tweetsWithNumbersDf,topicModelPath):

@@ -6,7 +6,8 @@ Created on 17.12.2024
 import pandas as pd
 from PredictionModelPath import AMAZON_REVENUE_10, TESLA_CAR_SALES_10,\
      APPLE__EPS_10
-from tweetnumbersconnector.FinancialFiguresClassifier import FinancialFiguresClassifier
+from tweetnumbersconnector.FinancialFiguresClassifier import FinancialFiguresMultiClassClassifier
+
 
 
 amazonRevenueDf = pd.read_csv(AMAZON_REVENUE_10.getFinancialNumbersPath())
@@ -19,7 +20,7 @@ classes = [
             {"class_name": 3, "from": 30, "to": float('inf')}
         ]
 
-classifier = FinancialFiguresClassifier(classes, percentChangeDfColumn='percent_change', classColumnName='multi_class')
+classifier = FinancialFiguresMultiClassClassifier(classes, percentChangeDfColumn='percent_change', classColumnName='multi_class')
 
 classifier.add_classes(amazonRevenueDf)
 classifier.add_classes(teslaCarSalesDf)

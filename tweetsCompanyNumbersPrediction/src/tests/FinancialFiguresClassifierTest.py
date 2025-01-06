@@ -5,7 +5,7 @@ Created on 17.12.2024
 '''
 import unittest
 import pandas as pd
-from tweetnumbersconnector.FinancialFiguresClassifier import FinancialFiguresClassifier
+from tweetnumbersconnector.FinancialFiguresClassifier import FinancialFiguresMultiClassClassifier
 
 class FinancialFiguresClassifierTest(unittest.TestCase):
 
@@ -23,7 +23,7 @@ class FinancialFiguresClassifierTest(unittest.TestCase):
             {"class_name": 3, "from": 20, "to": float('inf')}
         ]
     
-        classifier = FinancialFiguresClassifier(classes, percentChangeDfColumn='percent_change', classColumnName='multi_class')
+        classifier = FinancialFiguresMultiClassClassifier(classes, percentChangeDfColumn='percent_change', classColumnName='multi_class')
     
         classifier.add_classes(df)
         counts = classifier.calculate_counts(df)

@@ -23,7 +23,7 @@ from PredictionModelPath import AMAZON_REVENUE_10, AMAZON_REVENUE_20, APPLE_IPHO
     TESLA_CAR_SALES_20, MICROSOFT_EPS_5, MICROSOFT_EPS_10,\
     MICROSOFT_GROSS_PROFIT_20, MICROSOFT_XBOX_USERS_20, MICROSOFT_XBOX_USERS_10,\
     GOOGLE_SE_MARKET_SHARE_10, GOOGLE_SE_MARKET_SHARE_5,\
-    GOOGLE_SE_MARKET_SHARE_20
+    GOOGLE_SE_MARKET_SHARE_20, APPLE__EPS_10
 from tweetpreprocess.LoadTweetDataframe import LoadTweetDataframe
 from classifier.CreateClassifierModel import CreateClassifierModel
 
@@ -31,7 +31,7 @@ from classifier.CreateClassifierModel import CreateClassifierModel
 torch.set_float32_matmul_precision('medium') #needed for quicker cuda 
 
 if  __name__ == "__main__":
-    predictionModelPath = GOOGLE_SE_MARKET_SHARE_20
+    predictionModelPath = APPLE__EPS_10
 
     df = pd.read_csv(predictionModelPath.getDataframePath()) 
     df.fillna('', inplace=True) #nan values in body columns 
