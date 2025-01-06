@@ -149,7 +149,7 @@ class TweetDataframeExplore(object):
         counts = []
         for doc in nlp.pipe(documents):
             print(i := i + 1)
-            counts.append(sum(1 for ent in doc.ents if ent.label_ == "CARDINAL"))
+            counts.append(sum(1 for token in doc if token.like_num))
         return counts
     
     def getWrittenNumbersPerTweetValues(self):

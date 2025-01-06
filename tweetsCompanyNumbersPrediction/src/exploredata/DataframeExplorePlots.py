@@ -29,29 +29,31 @@ class DataframeExplorePlots(object):
     def createTweetsPerDayPlot(self):
         _, ax = plt.subplots()
         daily_counts,min_val,max_val,average = self.dataframeExplore.getTweetsPerDayValues()
-        daily_counts.plot(kind='line')
-        ax.axhline(average, color='green', linestyle='--')
-        ax.axhline(max_val, color='red', linestyle='--')
-        ax.axhline(min_val, color='blue', linestyle='--')
-        ax.text(daily_counts.index[-1], min_val, f'Min: {min_val}', color='blue', fontsize=10, va='center')
-        ax.text(daily_counts.index[-1], max_val, f'Max: {max_val}', color='red', fontsize=10, va='center')
-        ax.text(daily_counts.index[-1], average, f'Average: {average:.2f}', color='green', fontsize=10, va='center')
-        plt.ylabel('Number of tweets')
-        plt.title('Number of Tweets Per Day')
+        daily_counts.plot(kind='line',color='black')
+        ax.axhline(average, color='black', linestyle='--')
+        ax.axhline(max_val, color='black', linestyle='--')
+        ax.axhline(min_val, color='black', linestyle='--')
+        ax.text(daily_counts.index[-1], min_val, f'Min: {min_val}', color='black', fontsize=16, fontname='Times New Roman', va='center')
+        ax.text(daily_counts.index[-1], max_val, f'Max: {max_val}', color='black', fontsize=16, fontname='Times New Roman', va='center')
+        ax.text(daily_counts.index[-1], average, f'Average: {average:.2f}', color='black', fontsize=16, fontname='Times New Roman', va='center')
+        plt.ylabel('Number of tweets',fontsize=16, fontname='Times New Roman')
+        #plt.title('Number of Tweets Per Day')
         plt.show()
         
         
     def createHistPlot(self,counts,min_val,max_val,average,xLabel,yLabel,title):
-        plt.hist(counts, bins=20, color='c', edgecolor='black')
-        plt.axvline(min_val, color='red', linestyle='dashed', linewidth=2)
-        plt.axvline(average, color='green', linestyle='dashed', linewidth=2)
-        plt.axvline(max_val, color='blue', linestyle='dashed', linewidth=2)
-        plt.text(min_val+ 0.03,plt.ylim()[1] - 0.03 * plt.ylim()[1], f'Min: {min_val:.2f}', color='red', fontsize=10, va='center')
-        plt.text(average+ 0.03,plt.ylim()[1] + 0.03 * plt.ylim()[1], f'Average: {average:.2f}', color='green', fontsize=10, va='center')
-        plt.text(max_val+ 0.03,plt.ylim()[1] - 0.03 * plt.ylim()[1], f'Max: {max_val:.2f}', color='blue', fontsize=10, va='center')
-        plt.xlabel(xLabel)
-        plt.ylabel(yLabel)
-        plt.title(title)
+        plt.hist(counts, bins=20, color='lightgray', edgecolor='black')
+        plt.axvline(min_val, color='black', linestyle='dashed', linewidth=2)
+        plt.axvline(average, color='black', linestyle='dashed', linewidth=2)
+        plt.axvline(max_val, color='black', linestyle='dashed', linewidth=2)
+        y_max = plt.ylim()[1]
+        offset = 0.05 * y_max  # Adjust the text position slightly above the line
+        plt.text(min_val,y_max + offset, f'Min: {min_val:.2f}', color='black', fontsize=16, fontname='Times New Roman', va='center')
+        plt.text(average,y_max + offset, f'Average: {average:.2f}', color='black', fontsize=16, fontname='Times New Roman', va='center')
+        plt.text(max_val,y_max + offset, f'Max: {max_val:.2f}', color='black', fontsize=16, fontname='Times New Roman', va='center')
+        plt.xlabel(xLabel,fontsize=16, fontname='Times New Roman')
+        plt.ylabel(yLabel,fontsize=16, fontname='Times New Roman')
+        #plt.title(title,fontsize=16, fontname='Times New Roman')
         plt.show()
         
         
@@ -106,17 +108,17 @@ class DataframeExplorePlots(object):
     def createValPerTweetDatePlot(self,dateColumnDf, valColumnDf,min_val,max_val,average,xLabel,yLabel,title,
                                   xMinMaxAvrgLabelOffset = 100,yMinLabelOffset= -10,yMaxValOffset=0,yAvrgValOffset=0):
         plt.figure(figsize=(10, 6))
-        plt.plot(dateColumnDf, valColumnDf, marker='o')
-        plt.axhline(y=min_val, color='r', linestyle='--', label='Min Comment')
-        plt.axhline(y=max_val, color='g', linestyle='--', label='Max Comment')
-        plt.axhline(y=average, color='b', linestyle='--', label='Avg Comment')
+        plt.plot(dateColumnDf, valColumnDf, marker='o',color='black')
+        plt.axhline(y=min_val, color='black', linestyle='--', label='Min Comment')
+        plt.axhline(y=max_val, color='black', linestyle='--', label='Max Comment')
+        plt.axhline(y=average, color='black', linestyle='--', label='Avg Comment')
         x_offset_days =xMinMaxAvrgLabelOffset
         x_offset_timedelta = timedelta(days=x_offset_days)
-        plt.text(dateColumnDf.iloc[-1]+x_offset_timedelta, min_val+yMinLabelOffset, f'Min: {min_val:.2f}', color='red', fontsize=10, va='center')
-        plt.text(dateColumnDf.iloc[-1]+x_offset_timedelta, max_val+yMaxValOffset, f'Max: {max_val:.2f}', color='green', fontsize=10, va='center')
-        plt.text(dateColumnDf.iloc[-1]+x_offset_timedelta, average+yAvrgValOffset, f'Average: {average:.2f}', color='blue', fontsize=10, va='center')
-        plt.xlabel(xLabel)
-        plt.ylabel(yLabel)
+        plt.text(dateColumnDf.iloc[-1]+x_offset_timedelta, min_val+yMinLabelOffset, f'Min: {min_val:.2f}', color='black',fontsize=16, fontname='Times New Roman', va='center')
+        plt.text(dateColumnDf.iloc[-1]+x_offset_timedelta, max_val+yMaxValOffset, f'Max: {max_val:.2f}', color='black', fontsize=16, fontname='Times New Roman', va='center')
+        plt.text(dateColumnDf.iloc[-1]+x_offset_timedelta, average+yAvrgValOffset, f'Average: {average:.2f}', color='black', fontsize=16, fontname='Times New Roman', va='center')
+        plt.xlabel(xLabel,fontsize=16, fontname='Times New Roman')
+        plt.ylabel(yLabel,fontsize=16, fontname='Times New Roman')
         plt.title(title)
         plt.show() 
             
@@ -140,12 +142,13 @@ class DataframeExplorePlots(object):
         
     def createPOSCountsPlot(self):
         pos_counts = self.dataframeExplore.getPOSCounts()
-        plt.bar(list(pos_counts.keys()), list(pos_counts.values()), color='c', edgecolor='black')
+        plt.bar(list(pos_counts.keys()), list(pos_counts.values()), color='lightgray', edgecolor='black')
         plt.xlabel('Parts of Speech')
         plt.ylabel('Counts')
-        plt.title('Counts of Different Parts of Speech')
+        #plt.title('Counts of Different Parts of Speech')
         plt.xticks(rotation=45, ha='right') 
         plt.show() 
+        
     def createSentimentLabelNumbersPlot(self):
         _, ax = plt.subplots()
         self.dataframeExplore.getSentimentLabelsCounts().plot(kind='pie', ax=ax, autopct='%1.1f%%')
@@ -156,7 +159,9 @@ class DataframeExplorePlots(object):
         dateColumnDf, valColumnDf,min_val,max_val,average = self.dataframeExplore.getSentimentPolarityPerTweet()
         return self.createValPerTweetDatePlot(dateColumnDf, valColumnDf,min_val,max_val,average,'Tweet Date','Sentiment Polarity','Sentiment Polarity over Time')
 
-     
+    
+
+    
         
 
 df =  pd.read_csv(DataDirHelper().getDataDir()+ 'companyTweets\\CompanyTweets.csv')
@@ -166,9 +171,11 @@ dfApple = TweetDataframeQuery().query(df,TweetQueryParams(companyNames =["AAPL"]
 dfMicrosoft = TweetDataframeQuery().query(df,TweetQueryParams(companyNames =["MSFT"]))
 dfAmazon = TweetDataframeQuery().query(df,TweetQueryParams(companyNames =["AMZN"]))
 dfTesla = TweetDataframeQuery().query(df,TweetQueryParams(companyNames =["TSLA"]))
+df = dfApple
 print(len(dfGoogle),len(dfApple),len(dfMicrosoft),len(dfAmazon),len(dfTesla))
 dataframeExplore = TweetDataframeExplore(df)
 plots = DataframeExplorePlots(dataframeExplore)
+
 
 #plots.createSentimentLabelNumbersPlot()
 #print(TweetDataframeExplore(dfMicrosoft).printOriginalAndNearDuplicateRowsText())
@@ -176,10 +183,11 @@ plots = DataframeExplorePlots(dataframeExplore)
 #dataframeExplore.printValueCounts(dataframeExplore.getMostFrequentWriters(100))
 #plots.createExactAndNearDuplicatesPlot()
 #print(TweetDataframeExplore(df).getMostFrequentWordsNamedEntities(100))
-print(TweetDataframeExplore(df).getMostFrequentVerbs(100))
+#print(TweetDataframeExplore(df).getMostFrequentNouns(100))
+#print(TweetDataframeExplore(df).getMostFrequentVerbs(100))
 #plots.createWrittenNumbersPlot()
 #plots.createCompanyTweetNumbersPlot()
-#plots.createTweetsPerDayPlot() 
+plots.createTweetsPerDayPlot() 
 #plots.createNumberOfWordsPlot()
 #plots.createNumberOfCharactersPlot()
 #plots.createURLPerTweetsPlot()
