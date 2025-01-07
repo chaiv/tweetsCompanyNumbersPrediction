@@ -7,9 +7,9 @@ import pandas as pd
 from topicmodelling.TopicModelCreator import Top2VecTopicModelCreator
 from tweetpreprocess.wordfiltering.DefaultWordFilter import DefaultWordFilter
 from nlpvectors.TweetTokenizer import TweetTokenizer
-from PredictionModelPath import MICROSOFT_EPS_5, GOOGLE_SE_MARKET_SHARE_10
+from PredictionModelPath import MICROSOFT_EPS_5_LSTM_BINARY_CLASS, GOOGLE_SE_MARKET_SHARE_10_LSTM_BINARY_CLASS
 
-predictionModelPath = GOOGLE_SE_MARKET_SHARE_10 
+predictionModelPath = GOOGLE_SE_MARKET_SHARE_10_LSTM_BINARY_CLASS 
 
 tweets = pd.read_csv (predictionModelPath.getDataframePath())
 tweets.fillna('', inplace=True) #nan values in body columns 

@@ -5,9 +5,9 @@ Created on 27.01.2024
 '''
 import pandas as pd
 from tweetpreprocess.DataDirHelper import DataDirHelper
-from PredictionModelPath import AMAZON_REVENUE_10
+from PredictionModelPath import AMAZON_REVENUE_10_LSTM_BINARY_CLASS
 
-predictionModelPath = AMAZON_REVENUE_10
+predictionModelPath = AMAZON_REVENUE_10_LSTM_BINARY_CLASS
 
 
 tweetGroupDf = pd.read_csv(predictionModelPath.getModelPath()+"\\tweetGroups_at_"+str(predictionModelPath.getTweetGroupSize())+".csv")

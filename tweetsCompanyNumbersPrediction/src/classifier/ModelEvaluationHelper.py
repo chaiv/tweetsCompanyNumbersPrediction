@@ -13,8 +13,8 @@ from classifier.TweetGroupDataset import TweetGroupDataset
 from classifier.CreateClassifierModel import CreateClassifierModel
 
 
-def loadModel(path,wordVectors,evalMode=True):
-    model = CreateClassifierModel(word_vectors = wordVectors).createModel()
+def loadModel(path,wordVectors,num_classes=2,evalMode=True):
+    model = CreateClassifierModel(word_vectors = wordVectors,num_classes = num_classes).createModel()
     # model = Transformer(
     #         embeddings= Word2VecTransformerEmbedding(word_vectors =  torch.tensor(word_vectors.vectors), emb_size=300,pad_token_id = encoder.getPADTokenID()),
     #         lr=1e-4, n_outputs=2, vocab_size=encoder.getVocabularyLength(),channels= 300

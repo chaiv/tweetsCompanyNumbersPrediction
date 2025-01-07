@@ -8,9 +8,9 @@ from gensim.models import KeyedVectors
 from topicmodelling.TopicModelCreator import Top2VecTopicModelCreator
 from topicmodelling.TopicExtractor import Top2VecTopicExtractor
 from nlpvectors.VocabularyCreator import PAD_TOKEN, UNK_TOKEN, SEP_TOKEN
-from PredictionModelPath import MICROSOFT_EPS_5, GOOGLE_SE_MARKET_SHARE_10
+from PredictionModelPath import MICROSOFT_EPS_5_LSTM_BINARY_CLASS, GOOGLE_SE_MARKET_SHARE_10_LSTM_BINARY_CLASS
 
-predictionModelPath = GOOGLE_SE_MARKET_SHARE_10 
+predictionModelPath = GOOGLE_SE_MARKET_SHARE_10_LSTM_BINARY_CLASS 
 
 modelpath =  predictionModelPath.getTop2VecModelPath()
 wordVectorsPath = predictionModelPath.getWordVectorsPath()

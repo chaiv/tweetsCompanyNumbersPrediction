@@ -22,11 +22,11 @@ from classifier.TweetGroupDataset import TweetGroupDataset
 from classifier.ModelEvaluationHelper import createTweetGroupsAndTrueClasses,\
     loadModel, createTweetGroupsAndTrueClassesWithoutSplitIndexes
 from nlpvectors.TweetGroup import createTweetGroup
-from PredictionModelPath import AMAZON_REVENUE_5
+from PredictionModelPath import AMAZON_REVENUE_5_LSTM_BINARY_CLASS
 from featureinterpretation.TokenScoresSort import TokenScoresSort
 from nlpvectors.TokenizerWordsLookup import TokenizedWordsLookup
 
-predictionModelPath =  AMAZON_REVENUE_5
+predictionModelPath =  AMAZON_REVENUE_5_LSTM_BINARY_CLASS
     
 word_vectors = KeyedVectors.load_word2vec_format(predictionModelPath.getWordVectorsPath(), binary=False)
 textEncoder = WordVectorsIDEncoder(word_vectors)

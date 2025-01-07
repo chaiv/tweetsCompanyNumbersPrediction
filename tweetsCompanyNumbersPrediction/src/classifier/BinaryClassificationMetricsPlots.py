@@ -4,7 +4,7 @@ Created on 29.10.2023
 @author: vital
 '''
 import matplotlib.pyplot as plt
-from classifier.BinaryClassificationMetrics import BinaryClassificationMetrics
+from classifier.ClassificationMetrics import ClassificationMetrics
 
 class BinaryClassificationMetricsPlots(object):
     '''
@@ -12,14 +12,14 @@ class BinaryClassificationMetricsPlots(object):
     '''
 
 
-    def __init__(self, metrics: BinaryClassificationMetrics):
+    def __init__(self, metrics: ClassificationMetrics):
         self.metrics = metrics
     
     
     def createRocAUCAndPrAucPlots(self,y_true,y_pred):
         plt.figure(figsize=(12, 5))
         
-        fpr,tpr,roc_auc = BinaryClassificationMetrics().calculate_roc_auc(y_true, y_pred)
+        fpr,tpr,roc_auc = ClassificationMetrics().calculate_roc_auc(y_true, y_pred)
         
         # ROC Curve
         plt.subplot(1, 2, 1)
@@ -32,7 +32,7 @@ class BinaryClassificationMetricsPlots(object):
         plt.title('Receiver Operating Characteristic (ROC) Curve')
         plt.legend(loc='lower right')
         
-        precision, recall, pr_auc = BinaryClassificationMetrics().calculate_pr_auc(y_true, y_pred)
+        precision, recall, pr_auc = ClassificationMetrics().calculate_pr_auc(y_true, y_pred)
         
         # Precision-Recall Curve
         plt.subplot(1, 2, 2)

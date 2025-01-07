@@ -25,6 +25,9 @@ class PredictionClassMapper(object):
     
     def class_to_economic_interpretation(self,classVal):   
         return self.class_to_economic_interpretation_dict[classVal]
+    
+    def get_number_of_classes(self):
+        return len(self.index_to_class_dict)
         
 
     

@@ -10,9 +10,10 @@ class CreateClassifierModel(object):
 
 
 
-    def __init__(self, word_vectors):
+    def __init__(self, word_vectors,num_classes):
         self.word_vectors = word_vectors
+        self.num_classes = num_classes
     
     def createModel(self):
         #return LSTMNNWithDropout(emb_size = 300,word_vectors = self.word_vectors)
-        return LSTMNN(emb_size = 300,word_vectors = self.word_vectors)
+        return LSTMNN(emb_size = 300,word_vectors = self.word_vectors,num_classes = self.num_classes)

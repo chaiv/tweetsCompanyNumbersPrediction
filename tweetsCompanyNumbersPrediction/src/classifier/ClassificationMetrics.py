@@ -7,7 +7,7 @@ from sklearn.metrics import roc_curve, auc, precision_recall_curve, average_prec
 from sklearn.metrics import matthews_corrcoef
 from sklearn.metrics import precision_recall_fscore_support, accuracy_score, classification_report
 
-class BinaryClassificationMetrics(object):
+class ClassificationMetrics(object):
 
     def calculate_metrics(self, y_true,y_pred,pos_label,average='binary'):
         precision, recall, f1_score, support = precision_recall_fscore_support(

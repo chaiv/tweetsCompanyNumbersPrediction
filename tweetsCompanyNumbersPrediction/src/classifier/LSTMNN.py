@@ -7,13 +7,13 @@ import torch
 import pytorch_lightning as pl
 
 class LSTMNN(pl.LightningModule):
-    def __init__(self, emb_size, word_vectors):
+    def __init__(self, emb_size, word_vectors,num_classes):
         super().__init__()
         self.embedding = torch.nn.Embedding.from_pretrained(torch.tensor(word_vectors.vectors), freeze=False)
         self.lstm = torch.nn.LSTM(emb_size, hidden_size=512, num_layers=2, batch_first=True)
         self.fc1 = torch.nn.Linear(512, 512)
         self.fc2 = torch.nn.Linear(512, 256)
-        self.fc3 = torch.nn.Linear(256, 2)
+        self.fc3 = torch.nn.Linear(256, num_classes)
         
     def forward(self, inputs):
         x = self.embedding(inputs)

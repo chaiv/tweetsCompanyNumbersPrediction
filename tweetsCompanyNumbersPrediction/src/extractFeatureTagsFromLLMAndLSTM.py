@@ -7,13 +7,13 @@ import pandas as pd
 from nlpvectors.TweetTokenizer import TweetTokenizer
 from tweetpreprocess.wordfiltering.DefaultWordFilter import DefaultWordFilter
 from exploredata.POSTagging import PartOfSpeechTagging
-from PredictionModelPath import AMAZON_REVENUE_10
+from PredictionModelPath import AMAZON_REVENUE_10_LSTM_BINARY_CLASS
 from collections import Counter
 import json
 import ast
 tagger = PartOfSpeechTagging(TweetTokenizer(DefaultWordFilter()))
 
-predictionModelPath =  AMAZON_REVENUE_10
+predictionModelPath =  AMAZON_REVENUE_10_LSTM_BINARY_CLASS
 
 tweetGroupsWithMostImportantWordsDf = pd.read_csv(
     predictionModelPath.getModelPath()+"\\tweetGroups_with_important_words_label_0.csv",
