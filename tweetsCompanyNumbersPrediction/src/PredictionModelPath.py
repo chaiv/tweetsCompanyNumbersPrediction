@@ -111,6 +111,18 @@ AMAZON_REVENUE_10_LSTM_MULTI_CLASS = PredictionModelPath(
     MULTICLASS_4
     )
 
+AMAZON_REVENUE_20_LSTM_MULTI_CLASS = PredictionModelPath(
+    ["AMZN"],
+    DataDirHelper().getDataDir()+"companyTweets\\amazonTweetsWithNumbersMulticlass.csv",
+    DataDirHelper().getDataDir()+"companyTweets\\amazonQuarterRevenue.csv",
+    DataDirHelper().getDataDir()+ "companyTweets\\WordVectorsAmazonV2.txt",
+    DataDirHelper().getDataDir() + 'companyTweets\\model\\amazonRevenueLSTMN20Multiclass',
+    DataDirHelper().getDataDir() + "companyTweets\\amazonTopicModel",
+    True,
+    20,
+    MULTICLASS_4
+    )
+
 TESLA_CAR_SALES_10_LSTM_BINARY_CLASS = PredictionModelPath(
     ["TSLA"],
     DataDirHelper().getDataDir()+"companyTweets\\CompanyTweetsTeslaWithCarSales.csv",

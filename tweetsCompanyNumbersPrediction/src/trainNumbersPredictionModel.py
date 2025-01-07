@@ -22,13 +22,14 @@ from tweetpreprocess.EqualClassSampler import EqualClassSampler
 
 from tweetpreprocess.LoadTweetDataframe import LoadTweetDataframe
 from classifier.CreateClassifierModel import CreateClassifierModel
-from PredictionModelPath import AMAZON_REVENUE_10_LSTM_MULTI_CLASS
+from PredictionModelPath import AMAZON_REVENUE_10_LSTM_MULTI_CLASS,\
+    AMAZON_REVENUE_20_LSTM_MULTI_CLASS
 
 
 torch.set_float32_matmul_precision('medium') #needed for quicker cuda 
 
 if  __name__ == "__main__":
-    predictionModelPath = AMAZON_REVENUE_10_LSTM_MULTI_CLASS
+    predictionModelPath = AMAZON_REVENUE_20_LSTM_MULTI_CLASS
 
     df = pd.read_csv(predictionModelPath.getDataframePath()) 
     df.fillna('', inplace=True) #nan values in body columns 
@@ -66,7 +67,7 @@ if  __name__ == "__main__":
         print("len(test_data)", len(test_data))
         Trainer().train(
             batch_size=100, 
-            epochs=1, 
+            epochs=10, 
             num_workers=8, 
             pad_token_idx=pad_token_idx, 
             model=model, 
