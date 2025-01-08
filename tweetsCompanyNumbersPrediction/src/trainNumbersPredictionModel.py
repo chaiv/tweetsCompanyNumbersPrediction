@@ -23,13 +23,14 @@ from tweetpreprocess.EqualClassSampler import EqualClassSampler
 from tweetpreprocess.LoadTweetDataframe import LoadTweetDataframe
 from classifier.CreateClassifierModel import CreateClassifierModel
 from PredictionModelPath import AMAZON_REVENUE_10_LSTM_MULTI_CLASS,\
-    AMAZON_REVENUE_20_LSTM_MULTI_CLASS
+    AMAZON_REVENUE_20_LSTM_MULTI_CLASS, APPLE__EPS_10_LSTM_MULTI_CLASS,\
+    TESLA_CAR_SALES_10_LSTM_MULTI_CLASS
 
 
 torch.set_float32_matmul_precision('medium') #needed for quicker cuda 
 
 if  __name__ == "__main__":
-    predictionModelPath = AMAZON_REVENUE_20_LSTM_MULTI_CLASS
+    predictionModelPath = TESLA_CAR_SALES_10_LSTM_MULTI_CLASS
 
     df = pd.read_csv(predictionModelPath.getDataframePath()) 
     df.fillna('', inplace=True) #nan values in body columns 

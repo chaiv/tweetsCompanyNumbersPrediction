@@ -21,9 +21,10 @@ from tweetpreprocess.EqualClassSampler import EqualClassSampler
 from tweetpreprocess.LoadTweetDataframe import LoadTweetDataframe
 from classifier.PredictionClassMapper import PredictionClassMapper
 from PredictionModelPath import AMAZON_REVENUE_10_LSTM_MULTI_CLASS,\
-    AMAZON_REVENUE_20_LSTM_MULTI_CLASS
+    AMAZON_REVENUE_20_LSTM_MULTI_CLASS, APPLE__EPS_10_LSTM_MULTI_CLASS,\
+    TESLA_CAR_SALES_10_LSTM_MULTI_CLASS
 
-predictionModelPath = AMAZON_REVENUE_10_LSTM_MULTI_CLASS
+predictionModelPath = TESLA_CAR_SALES_10_LSTM_MULTI_CLASS
 predictionClassMapper = predictionModelPath.getPredictionClassMapper()
 fold = 0
 word_vectors = KeyedVectors.load_word2vec_format(predictionModelPath.getWordVectorsPath(), binary=False)

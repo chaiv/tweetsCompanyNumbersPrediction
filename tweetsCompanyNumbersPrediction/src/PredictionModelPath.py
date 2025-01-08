@@ -135,6 +135,19 @@ TESLA_CAR_SALES_10_LSTM_BINARY_CLASS = PredictionModelPath(
     BINARY_0_1
     )
 
+TESLA_CAR_SALES_10_LSTM_MULTI_CLASS = PredictionModelPath(
+    ["TSLA"],
+    DataDirHelper().getDataDir()+"companyTweets\\CompanyTweetsTeslaWithCarSalesMulticlass.csv",
+    DataDirHelper().getDataDir()+"companyTweets\\teslaCarSales.csv",
+    DataDirHelper().getDataDir()+ "companyTweets\\WordVectorsTesla.txt",
+    DataDirHelper().getDataDir() + 'companyTweets\\model\\teslaCarSalesLSTM10Multiclass',
+    DataDirHelper().getDataDir() + "companyTweets\\teslaTopicModel",
+    True,
+    10,
+    MULTICLASS_4
+    )
+
+
 APPLE__EPS_10_LSTM_BINARY_CLASS = PredictionModelPath(
     ["AAPL"],
     DataDirHelper().getDataDir()+"companyTweets\\CompanyTweetsAppleWithEps.csv",
@@ -145,6 +158,18 @@ APPLE__EPS_10_LSTM_BINARY_CLASS = PredictionModelPath(
     True,
     10,
     BINARY_0_1
+    )
+
+APPLE__EPS_10_LSTM_MULTI_CLASS = PredictionModelPath(
+    ["AAPL"],
+    DataDirHelper().getDataDir()+"companyTweets\\CompanyTweetsAppleWithEpsMulticlass.csv",
+    DataDirHelper().getDataDir()+"companyTweets\\appleEps.csv",
+    DataDirHelper().getDataDir()+ "companyTweets\\wordVectorsApple.txt",
+    DataDirHelper().getDataDir() + "companyTweets\\model\\appleEpsLSTM10Multiclass",
+    DataDirHelper().getDataDir() + "companyTweets\\appleTopicModel",
+    True,
+    10,
+    MULTICLASS_4
     )
 
 
