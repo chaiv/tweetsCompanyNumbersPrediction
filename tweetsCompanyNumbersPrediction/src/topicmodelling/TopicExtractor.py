@@ -24,6 +24,9 @@ class AbstractTopicExtractor():
     
     def getDocumentTopicWordsTopicScoresAndTopicIds(self,doc_ids):
         pass
+    
+    def searchTopics(self,keywords, num_topics):
+        pass
 
 class BertTopicExtractor(AbstractTopicExtractor):
     
@@ -34,6 +37,17 @@ class BertTopicExtractor(AbstractTopicExtractor):
         self.topicModel = BERTopic.load(topicModelPath)
         self.tweetIdColumn = tweetIdColumn
         self.tokenizer = tokenizer
+        
+    def findTopics(self,keyword, num_topics):
+        topic_nums, topic_scores = self.topicModel.find_topics(keyword, top_n=num_topics)
+        topic_words = []
+        word_scores = []
+        for topic_num in topic_nums:
+            topic_info = self.topicModel.get_topic(topic_num)
+            words, scores = zip(*topic_info)  # Separate words and scores
+            topic_words.append(list(words))
+            word_scores.append(list(scores))
+        return topic_words,word_scores,topic_scores,topic_nums 
         
     def get_documents(self):
         pass
