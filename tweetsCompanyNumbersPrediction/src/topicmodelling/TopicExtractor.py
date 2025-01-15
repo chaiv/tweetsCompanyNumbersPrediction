@@ -38,9 +38,12 @@ class BertTopicExtractor(AbstractTopicExtractor):
         self.tweetIdColumn = tweetIdColumn
         self.tokenizer = tokenizer
         
-    def get_document_ids_by_topic(self, topic_num, num_docs):
+    def get_document_ids_by_topic(self, topic_num, num_docs = None):
         filtered_df = self.tweetIdTopicIdMappingDf[self.tweetIdTopicIdMappingDf[self.topicIdColumn] == topic_num]
-        document_ids = filtered_df[self.tweetIdColumn].head(num_docs).tolist()
+        if num_docs is None:
+            document_ids = filtered_df[self.tweetIdColumn].tolist()
+        else:    
+            document_ids = filtered_df[self.tweetIdColumn].head(num_docs).tolist()
         return document_ids
         
     def findTopics(self,keyword, num_topics):
