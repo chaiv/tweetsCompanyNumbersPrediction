@@ -41,11 +41,12 @@ def getMostImportantWordsForClass(predictor,tweetGroups, preditionClass,topNImpo
     )
     return topNImportantWords
 
-manualTopic = "Black Lives Matter Movement "
+manualTopic = "Donald Trump election"
 topNImportantWords = 10
 predictionModelPath = AMAZON_REVENUE_10_LSTM_BINARY_CLASS
 predictionClassMapper = predictionModelPath.getPredictionClassMapper()
-df = pd.read_csv(predictionModelPath.getDataframePath()) 
+df = pd.read_csv(predictionModelPath.getDataframePath())
+df.fillna('', inplace=True) #nan values in body columns  
 tokenizer = TweetTokenizer(DefaultWordFilter())
 word_vectors = KeyedVectors.load_word2vec_format(predictionModelPath.getWordVectorsPath(), binary=False)
 textEncoder = WordVectorsIDEncoder(word_vectors)

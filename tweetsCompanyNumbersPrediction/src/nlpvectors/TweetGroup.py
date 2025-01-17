@@ -9,7 +9,7 @@ from itertools import chain
 
 def split_list_on_indices(lst, indices):
     if not indices:
-        return lst
+        return [lst]
     
     splitted_list = []
     start_idx = 0
@@ -44,6 +44,8 @@ def createTweetGroup(tokenizer: AbstractTokenizer,textEncoder : AbstractEncoder,
 
     # Find the indexes of encodedSeparatorToken in the totalFeatureVector
     separatorIndexesInFeatureVector = [i for i, token in enumerate(totalFeatureVector) if token == encodedSeparatorToken] 
+    if(len(separatorIndexesInFeatureVector)==0):
+        print(separatorIndexesInFeatureVector)
             
     tweetGroup = TweetGroup(sentences,sentenceIds,totalTokenIndexes,totalTokens,totalFeatureVector,separatorIndexesInFeatureVector,label)
     return tweetGroup
