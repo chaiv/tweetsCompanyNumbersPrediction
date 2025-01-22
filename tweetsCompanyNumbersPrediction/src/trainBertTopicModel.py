@@ -9,12 +9,12 @@ from sklearn.feature_extraction.text import CountVectorizer
 from tweetpreprocess.DataDirHelper import DataDirHelper
 from tweetpreprocess.wordfiltering.DefaultWordFilter import DefaultWordFilter
 from nlpvectors.TweetTokenizer import TweetTokenizer
+from PredictionModelPath import APPLE__EPS_10_LSTM_MULTI_CLASS
 
-
-tweetsFile = "amazonTweetsWithNumbers.csv"
-topicModelFile = "amazonTopicModelBert"
-tweetIdTopicIdMappingFile = "amazonBertTopicMapping.csv"
-tweets = pd.read_csv (DataDirHelper().getDataDir()+ "companyTweets\\"+tweetsFile)
+predictionModelPath = APPLE__EPS_10_LSTM_MULTI_CLASS
+topicModelFile = "appleTopicModelBert"
+tweetIdTopicIdMappingFile = "appleBertTopicMapping.csv"
+tweets = pd.read_csv (predictionModelPath.getDataframePath())
 tweets.fillna('', inplace=True) #nan values in body columns 
 tokenizer = TweetTokenizer(DefaultWordFilter())
 documents = []

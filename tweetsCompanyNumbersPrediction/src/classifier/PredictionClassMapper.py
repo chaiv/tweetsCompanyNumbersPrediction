@@ -29,5 +29,6 @@ class PredictionClassMapper(object):
     def get_number_of_classes(self):
         return len(self.index_to_class_dict)
         
-
+    def get_all_class_values(self):
+        return list(self.index_to_class_dict.values())
     

@@ -8,7 +8,8 @@ from tweetpreprocess.DataDirHelper import DataDirHelper
 from tweetpreprocess.wordfiltering.DefaultWordFilter import DefaultWordFilter
 from nlpvectors.TweetTokenizer import TweetTokenizer
 from topicmodelling.TopicExtractor import BertTopicExtractor
-from PredictionModelPath import AMAZON_REVENUE_10_LSTM_BINARY_CLASS
+from PredictionModelPath import AMAZON_REVENUE_10_LSTM_BINARY_CLASS,\
+    APPLE__EPS_10_LSTM_MULTI_CLASS
 from nlpvectors.DataframeSplitter import DataframeSplitter
 from gensim.models.keyedvectors import KeyedVectors
 from nlpvectors.WordVectorsIDEncoder import WordVectorsIDEncoder
@@ -41,19 +42,24 @@ def getMostImportantWordsForClass(predictor,tweetGroups, preditionClass,topNImpo
     )
     return topNImportantWords
 
-manualTopic = "Donald Trump election"
+manualTopic = "Volkswagen Emissions Scandal"
 topNImportantWords = 10
-predictionModelPath = AMAZON_REVENUE_10_LSTM_BINARY_CLASS
+predictionModelPath = APPLE__EPS_10_LSTM_MULTI_CLASS
 predictionClassMapper = predictionModelPath.getPredictionClassMapper()
 df = pd.read_csv(predictionModelPath.getDataframePath())
 df.fillna('', inplace=True) #nan values in body columns  
 tokenizer = TweetTokenizer(DefaultWordFilter())
 word_vectors = KeyedVectors.load_word2vec_format(predictionModelPath.getWordVectorsPath(), binary=False)
 textEncoder = WordVectorsIDEncoder(word_vectors)
+# topicExtractor = BertTopicExtractor(
+#        DataDirHelper().getDataDir()+ "companyTweets\\amazonTopicModelBert",
+#        tokenizer,
+#        pd.read_csv (DataDirHelper().getDataDir()+ "companyTweets\\amazonBertTopicMapping.csv")
+#        )
 topicExtractor = BertTopicExtractor(
-       DataDirHelper().getDataDir()+ "companyTweets\\amazonTopicModelBert",
+       DataDirHelper().getDataDir()+ "companyTweets\\appleTopicModelBert",
        tokenizer,
-       pd.read_csv (DataDirHelper().getDataDir()+ "companyTweets\\amazonBertTopicMapping.csv")
+       pd.read_csv (DataDirHelper().getDataDir()+ "companyTweets\\appleBertTopicMapping.csv")
        )
 fold = 0
 modelPath = predictionModelPath.getModelPath()+"\\tweetpredict_fold"+str(fold)+".ckpt"
@@ -86,8 +92,9 @@ print("prediction_classes counts ",', '.join(f"{item}: {count}" for item, count 
 metrics = ClassificationMetrics() 
 print(metrics.classification_report(trueClasses, prediction_classes))
 print("MCC "+str(metrics.calculate_mcc(trueClasses, prediction_classes)))
-print(getMostImportantWordsForClass(predictor,tweetGroups, 0,topNImportantWords))
-print(getMostImportantWordsForClass(predictor,tweetGroups, 1,topNImportantWords))
+for classValue in predictionModelPath.getPredictionClassMapper().get_all_class_values():
+    print(classValue)
+    print(getMostImportantWordsForClass(predictor,tweetGroups, classValue,topNImportantWords))
 
 
 
