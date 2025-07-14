@@ -42,7 +42,7 @@ def getMostImportantWordsForClass(predictor,tweetGroups, preditionClass,topNImpo
     )
     return topNImportantWords
 
-manualTopic = "Volkswagen Emissions Scandal"
+manualTopic = "Donald Trump election"
 topNImportantWords = 10
 predictionModelPath = APPLE__EPS_10_LSTM_MULTI_CLASS
 predictionClassMapper = predictionModelPath.getPredictionClassMapper()

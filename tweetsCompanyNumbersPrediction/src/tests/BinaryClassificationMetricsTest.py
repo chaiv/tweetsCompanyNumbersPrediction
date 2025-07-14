@@ -11,8 +11,8 @@ class BinaryClassificationMetricsTest(unittest.TestCase):
     
     
     def test_classification_report(self):
-        y_true = [0,0,0,1,1,0,0,1,1,1,1,0,1]
-        y_pred = [1,0,0,0,0,0,0,1,1,1,1,1,1]
+        y_true = [0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,2,2,2,2,2,2,3,3,3,3,3,3,1,1,0,2,2,2,1,1,1,1,1,1,1,1]
+        y_pred = [0,0,0,1,0,0,1,1,2,0,0,1,1,2,0,0,1,1,2,2,2,1,0,3,3,0,3,0,3,1,1,2,2,2,2,1,1,1,1,1,1,1,1]
         classificationReport = ClassificationMetrics().classification_report(y_true, y_pred)
         mcc = ClassificationMetrics().calculate_mcc(y_true, y_pred)
         print(classificationReport)

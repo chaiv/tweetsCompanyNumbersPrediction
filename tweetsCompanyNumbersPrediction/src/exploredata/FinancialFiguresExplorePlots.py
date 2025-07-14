@@ -43,19 +43,20 @@ class FinancialFiguresExplorePlots(object):
 
         # Set x-axis labels
         ax.set_xticks(quarters)
-        ax.set_xticklabels(quarters, rotation=45, ha='right')
+        ax.set_xticklabels(quarters, rotation=45, ha='right',fontsize=14)
 
         # Set labels and title
-        plt.xlabel(xLabel)
-        plt.ylabel(yLabel)
-        plt.title(title)
+        plt.xlabel(xLabel,fontsize=14)
+        plt.ylabel(yLabel,fontsize=14)
+        #plt.title(title,fontsize=14)
 
         # Show the plot
         plt.tight_layout()
         plt.show()    
         
+#df =  pd.read_csv(DataDirHelper().getDataDir()+ 'companyTweets\\amazonQuarterRevenue.csv')        
 #df =  pd.read_csv(DataDirHelper().getDataDir()+ 'companyTweets\\teslaCarSales.csv')
 df =  pd.read_csv(DataDirHelper().getDataDir()+ 'companyTweets\\appleEps.csv')
 
 plots = FinancialFiguresExplorePlots(FinancialFiguresExplore(df))
-plots.createFiguresOverTimePlot("Quarter","Figures","")
+plots.createFiguresOverTimePlot("Quarter","Metrics","")
