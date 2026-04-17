@@ -3,7 +3,7 @@ from nlpvectors.DataframeSplitter import DataframeSplitter
 
 '''
 Created on 03.02.2023
-This training approach does not uses the latest tweets as test set. It only considers the temporal order of N subsequent tweets. That method is used for analyzing topics and most important words that can appear during the whole time period
+This training approach does not uses the latest tweets as test set. It only considers the temporal order of N subsequent tweets. That method is used to identify recurring topic and word associations with financial outcome classes across the full observation period
 @author: vital
 '''
 import pandas as pd
@@ -42,8 +42,6 @@ if  __name__ == "__main__":
     pad_token_idx = textEncoder.getPADTokenID()
     vocab_size = textEncoder.getVocabularyLength()
 
-    model =CreateClassifierModel(word_vectors = word_vectors,num_classes =  predictionModelPath.getPredictionClassMapper().get_number_of_classes()).createModel()
-
     # model = Transformer(
     #     embeddings= Word2VecTransformerEmbedding(word_vectors =  torch.tensor(word_vectors.vectors), emb_size=emb_size,pad_token_id = textEncoder.getPADTokenID()),
     #     lr=1e-4, n_outputs=2, vocab_size=vocab_size,channels= 300
@@ -51,9 +49,10 @@ if  __name__ == "__main__":
 
     splitter = DataframeSplitter()
     tweetSplits = splitter.getSplitIds(df, predictionModelPath.getTweetGroupSize()) #how many tweets should be trained as one sample
-    kfold_splits = 2
+    kfold_splits = 10
     kfold_cross_val = KFold(n_splits=kfold_splits, shuffle=True, random_state=1337)
     for fold, (train_idx, test_idx) in enumerate(kfold_cross_val.split(tweetSplits)):
+        model =CreateClassifierModel(word_vectors = word_vectors,num_classes =  predictionModelPath.getPredictionClassMapper().get_number_of_classes()).createModel()
         testIdxPath = predictionModelPath.getModelPath()+f"\\test_idx_fold{fold}.npy"
         np.save(testIdxPath, test_idx) #save test indexes for later classification metrics
         train_idx, val_idx = train_test_split(train_idx, random_state=1337, test_size=0.3)
@@ -67,9 +66,9 @@ if  __name__ == "__main__":
         print("len(val_data)", len(val_data))
         print("len(test_data)", len(test_data))
         Trainer().train(
-            batch_size=100,
+            batch_size=256,
             epochs=10,
-            num_workers=8,
+            num_workers=2,
             pad_token_idx=pad_token_idx,
             model=model,
             train_data=train_data,
