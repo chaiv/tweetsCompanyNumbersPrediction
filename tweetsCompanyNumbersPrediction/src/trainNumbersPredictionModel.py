@@ -23,19 +23,25 @@ from classifier.CreateClassifierModel import CreateClassifierModel
 from classifier.transformer.Predictor import Predictor
 from classifier.ClassificationMetrics import ClassificationMetrics
 from classifier.ModelEvaluationHelper import loadModel
-from PredictionModelPath import AMAZON_REVENUE_10_LSTM_MULTI_CLASS,\
+from tweetpreprocess.EqualClassSampler import EqualClassSampler
+from PredictionModelPath import AMAZON_REVENUE_10_LSTM_BINARY_CLASS,AMAZON_REVENUE_10_LSTM_MULTI_CLASS,\
     AMAZON_REVENUE_20_LSTM_MULTI_CLASS, TESLA_CAR_SALES_10_LSTM_MULTI_CLASS, \
     APPLE__EPS_10_LSTM_MULTI_CLASS
 
 
 torch.set_float32_matmul_precision('medium') #needed for quicker cuda 
 
-if  __name__ == "__main__":
-    predictionModelPath =  APPLE__EPS_10_LSTM_MULTI_CLASS
+# Set to True to balance classes before splitting, necessary for subsequent topic evaluation where topics are highly underrepresented in a class.
+BALANCE_CLASSES = True
 
-    # Read raw dataframe WITHOUT EqualClassSampler (no pre-split balancing)
+if  __name__ == "__main__":
+    predictionModelPath =  AMAZON_REVENUE_10_LSTM_BINARY_CLASS
+
     df = pd.read_csv(predictionModelPath.getDataframePath())
     df.fillna('', inplace=True) #nan values in body columns 
+    if BALANCE_CLASSES:
+        df = EqualClassSampler().getDfWithEqualNumberOfClassSamples(df)
+        print("Classes balanced with EqualClassSampler")
     print(TweetDataframeExplore(df).getClassDistribution())
     word_vectors = KeyedVectors.load_word2vec_format(predictionModelPath.getWordVectorsPath(), binary=False)
     textEncoder = WordVectorsIDEncoder(word_vectors)
@@ -46,11 +52,10 @@ if  __name__ == "__main__":
     splitter = DataframeSplitter()
     tweetSplits = splitter.getSplitIds(df, predictionModelPath.getTweetGroupSize())
 
-    # Sort splits chronologically
     postTSPColumn = "post_date"
     df[postTSPColumn] = pd.to_datetime(df[postTSPColumn])
 
-    # Pre-build index for fast lookups (avoid repeated isin() on large dataframes)
+    # Pre-build index for fast lookups
     tweet_id_to_date = dict(zip(df["tweet_id"], df[postTSPColumn]))
     tweet_id_to_class = dict(zip(df["tweet_id"], df["class"]))
 
