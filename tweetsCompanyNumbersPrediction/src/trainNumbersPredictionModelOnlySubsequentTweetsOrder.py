@@ -3,7 +3,7 @@ from nlpvectors.DataframeSplitter import DataframeSplitter
 
 '''
 Created on 03.02.2023
-This training approach does not uses the latest tweets as test set. It only considers the temporal order of N subsequent tweets. That approach is used for analyzing topics and most important words that can appear during the whole time period
+This training approach does not uses the latest tweets as test set. It only considers the temporal order of N subsequent tweets. That method is used for analyzing topics and most important words that can appear during the whole time period
 @author: vital
 '''
 import pandas as pd

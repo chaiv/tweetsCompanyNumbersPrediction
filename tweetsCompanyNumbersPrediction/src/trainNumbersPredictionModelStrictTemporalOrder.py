@@ -3,7 +3,7 @@ from nlpvectors.DataframeSplitter import DataframeSplitter
 
 '''
 Created on 03.02.2023
-
+This training approach uses the latest tweets as test set to reflect the strict temporal order of the dataset. Some topics can not be analyzed properly with that method due to underrepresentation
 @author: vital
 '''
 import pandas as pd
@@ -31,7 +31,7 @@ from PredictionModelPath import AMAZON_REVENUE_10_LSTM_BINARY_CLASS,AMAZON_REVEN
 
 torch.set_float32_matmul_precision('medium') #needed for quicker cuda 
 
-# Set to True to balance classes before splitting, necessary for subsequent topic evaluation where some topics are highly underrepresented in a class.
+# Set to True to balance classes before splitting, helpful for subsequent topic evaluation where some topics are highly underrepresented in a class.
 BALANCE_CLASSES = False
 
 if  __name__ == "__main__":
