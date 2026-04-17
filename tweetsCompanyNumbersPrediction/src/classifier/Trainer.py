@@ -14,9 +14,9 @@ class Trainer(object):
     def train(self,batch_size, epochs, num_workers, pad_token_idx, model, train_data, val_data, test_data, loggerPath, loggerName, checkpointPath, checkpointName
               ,accelerator='cuda', devices=find_usable_cuda_devices(1)
               ):
-        train_loader = createDataloader(train_data, batch_size, num_workers, pad_token_idx)
-        val_loader = createDataloader(val_data, batch_size, num_workers, pad_token_idx)
-        test_loader = createDataloader(test_data, batch_size, num_workers, pad_token_idx)
+        train_loader = createDataloader(train_data, batch_size, num_workers, pad_token_idx, shuffle=True)
+        val_loader = createDataloader(val_data, batch_size, num_workers, pad_token_idx, shuffle=False)
+        test_loader = createDataloader(test_data, batch_size, num_workers, pad_token_idx, shuffle=False)
         logger = TensorBoardLogger(
             save_dir=loggerPath, 
             name=loggerName)
@@ -33,7 +33,7 @@ class Trainer(object):
             devices=devices, 
             logger=logger, 
             callbacks=[checkpoint_callback, early_stopping], 
-            accumulate_grad_batches=1)
+            accumulate_grad_batches=1,
+            precision=16)
         trainer.fit(model, train_loader, val_loader)
-        trainer.test(model, dataloaders=test_loader)
-        
+        trainer.test(model, dataloaders=test_loader, ckpt_path="best")

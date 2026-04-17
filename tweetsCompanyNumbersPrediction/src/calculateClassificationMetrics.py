@@ -27,13 +27,15 @@ from PredictionModelPath import AMAZON_REVENUE_10_LSTM_MULTI_CLASS,\
 
 predictionModelPath = APPLE__EPS_10_LSTM_MULTI_CLASS
 predictionClassMapper = predictionModelPath.getPredictionClassMapper()
-fold = 1
+fold = 0
 word_vectors = KeyedVectors.load_word2vec_format(predictionModelPath.getWordVectorsPath(), binary=False)
 textEncoder = WordVectorsIDEncoder(word_vectors)
 tokenizer = TweetTokenizer(DefaultWordFilter())
 modelPath = predictionModelPath.getModelPath()+"\\tweetpredict_fold"+str(fold)+".ckpt"
 model = loadModel(modelPath,word_vectors,num_classes=predictionClassMapper.get_number_of_classes())
-df = LoadTweetDataframe(predictionModelPath).readDataframe()
+# Read raw dataframe WITHOUT EqualClassSampler (consistent with training)
+df = pd.read_csv(predictionModelPath.getDataframePath())
+df.fillna('', inplace=True)
 testIdxPath = predictionModelPath.getModelPath()+'\\test_idx_fold'+str(fold)+'.npy'
 testSplitIndexes = np.load(testIdxPath)
 
@@ -42,10 +44,8 @@ splitter = DataframeSplitter()
 splits = splitter.getSplitIds(df, predictionModelPath.getTweetGroupSize())
 postTSPColumn = "post_date"
 df[postTSPColumn] = pd.to_datetime(df[postTSPColumn])
-split_dates = []
-for split in splits:
-    earliest_date = df[df["tweet_id"].isin(split)][postTSPColumn].min()
-    split_dates.append(earliest_date)
+tweet_id_to_date = dict(zip(df["tweet_id"], df[postTSPColumn]))
+split_dates = [min(tweet_id_to_date[tid] for tid in split) for split in splits]
 sorted_indices = np.argsort(split_dates)
 splits = [splits[i] for i in sorted_indices]
 

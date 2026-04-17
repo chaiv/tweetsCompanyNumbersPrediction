@@ -21,7 +21,7 @@ def loadModel(path,wordVectors,num_classes=2,evalMode=True):
     #         )
     model = model.to(torch.device("cuda:0"))
     checkpoint = torch.load(path)
-    model.load_state_dict(checkpoint['state_dict'])
+    model.load_state_dict(checkpoint['state_dict'], strict=False)
     if(evalMode):
         model.eval()
     return model

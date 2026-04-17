@@ -7,13 +7,17 @@ import torch
 import pytorch_lightning as pl
 
 class LSTMNN(pl.LightningModule):
-    def __init__(self, emb_size, word_vectors,num_classes):
+    def __init__(self, emb_size, word_vectors, num_classes, class_weights=None):
         super().__init__()
         self.embedding = torch.nn.Embedding.from_pretrained(torch.tensor(word_vectors.vectors), freeze=False)
         self.lstm = torch.nn.LSTM(emb_size, hidden_size=512, num_layers=2, batch_first=True)
         self.fc1 = torch.nn.Linear(512, 512)
         self.fc2 = torch.nn.Linear(512, 256)
         self.fc3 = torch.nn.Linear(256, num_classes)
+        if class_weights is not None:
+            self.register_buffer('class_weights', class_weights)
+        else:
+            self.class_weights = None
         
     def forward(self, inputs):
         x = self.embedding(inputs)
@@ -28,7 +32,7 @@ class LSTMNN(pl.LightningModule):
     def training_step(self, batch, batch_idx):
         inputs, targets = batch
         outputs = self(inputs)
-        loss = torch.nn.functional.cross_entropy(outputs, targets)
+        loss = torch.nn.functional.cross_entropy(outputs, targets, weight=self.class_weights)
         self.log('train_loss', loss, on_step=True, on_epoch=True, prog_bar=True, logger=True)
         return loss
     

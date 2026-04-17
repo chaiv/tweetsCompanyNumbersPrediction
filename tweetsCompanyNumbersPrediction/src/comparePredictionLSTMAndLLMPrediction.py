@@ -6,10 +6,10 @@ Created on 27.01.2024
 import pandas as pd
 from tweetpreprocess.DataDirHelper import DataDirHelper
 from classifier.ClassificationMetrics import ClassificationMetrics
-from PredictionModelPath import AMAZON_20
+from PredictionModelPath import AMAZON_REVENUE_20_LSTM_MULTI_CLASS
 
 
-predictionModelPath = AMAZON_20
+predictionModelPath = AMAZON_REVENUE_20_LSTM_MULTI_CLASS
 
 tweetGroupDf = pd.read_csv(
     predictionModelPath.getModelPath()+"\\tweetGroups_at_"+str(predictionModelPath.getTweetGroupSize())+"_first_N.csv")

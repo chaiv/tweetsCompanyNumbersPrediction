@@ -31,7 +31,7 @@ predictionModelPath =  AMAZON_REVENUE_5_LSTM_BINARY_CLASS
 word_vectors = KeyedVectors.load_word2vec_format(predictionModelPath.getWordVectorsPath(), binary=False)
 textEncoder = WordVectorsIDEncoder(word_vectors)
 tokenizer = TweetTokenizer(DefaultWordFilter())
-model = loadModel(predictionModelPath.getModelPath()+"\\tweetpredict_fold1.ckpt",word_vectors,evalMode=False)
+model = loadModel(predictionModelPath.getModelPath()+"\\tweetpredict_fold1.ckpt",word_vectors,evalMode=True)
 
 combinedSentences = "$TRIP Forum Updates Available: Check Them Out: $T $VWO $PFE $AMZN; $QCOM Price Movement Summary for Thursday, April 2, 2015 10:07:16 PM $MSFT $CVX $DWT $AMZN; Not endorsing @MarketMaverick from @CNBCMarketWatch, always negative. Glad I ignored your suggestions, Mark, and invested in $amzn when it was below $350 #shiftfrombearishbullish!; 4/2/15 - US: $DIA down 0.33%, $XLK down 0.50%, $VTI up 0.05% RED: $MSFT $GOOGL $AMZN $PYPL $DIS $NVDA $BABA $SQ $TWTR $SNAP $FB $CRM BLUE: $LYFT $NFLX; $AG Community Stock Update Thursday, April 2, 2015 11:07:16 PM $INTC $DELL $AMZN $CGC"
 

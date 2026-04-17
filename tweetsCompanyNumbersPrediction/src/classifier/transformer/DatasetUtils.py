@@ -43,12 +43,13 @@ def generate_batch(data_batch, pad_idx):
     y_output = torch.tensor(y_output, dtype=torch.long)
     return x_input, y_output
 
-def createDataloader(data,batch_size, num_workers, pad_token_idx):
+def createDataloader(data, batch_size, num_workers, pad_token_idx, shuffle=False):
     return DataLoader(
         data, 
         batch_size=batch_size, 
         num_workers=num_workers, 
-        shuffle=False, 
+        shuffle=shuffle,
         collate_fn=partial(generate_batch, pad_idx=pad_token_idx),
-        persistent_workers=True if num_workers > 0 else False
+        persistent_workers=True if num_workers > 0 else False,
+        pin_memory=True
         )

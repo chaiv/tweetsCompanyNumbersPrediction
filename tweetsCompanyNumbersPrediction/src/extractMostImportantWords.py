@@ -26,7 +26,7 @@ from classifier.ModelEvaluationHelper import createTweetGroupsAndTrueClasses,\
 word_vectors = KeyedVectors.load_word2vec_format(DataDirHelper().getDataDir()+ "companyTweets\\WordVectorsAmazonV2.txt", binary=False)
 textEncoder = WordVectorsIDEncoder(word_vectors)
 tokenizer = TweetTokenizer(DefaultWordFilter())
-model = loadModel(DataDirHelper().getDataDir()+"companyTweets\\model\\amazonRevenueLSTMN5\\tweetpredict_fold1.ckpt",word_vectors,evalMode=False)
+model = loadModel(DataDirHelper().getDataDir()+"companyTweets\\model\\amazonRevenueLSTMN5\\tweetpredict_fold1.ckpt",word_vectors,evalMode=True)
 df = pd.read_csv(DataDirHelper().getDataDir()+ 'companyTweets\\amazonTweetsWithNumbers.csv')
 df = df.head(50000)
 testSplitIndexes = np.load(DataDirHelper().getDataDir()+"companyTweets\\model\\amazonRevenueLSTMN5\\test_idx_fold1.npy")
