@@ -49,5 +49,6 @@ def createDataloader(data,batch_size, num_workers, pad_token_idx):
         batch_size=batch_size, 
         num_workers=num_workers, 
         shuffle=False, 
-        collate_fn=partial(generate_batch, pad_idx=pad_token_idx)
+        collate_fn=partial(generate_batch, pad_idx=pad_token_idx),
+        persistent_workers=True if num_workers > 0 else False
         )

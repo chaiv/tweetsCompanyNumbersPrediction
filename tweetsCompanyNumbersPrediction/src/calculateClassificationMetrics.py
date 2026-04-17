@@ -5,6 +5,7 @@ Created on 09.03.2023
 '''
 import pandas as pd
 import numpy as np
+from nlpvectors.DataframeSplitter import DataframeSplitter
 from tweetpreprocess.DataDirHelper import DataDirHelper
 from classifier.transformer.Predictor import Predictor
 from classifier.PredictionClassMappers import BINARY_0_1
@@ -13,8 +14,8 @@ from nlpvectors.TweetTokenizer import TweetTokenizer
 from classifier.ClassificationMetrics import ClassificationMetrics
 from gensim.models import KeyedVectors
 from nlpvectors.WordVectorsIDEncoder import WordVectorsIDEncoder
-from classifier.ModelEvaluationHelper import loadModel,\
-    createTweetGroupsAndTrueClasses
+from classifier.ModelEvaluationHelper import loadModel
+from classifier.TweetGroupDataset import TweetGroupDataset
 from collections import Counter
 from tweetpreprocess.EqualClassSampler import EqualClassSampler
 
@@ -24,9 +25,9 @@ from PredictionModelPath import AMAZON_REVENUE_10_LSTM_MULTI_CLASS,\
     AMAZON_REVENUE_20_LSTM_MULTI_CLASS, APPLE__EPS_10_LSTM_MULTI_CLASS,\
     TESLA_CAR_SALES_10_LSTM_MULTI_CLASS
 
-predictionModelPath = TESLA_CAR_SALES_10_LSTM_MULTI_CLASS
+predictionModelPath = APPLE__EPS_10_LSTM_MULTI_CLASS
 predictionClassMapper = predictionModelPath.getPredictionClassMapper()
-fold = 0
+fold = 1
 word_vectors = KeyedVectors.load_word2vec_format(predictionModelPath.getWordVectorsPath(), binary=False)
 textEncoder = WordVectorsIDEncoder(word_vectors)
 tokenizer = TweetTokenizer(DefaultWordFilter())
@@ -35,18 +36,33 @@ model = loadModel(modelPath,word_vectors,num_classes=predictionClassMapper.get_n
 df = LoadTweetDataframe(predictionModelPath).readDataframe()
 testIdxPath = predictionModelPath.getModelPath()+'\\test_idx_fold'+str(fold)+'.npy'
 testSplitIndexes = np.load(testIdxPath)
-tweetGroups,trueClasses = createTweetGroupsAndTrueClasses(
-        df,
-        predictionModelPath.getTweetGroupSize(),
-        testSplitIndexes,
-        tokenizer,
-        textEncoder
-        )
+
+# Apply same time-based sorting as in training
+splitter = DataframeSplitter()
+splits = splitter.getSplitIds(df, predictionModelPath.getTweetGroupSize())
+postTSPColumn = "post_date"
+df[postTSPColumn] = pd.to_datetime(df[postTSPColumn])
+split_dates = []
+for split in splits:
+    earliest_date = df[df["tweet_id"].isin(split)][postTSPColumn].min()
+    split_dates.append(earliest_date)
+sorted_indices = np.argsort(split_dates)
+splits = [splits[i] for i in sorted_indices]
+
+df.fillna('', inplace=True)
+test_dataset = TweetGroupDataset(dataframe=df, splits=splits, splitIndexes=testSplitIndexes, tokenizer=tokenizer, textEncoder=textEncoder)
+tweetGroups = []
+trueClasses = []
+for i in range(len(test_dataset)):
+    tweetGroup = test_dataset.getAsTweetGroup(i)
+    tweetGroups.append(tweetGroup)
+    trueClasses.append(tweetGroup.getLabel())
+    print("created tweet group "+str(i))
 predictor = Predictor(model,tokenizer,textEncoder ,predictionClassMapper ,None)
 prediction_classes = predictor.predictMultipleAsTweetGroupsInChunks(tweetGroups, 1000)
 print("true_classes counts ",', '.join(f"{item}: {count}" for item, count in Counter(trueClasses).items()))
 print("prediction_classes counts ",', '.join(f"{item}: {count}" for item, count in Counter(prediction_classes).items()))
-metrics = ClassificationMetrics() 
+metrics = ClassificationMetrics()
 print(metrics.classification_report(trueClasses, prediction_classes))
 print("MCC "+str(metrics.calculate_mcc(trueClasses, prediction_classes)))
 #BinaryClassificationMetricsPlots(metrics).createRocAUCAndPrAucPlots(trueClasses, prediction_classes)
