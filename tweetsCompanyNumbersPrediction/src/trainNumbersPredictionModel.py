@@ -31,8 +31,8 @@ from PredictionModelPath import AMAZON_REVENUE_10_LSTM_BINARY_CLASS,AMAZON_REVEN
 
 torch.set_float32_matmul_precision('medium') #needed for quicker cuda 
 
-# Set to True to balance classes before splitting, necessary for subsequent topic evaluation where topics are highly underrepresented in a class.
-BALANCE_CLASSES = True
+# Set to True to balance classes before splitting, necessary for subsequent topic evaluation where some topics are highly underrepresented in a class.
+BALANCE_CLASSES = False
 
 if  __name__ == "__main__":
     predictionModelPath =  AMAZON_REVENUE_10_LSTM_BINARY_CLASS
@@ -70,7 +70,7 @@ if  __name__ == "__main__":
     # Per class, preserve temporal order. First 70% of each class = train/val, last 30% = test.
     # This ensures all classes are represented in train, val, and test.
     n = len(tweetSplits)
-    kfold_splits = 2
+    kfold_splits = 10
     num_classes = predictionModelPath.getPredictionClassMapper().get_number_of_classes()
 
     # Group indices by class, preserving temporal order within each class
