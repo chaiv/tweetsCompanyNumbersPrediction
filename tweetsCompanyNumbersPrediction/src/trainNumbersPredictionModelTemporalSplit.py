@@ -70,7 +70,7 @@ if __name__ == "__main__":
     train_val_idx = np.arange(0, split_point)
     test_idx = np.arange(split_point, n)
 
-    testIdxPath = predictionModelPath.getModelPath() + "\\test_idx_temporal.npy"
+    testIdxPath = predictionModelPath.getModelPath() + "\\test_idx_fold0.npy"
     np.save(testIdxPath, test_idx)
 
     # Stratified train/val split within the 80% (70% train, 30% val)
@@ -110,14 +110,14 @@ if __name__ == "__main__":
         val_data=val_data,
         test_data=test_data,
         loggerPath=DataDirHelper().getDataDir() + 'companyTweets\\modellogs',
-        loggerName="tweetpredict_temporal",
+        loggerName="tweetpredict",
         checkpointPath=predictionModelPath.getModelPath(),
-        checkpointName="tweetpredict_temporal"
+        checkpointName="tweetpredict_fold0"
     )
 
     # Classification metrics on test set using best checkpoint
     print("\n=== Classification Metrics (Temporal 80/20 Split) ===")
-    bestModelPath = predictionModelPath.getModelPath() + "\\tweetpredict_temporal.ckpt"
+    bestModelPath = predictionModelPath.getModelPath() + "\\tweetpredict_fold0.ckpt"
     bestModel = loadModel(bestModelPath, word_vectors, num_classes=num_classes)
     predictionClassMapper = predictionModelPath.getPredictionClassMapper()
 

@@ -27,15 +27,28 @@ def loadModel(path,wordVectors,num_classes=2,evalMode=True):
     return model
 
 
+def _sortSplitsTemporally(splits, tweetDf):
+    """Sort splits by earliest tweet date (temporal order), matching training scripts."""
+    postTSPColumn = "post_date"
+    tweetDf[postTSPColumn] = pd.to_datetime(tweetDf[postTSPColumn])
+    tweet_id_to_date = dict(zip(tweetDf["tweet_id"], tweetDf[postTSPColumn]))
+    split_dates = [min(tweet_id_to_date[tid] for tid in split) for split in splits]
+    sorted_indices = np.argsort(split_dates)
+    return [splits[i] for i in sorted_indices]
+
+
 def createTweetGroupsAndTrueClassesWithoutSplitIndexes(
          tweetDf,
         splitNumber,
         tokenizer,
-        textEncoder
-        ): 
+        textEncoder,
+        sortTemporally=False
+        ):
         tweetDf.fillna('', inplace=True) #nan values in body columns
         splits = DataframeSplitter().getSplitIds(tweetDf,splitNumber)
-        test_dataset = TweetGroupDataset(dataframe=tweetDf,splits = splits, splitIndexes= [i for i in range(0,len(splits))], tokenizer=tokenizer, textEncoder=textEncoder)   
+        if sortTemporally:
+            splits = _sortSplitsTemporally(splits, tweetDf)
+        test_dataset = TweetGroupDataset(dataframe=tweetDf,splits = splits, splitIndexes= [i for i in range(0,len(splits))], tokenizer=tokenizer, textEncoder=textEncoder)
         tweetGroups = []
         trueClasses = []
         for i in range(len(test_dataset)):
@@ -51,10 +64,13 @@ def createTweetGroupsAndTrueClasses(
         splitNumber,
         splitIndexes,
         tokenizer,
-        textEncoder
+        textEncoder,
+        sortTemporally=False
         ):
     tweetDf.fillna('', inplace=True) #nan values in body columns
     splits = DataframeSplitter().getSplitIds(tweetDf,splitNumber)
+    if sortTemporally:
+        splits = _sortSplitsTemporally(splits, tweetDf)
     test_dataset = TweetGroupDataset(dataframe=tweetDf,splits = splits, splitIndexes= splitIndexes, tokenizer=tokenizer, textEncoder=textEncoder)
     tweetGroups = []
     trueClasses = []
