@@ -24,24 +24,29 @@ from classifier.PredictionClassMappers import BINARY_0_1
 from classifier.transformer.Predictor import Predictor
 from featureinterpretation.AttributionsCalculator import AttributionsCalculator
 from featureinterpretation.TokenScoresSort import TokenScoresSort
+from TrainingMode import TrainingMode
 
+
+TRAINING_MODE = TrainingMode.SUBSEQUENT
 
 predictionModelPath =  AMAZON_REVENUE_10_LSTM_BINARY_CLASS
 fold = 1
 word_vectors = KeyedVectors.load_word2vec_format(predictionModelPath.getWordVectorsPath(), binary=False)
 textEncoder = WordVectorsIDEncoder(word_vectors)
 tokenizer = TweetTokenizer(DefaultWordFilter())
-modelPath = predictionModelPath.getModelPath()+"\\tweetpredict_fold"+str(fold)+".ckpt"
+
+modelPath = predictionModelPath.getModelPath() + f"\\tweetpredict_fold{fold}.ckpt"
 model = loadModel(modelPath,word_vectors,evalMode=False)
 df = LoadTweetDataframe(predictionModelPath).readDataframe()
-testIdxPath = predictionModelPath.getModelPath()+'\\test_idx_fold'+str(fold)+'.npy'
+testIdxPath = predictionModelPath.getModelPath() + f'\\test_idx_fold{fold}.npy'
 testSplitIndexes = np.load(testIdxPath)
 tweetGroups,trueClasses = createTweetGroupsAndTrueClasses(
         df,
         predictionModelPath.getTweetGroupSize(),
         testSplitIndexes,
         tokenizer,
-        textEncoder
+        textEncoder,
+        sortTemporally=TRAINING_MODE.isSortedTemporally()
         )
 tweetGroups1Label = []
 tweetGroups0Label = []
@@ -98,4 +103,3 @@ tweetGroupsWithMostImportantWordsDf = pd.DataFrame({
 })
 
 tweetGroupsWithMostImportantWordsDf.to_csv(predictionModelPath.getModelPath()+"\\tweetGroups_with_important_words_label_"+str(observed_class)+".csv")
-

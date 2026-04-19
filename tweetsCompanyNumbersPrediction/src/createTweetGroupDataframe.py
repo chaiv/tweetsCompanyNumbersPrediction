@@ -18,10 +18,12 @@ from PredictionModelPath import AMAZON_REVENUE_20_LSTM_BINARY_CLASS, TESLA_CAR_S
     AMAZON_REVENUE_10_LSTM_BINARY_CLASS
 from collections import Counter
 from tweetpreprocess.EqualClassSampler import EqualClassSampler
+from TrainingMode import TrainingMode
 
+TRAINING_MODE = TrainingMode.SUBSEQUENT
 
 predictionModelPath = AMAZON_REVENUE_10_LSTM_BINARY_CLASS
-
+fold = 0
 
 word_vectors = KeyedVectors.load_word2vec_format(predictionModelPath.getWordVectorsPath(), binary=False)
 textEncoder = WordVectorsIDEncoder(word_vectors)
@@ -29,13 +31,15 @@ tokenizer = TweetTokenizer(DefaultWordFilter())
 df = pd.read_csv(predictionModelPath.getDataframePath())
 df.fillna('', inplace=True)
 df = EqualClassSampler().getDfWithEqualNumberOfClassSamples(df)
-testSplitIndexes = np.load(predictionModelPath.getModelPath()+'\\test_idx_fold0.npy')
+
+testSplitIndexes = np.load(predictionModelPath.getModelPath() + f'\\test_idx_fold{fold}.npy')
 tweetGroups,trueClasses = createTweetGroupsAndTrueClasses(
         df,
         predictionModelPath.getTweetGroupSize(),
         testSplitIndexes,
         tokenizer,
-        textEncoder
+        textEncoder,
+        sortTemporally=TRAINING_MODE.isSortedTemporally()
         )
 print("true_classes counts ",', '.join(f"{item}: {count}" for item, count in Counter(trueClasses).items()))
 tweetGroupToDataframe = TweetGroupToDataframe()

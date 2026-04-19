@@ -21,6 +21,7 @@ from classifier.ClassificationMetrics import ClassificationMetrics
 from featureinterpretation.ImportantWordsStore import createImportantWordStore
 from featureinterpretation.AttributionsCalculator import AttributionsCalculator
 from nlpvectors.TokenizerWordsLookup import TokenizedWordsLookup
+from TrainingMode import TrainingMode
 
 def transform_token(tokenizerLookUp,token):
     if tokenizerLookUp.hasOriginalWord(token):
@@ -61,8 +62,10 @@ topicExtractor = BertTopicExtractor(
        tokenizer,
        pd.read_csv (DataDirHelper().getDataDir()+ "companyTweets\\appleBertTopicMapping.csv")
        )
+
 fold = 0
-modelPath = predictionModelPath.getModelPath()+"\\tweetpredict_fold"+str(fold)+".ckpt"
+
+modelPath = predictionModelPath.getModelPath() + f"\\tweetpredict_fold{fold}.ckpt"
 model = loadModel(modelPath,word_vectors,num_classes=predictionClassMapper.get_number_of_classes(),evalMode=False)
 predictor = Predictor(model,tokenizer,textEncoder ,predictionClassMapper ,AttributionsCalculator(model,model.embedding))
 tokenizerLookUp = TokenizedWordsLookup(predictionModelPath.getModelPath()+"\\tokensDictionary.json")

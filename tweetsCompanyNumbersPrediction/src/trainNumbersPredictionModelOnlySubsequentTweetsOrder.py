@@ -3,7 +3,7 @@ from nlpvectors.DataframeSplitter import DataframeSplitter
 
 '''
 Created on 03.02.2023
-This training approach does not uses the latest tweets as test set. It only considers the temporal order of N subsequent tweets. That method is used to identify recurring topic and word associations with financial outcome classes across the full observation period
+This training approach does not uses the latest tweets as test set. It only considers the temporal order of N subsequent tweets. That method is used for analyzing topics and most important words that can appear during the whole time period
 @author: vital
 '''
 import pandas as pd
@@ -20,21 +20,26 @@ from classifier.Trainer import Trainer
 from classifier.TweetGroupDataset import TweetGroupDataset
 from tweetpreprocess.EqualClassSampler import EqualClassSampler
 
-from tweetpreprocess.LoadTweetDataframe import LoadTweetDataframe
 from classifier.CreateClassifierModel import CreateClassifierModel
 from PredictionModelPath import AMAZON_REVENUE_10_LSTM_MULTI_CLASS, \
     AMAZON_REVENUE_20_LSTM_MULTI_CLASS, APPLE__EPS_10_LSTM_MULTI_CLASS, \
-    TESLA_CAR_SALES_10_LSTM_MULTI_CLASS
+    TESLA_CAR_SALES_10_LSTM_MULTI_CLASS,AMAZON_REVENUE_10_LSTM_BINARY_CLASS
 
 
 torch.set_float32_matmul_precision('medium') #needed for quicker cuda
 
 if  __name__ == "__main__":
-    predictionModelPath = TESLA_CAR_SALES_10_LSTM_MULTI_CLASS
+    predictionModelPath = AMAZON_REVENUE_10_LSTM_BINARY_CLASS
 
     df = pd.read_csv(predictionModelPath.getDataframePath())
-    df.fillna('', inplace=True) #nan values in body columns
-    df = LoadTweetDataframe(predictionModelPath).readDataframe()
+    df.fillna('', inplace=True)
+
+    # Set to True to balance classes before splitting, helpful for subsequent topic evaluation where some topics are highly underrepresented in a class.
+    BALANCE_CLASSES = predictionModelPath.hasEqualSamplesForEachClass()
+
+    if  BALANCE_CLASSES:
+        df = EqualClassSampler().getDfWithEqualNumberOfClassSamples(df)
+        print("Classes balanced with EqualClassSampler")
     print(TweetDataframeExplore(df).getClassDistribution())
     word_vectors = KeyedVectors.load_word2vec_format(predictionModelPath.getWordVectorsPath(), binary=False)
     textEncoder = WordVectorsIDEncoder(word_vectors)
@@ -49,7 +54,7 @@ if  __name__ == "__main__":
 
     splitter = DataframeSplitter()
     tweetSplits = splitter.getSplitIds(df, predictionModelPath.getTweetGroupSize()) #how many tweets should be trained as one sample
-    kfold_splits = 10
+    kfold_splits = 2
     kfold_cross_val = KFold(n_splits=kfold_splits, shuffle=True, random_state=1337)
     for fold, (train_idx, test_idx) in enumerate(kfold_cross_val.split(tweetSplits)):
         model =CreateClassifierModel(word_vectors = word_vectors,num_classes =  predictionModelPath.getPredictionClassMapper().get_number_of_classes()).createModel()
@@ -66,9 +71,9 @@ if  __name__ == "__main__":
         print("len(val_data)", len(val_data))
         print("len(test_data)", len(test_data))
         Trainer().train(
-            batch_size=256,
+            batch_size=100,
             epochs=10,
-            num_workers=2,
+            num_workers=0,
             pad_token_idx=pad_token_idx,
             model=model,
             train_data=train_data,
