@@ -25,14 +25,14 @@ from classifier.transformer.Predictor import Predictor
 from classifier.ClassificationMetrics import ClassificationMetrics
 from classifier.ModelEvaluationHelper import loadModel
 from tweetpreprocess.EqualClassSampler import EqualClassSampler
-from PredictionModelPath import AMAZON_REVENUE_10_LSTM_BINARY_CLASS
+from PredictionModelPath import AMAZON_REVENUE_10_LSTM_BINARY_CLASS,APPLE__EPS_10_LSTM_MULTI_CLASS
 
 torch.set_float32_matmul_precision('medium')
 
 BALANCE_CLASSES = False
 
 if __name__ == "__main__":
-    predictionModelPath = AMAZON_REVENUE_10_LSTM_BINARY_CLASS
+    predictionModelPath =APPLE__EPS_10_LSTM_MULTI_CLASS
 
     df = pd.read_csv(predictionModelPath.getDataframePath())
     df.fillna('', inplace=True)
@@ -103,7 +103,7 @@ if __name__ == "__main__":
     Trainer().train(
         batch_size=256,
         epochs=10,
-        num_workers=2,
+        num_workers=0,
         pad_token_idx=pad_token_idx,
         model=model,
         train_data=train_data,

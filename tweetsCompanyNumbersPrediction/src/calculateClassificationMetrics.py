@@ -19,17 +19,17 @@ from classifier.TweetGroupDataset import TweetGroupDataset
 from collections import Counter
 from tweetpreprocess.EqualClassSampler import EqualClassSampler
 
-from tweetpreprocess.LoadTweetDataframe import LoadTweetDataframe
 from classifier.PredictionClassMapper import PredictionClassMapper
 from PredictionModelPath import AMAZON_REVENUE_10_LSTM_MULTI_CLASS,\
     AMAZON_REVENUE_20_LSTM_MULTI_CLASS, APPLE__EPS_10_LSTM_MULTI_CLASS,\
-    TESLA_CAR_SALES_10_LSTM_MULTI_CLASS
+    TESLA_CAR_SALES_10_LSTM_MULTI_CLASS,AMAZON_REVENUE_10_LSTM_BINARY_CLASS
 from TrainingMode import TrainingMode
 
-TRAINING_MODE = TrainingMode.STRATIFIED_TEMPORAL
+TRAINING_MODE = TrainingMode.SUBSEQUENT
 
-predictionModelPath = APPLE__EPS_10_LSTM_MULTI_CLASS
+predictionModelPath = AMAZON_REVENUE_10_LSTM_BINARY_CLASS
 predictionClassMapper = predictionModelPath.getPredictionClassMapper()
+BALANCE_CLASSES = predictionModelPath.hasEqualSamplesForEachClass()
 fold = 0
 
 word_vectors = KeyedVectors.load_word2vec_format(predictionModelPath.getWordVectorsPath(), binary=False)
@@ -39,9 +39,11 @@ tokenizer = TweetTokenizer(DefaultWordFilter())
 modelPath = predictionModelPath.getModelPath() + f"\\tweetpredict_fold{fold}.ckpt"
 model = loadModel(modelPath, word_vectors, num_classes=predictionClassMapper.get_number_of_classes())
 
-# Read raw dataframe WITHOUT EqualClassSampler (consistent with training)
+# Read dataframe the same way as during training
 df = pd.read_csv(predictionModelPath.getDataframePath())
 df.fillna('', inplace=True)
+if BALANCE_CLASSES:
+    df = EqualClassSampler().getDfWithEqualNumberOfClassSamples(df)
 
 testIdxPath = predictionModelPath.getModelPath() + f'\\test_idx_fold{fold}.npy'
 testSplitIndexes = np.load(testIdxPath)

@@ -20,29 +20,32 @@ from classifier.Trainer import Trainer
 from classifier.TweetGroupDataset import TweetGroupDataset
 from tweetpreprocess.EqualClassSampler import EqualClassSampler
 
-from tweetpreprocess.LoadTweetDataframe import LoadTweetDataframe
 from classifier.CreateClassifierModel import CreateClassifierModel
 from PredictionModelPath import AMAZON_REVENUE_10_LSTM_MULTI_CLASS, \
     AMAZON_REVENUE_20_LSTM_MULTI_CLASS, APPLE__EPS_10_LSTM_MULTI_CLASS, \
-    TESLA_CAR_SALES_10_LSTM_MULTI_CLASS
+    TESLA_CAR_SALES_10_LSTM_MULTI_CLASS,AMAZON_REVENUE_10_LSTM_BINARY_CLASS
 
 
 torch.set_float32_matmul_precision('medium') #needed for quicker cuda
 
 if  __name__ == "__main__":
-    predictionModelPath = TESLA_CAR_SALES_10_LSTM_MULTI_CLASS
+    predictionModelPath = AMAZON_REVENUE_10_LSTM_BINARY_CLASS
 
     df = pd.read_csv(predictionModelPath.getDataframePath())
-    df.fillna('', inplace=True) #nan values in body columns
-    df = LoadTweetDataframe(predictionModelPath).readDataframe()
+    df.fillna('', inplace=True)
+
+    # Set to True to balance classes before splitting, helpful for subsequent topic evaluation where some topics are highly underrepresented in a class.
+    BALANCE_CLASSES = predictionModelPath.hasEqualSamplesForEachClass()
+
+    if  BALANCE_CLASSES:
+        df = EqualClassSampler().getDfWithEqualNumberOfClassSamples(df)
+        print("Classes balanced with EqualClassSampler")
     print(TweetDataframeExplore(df).getClassDistribution())
     word_vectors = KeyedVectors.load_word2vec_format(predictionModelPath.getWordVectorsPath(), binary=False)
     textEncoder = WordVectorsIDEncoder(word_vectors)
     tokenizer = TweetTokenizer(DefaultWordFilter())
     pad_token_idx = textEncoder.getPADTokenID()
     vocab_size = textEncoder.getVocabularyLength()
-
-    model =CreateClassifierModel(word_vectors = word_vectors,num_classes =  predictionModelPath.getPredictionClassMapper().get_number_of_classes()).createModel()
 
     # model = Transformer(
     #     embeddings= Word2VecTransformerEmbedding(word_vectors =  torch.tensor(word_vectors.vectors), emb_size=emb_size,pad_token_id = textEncoder.getPADTokenID()),
@@ -54,6 +57,7 @@ if  __name__ == "__main__":
     kfold_splits = 2
     kfold_cross_val = KFold(n_splits=kfold_splits, shuffle=True, random_state=1337)
     for fold, (train_idx, test_idx) in enumerate(kfold_cross_val.split(tweetSplits)):
+        model =CreateClassifierModel(word_vectors = word_vectors,num_classes =  predictionModelPath.getPredictionClassMapper().get_number_of_classes()).createModel()
         testIdxPath = predictionModelPath.getModelPath()+f"\\test_idx_fold{fold}.npy"
         np.save(testIdxPath, test_idx) #save test indexes for later classification metrics
         train_idx, val_idx = train_test_split(train_idx, random_state=1337, test_size=0.3)
@@ -69,7 +73,7 @@ if  __name__ == "__main__":
         Trainer().train(
             batch_size=100,
             epochs=10,
-            num_workers=8,
+            num_workers=0,
             pad_token_idx=pad_token_idx,
             model=model,
             train_data=train_data,
