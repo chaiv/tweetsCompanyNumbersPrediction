@@ -54,7 +54,7 @@ if  __name__ == "__main__":
 
     splitter = DataframeSplitter()
     tweetSplits = splitter.getSplitIds(df, predictionModelPath.getTweetGroupSize()) #how many tweets should be trained as one sample
-    kfold_splits = 2
+    kfold_splits = 10
     kfold_cross_val = KFold(n_splits=kfold_splits, shuffle=True, random_state=1337)
     for fold, (train_idx, test_idx) in enumerate(kfold_cross_val.split(tweetSplits)):
         model =CreateClassifierModel(word_vectors = word_vectors,num_classes =  predictionModelPath.getPredictionClassMapper().get_number_of_classes()).createModel()

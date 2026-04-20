@@ -3,11 +3,16 @@ from nlpvectors.DataframeSplitter import DataframeSplitter
 
 '''
 Created on 03.02.2023
-This training approach uses Stratified KFold cross-validation with rotating test blocks per class.
-Each class is divided into kfold_splits temporal blocks. For fold k, block k is used as test and 
-all other blocks as train/val. This guarantees:
+This training apprCreated on 20.04.2oach uses a Stratified Expanding Window cross-validation where within each class
+the temporal order is strictly preserved. Each class is divided into kfold_splits+1 temporal blocks.
+For fold k: train/val = blocks 0..k (past), test = block k+1 (future).
+This guarantees:
   1. All classes are represented in train, val, and test in every fold
-  2. Multiple folds for robust evaluation
+  2. Within each class, training data is always temporally BEFORE test data (no future leakage)
+  3. Multiple folds with expanding training window for robust evaluation
+Unlike the pure temporal split, this avoids the problem of entire classes being absent from train or test.
+Unlike the shuffled KFold, this preserves temporal integrity within each class.
+Unlike a rotating KFold, this never trains on future data.
 @author: vital
 '''
 import pandas as pd
@@ -33,7 +38,7 @@ from PredictionModelPath import AMAZON_REVENUE_10_LSTM_BINARY_CLASS, AMAZON_REVE
 
 torch.set_float32_matmul_precision('medium')
 
-BALANCE_CLASSES = True
+BALANCE_CLASSES = False
 
 if __name__ == "__main__":
     predictionModelPath = APPLE__EPS_10_LSTM_MULTI_CLASS
@@ -68,27 +73,20 @@ if __name__ == "__main__":
 
     split_labels = np.array([tweet_id_to_class[split[0]] for split in tweetSplits])
 
-    # --- Stratified KFold with temporal order per class ---
+    # --- Stratified Expanding Window with temporal order per class ---
     # For each class, splits are already in temporal order (sorted above).
-    # In each fold, each class contributes its temporally earliest portion to train/val
-    # and the next temporal block to test.
+    # We divide each class into kfold_splits+1 temporal blocks.
+    # Fold k: train/val = blocks 0..k (past), test = block k+1 (future).
+    # Training window expands with each fold, test always moves forward in time.
     kfold_splits = 10
     unique_classes = np.unique(split_labels)
     class_indices = {c: np.where(split_labels == c)[0] for c in unique_classes}
 
-    # For each class, divide into kfold_splits+1 temporal blocks.
-    # Fold k: train/val = blocks 0..k, test = block k+1
-    # This is an expanding window per class.
-    # To keep it simple and balanced: each fold uses a different test block per class.
-    # We divide each class into kfold_splits equal temporal blocks.
-    # Fold k: test = block k, train/val = all other blocks.
-    # This is like TimeSeriesSplit but stratified per class.
-
+    # Each class gets kfold_splits+1 blocks so we can have kfold_splits folds
     class_fold_blocks = {}
     for c in unique_classes:
         c_idx = class_indices[c]
-        # Split into kfold_splits roughly equal temporal blocks
-        class_fold_blocks[c] = np.array_split(c_idx, kfold_splits)
+        class_fold_blocks[c] = np.array_split(c_idx, kfold_splits + 1)
 
     all_fold_metrics = []
 
@@ -98,12 +96,10 @@ if __name__ == "__main__":
 
         for c in unique_classes:
             blocks = class_fold_blocks[c]
-            # Test block = fold-th block, train/val = all other blocks
-            for b_idx, block in enumerate(blocks):
-                if b_idx == fold:
-                    test_all.extend(block.tolist())
-                else:
-                    train_val_all.extend(block.tolist())
+            # Train/val = blocks 0..fold (past), test = block fold+1 (future)
+            for b_idx in range(fold + 1):
+                train_val_all.extend(blocks[b_idx].tolist())
+            test_all.extend(blocks[fold + 1].tolist())
 
         train_val_idx = np.array(train_val_all)
         test_idx = np.array(test_all)
