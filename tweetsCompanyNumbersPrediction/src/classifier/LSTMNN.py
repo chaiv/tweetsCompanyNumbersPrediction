@@ -39,7 +39,8 @@ class LSTMNN(pl.LightningModule):
     def validation_step(self, batch, batch_idx):
         inputs, targets = batch
         outputs = self(inputs)
-        loss = torch.nn.functional.cross_entropy(outputs, targets, weight=self.class_weights)
+        loss = torch.nn.functional.cross_entropy(outputs, targets)
+        #loss = torch.nn.functional.cross_entropy(outputs, targets, weight=self.class_weights)
         self.log('valid_loss', loss, on_step=True, on_epoch=True, prog_bar=True, logger=True)
         return loss
     
