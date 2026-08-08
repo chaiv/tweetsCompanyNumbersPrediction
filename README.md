@@ -1,6 +1,6 @@
 # Predicting Company Financial Metrics from Tweets
 
-Research code accompanying the PhD thesis *"Machine learning as a tool for developing an information system for predicting company metrics from social media data"* by Vitali Chaiko.
+Research code accompanying the PhD thesis *"Machine learning as a tool for developing an information system for predicting company metrics from social media data"* by Vitali Chaiko, written at [UniBIT](https://www.unibit.bg/en) in cooperation with [Vienna International Studies](https://viennastudies.com/home) and [AfW Bad Harzburg](https://www.afwbadharzburg.de).
 
 ## Abstract
 
