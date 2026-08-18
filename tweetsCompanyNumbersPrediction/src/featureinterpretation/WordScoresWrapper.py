@@ -28,4 +28,6 @@ class WordScoresWrapper(object):
     
     def getAttributionsSum(self):
         return sum(sum(attr_list) for attr_list in self.getAttributions())
-        
+
+    def getTweetAttributionSums(self):
+        return [sum(attr_list) for attr_list in self.getAttributions()]

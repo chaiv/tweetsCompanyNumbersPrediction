@@ -24,11 +24,18 @@ import pandas as pd
 from sklearn.metrics import accuracy_score, matthews_corrcoef
 
 
-def toDatetime(dateColumn):
-    """post_date holds epoch seconds. pd.to_datetime would read plain integers as nanoseconds and
-    map every tweet to 1970, which keeps the order intact but destroys the calendar information."""
+def toDatetime(dateColumn, timezone="Europe/Berlin"):
+    """Convert epoch seconds to the local time used for financial-period boundaries.
+
+    DateTSPConverter created boundaries from naive local datetimes.  Epoch seconds are UTC, so the
+    timezone conversion is required before deriving a reporting quarter; otherwise tweets around
+    midnight at a quarter boundary are assigned to the adjacent calendar quarter.
+    """
     if pd.api.types.is_numeric_dtype(dateColumn):
-        return pd.to_datetime(dateColumn, unit="s")
+        datetimes = pd.to_datetime(dateColumn, unit="s", utc=True)
+        if isinstance(datetimes, pd.Series):
+            return datetimes.dt.tz_convert(timezone).dt.tz_localize(None)
+        return datetimes.tz_convert(timezone).tz_localize(None)
     return pd.to_datetime(dateColumn)
 
 
@@ -53,7 +60,7 @@ def printSplitComposition(quartersOfSplits, trainIndexes, valIndexes, testIndexe
     print("Train quarters", trainQuarters)
     print("Val quarters  ", valQuarters)
     print("Test quarters ", testQuarters)
-    print("Share of test groups whose quarter also occurs in train: %.2f" % overlap)
+    print("Share of test groups whose quarter also occurs in train: %.4f" % overlap)
     print("Distinct labels in the test period: %d over %d quarters, so the test set decides %d "
           "independent cases regardless of how many tweet groups it contains."
           % (len(set(labelsOfSplits[testIndexes].tolist())), len(testQuarters), len(testQuarters)))

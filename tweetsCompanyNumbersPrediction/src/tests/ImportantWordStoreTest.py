@@ -33,6 +33,7 @@ class TestImportantWordStore(unittest.TestCase):
         [[0.1,0.2],[0.3,0.4,0.5]]
         )
         self.assertEquals(1.5,wordScoreWrapper.getAttributionsSum())
+        self.assertEqual([0.30000000000000004, 1.2], wordScoreWrapper.getTweetAttributionSums())
         wordscoreWrappers =[wordScoreWrapper ]
         predictions = [1]
         result = createImportantWordStore(wordscoreWrappers,predictions)
@@ -43,7 +44,8 @@ class TestImportantWordStore(unittest.TestCase):
         self.assertEqual("tweet",df["token"].iloc[0])
         self.assertEqual(0.1,df["token_attribution"].iloc[0])
         self.assertEqual(1,df["prediction"].iloc[0])
-        self.assertEqual(1.5,df["tweet_attribution"].iloc[0])
+        self.assertAlmostEqual(0.3,df["tweet_attribution"].iloc[0])
+        self.assertAlmostEqual(1.2,df["tweet_attribution"].iloc[-1])
    
            
     

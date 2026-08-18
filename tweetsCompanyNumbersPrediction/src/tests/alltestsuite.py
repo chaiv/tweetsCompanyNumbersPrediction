@@ -29,6 +29,10 @@ from tests.TestTweetGroupDataset import TestTweetGroupDataset
 from tests.TestDataframeSplitter import TestDataframeSplitter
 from tests.TestKFold import TestKFold
 from tests.TestDuplicateDetector import TestDuplicateDetector
+from tests import QuarterAlignedEmbeddingModelTest, MultiViewQuarterModelTest, QuarterSequenceModelTest, \
+    RelevantTextResidualModelTest, TextDeltaOrdinalModelTest, PastOnlyTeacherStudentTest, \
+    EnhancedPastOnlyTeacherStudentTest, PureTextQuarterModelTest, \
+    NumericQuarterTextExplanationsTest
 
 
 loader = unittest.TestLoader()
@@ -61,5 +65,14 @@ suite.addTests(loader.loadTestsFromModule(TestDataframeSplitter))
 suite.addTests(loader.loadTestsFromModule(TestKFold))
 suite.addTests(loader.loadTestsFromModule(TestNearDuplicateDetector))
 suite.addTests(loader.loadTestsFromModule(TestDuplicateDetector))
+suite.addTests(loader.loadTestsFromModule(QuarterAlignedEmbeddingModelTest))
+suite.addTests(loader.loadTestsFromModule(MultiViewQuarterModelTest))
+suite.addTests(loader.loadTestsFromModule(QuarterSequenceModelTest))
+suite.addTests(loader.loadTestsFromModule(RelevantTextResidualModelTest))
+suite.addTests(loader.loadTestsFromModule(TextDeltaOrdinalModelTest))
+suite.addTests(loader.loadTestsFromModule(PastOnlyTeacherStudentTest))
+suite.addTests(loader.loadTestsFromModule(EnhancedPastOnlyTeacherStudentTest))
+suite.addTests(loader.loadTestsFromModule(PureTextQuarterModelTest))
+suite.addTests(loader.loadTestsFromModule(NumericQuarterTextExplanationsTest))
 runner = unittest.TextTestRunner(verbosity=3)
 result = runner.run(suite)

@@ -75,7 +75,7 @@ def createImportantWordStore(wordscoreWrappers,predictions):
                 tokenColumn : list(wordscoreWrapper.getTokens()),
                 tokenAttributionColumn : list(wordscoreWrapper.getAttributions()),
                 predictionColumn : prediction,
-                tweetAttributionColumn: wordscoreWrapper.getAttributionsSum()
+                tweetAttributionColumn: wordscoreWrapper.getTweetAttributionSums()
                 }
         
         wordscore_dict_flattened = flatten_dict_lists(pad_dict_lists(wordscore_dict))

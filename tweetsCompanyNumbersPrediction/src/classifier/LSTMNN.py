@@ -25,11 +25,13 @@ class LSTMNN(pl.LightningModule):
     '''
 
     def __init__(self, emb_size, word_vectors, num_classes, class_weights=None,
-                 pooling=LAST_HIDDEN_STATE_POOLING, padTokenIdx=None):
+                 pooling=LAST_HIDDEN_STATE_POOLING, padTokenIdx=None,
+                 freeze_embeddings=False):
         super().__init__()
         if pooling == MEAN_POOLING and padTokenIdx is None:
             raise ValueError("padTokenIdx is required for mean pooling, it defines which positions are padding")
-        self.embedding = torch.nn.Embedding.from_pretrained(torch.tensor(word_vectors.vectors), freeze=False)
+        self.embedding = torch.nn.Embedding.from_pretrained(
+            torch.tensor(word_vectors.vectors), freeze=freeze_embeddings)
         self.lstm = torch.nn.LSTM(emb_size, hidden_size=512, num_layers=2, batch_first=True)
         self.fc1 = torch.nn.Linear(512, 512)
         self.fc2 = torch.nn.Linear(512, 256)
@@ -41,8 +43,13 @@ class LSTMNN(pl.LightningModule):
         else:
             self.class_weights = None
 
-    def forward(self, inputs):
-        x = self.embedding(inputs)
+    def embed(self, inputs):
+        """Embed token IDs; subclasses may add a small task-specific adapter."""
+        return self.embedding(inputs)
+
+    def encode(self, inputs):
+        """Return the original 256-dimensional representation before the class head."""
+        x = self.embed(inputs)
         outputs, (h_n, _) = self.lstm(x)
         if self.pooling == MEAN_POOLING:
             mask = (inputs != self.padTokenIdx).unsqueeze(-1).to(outputs.dtype)
@@ -53,8 +60,10 @@ class LSTMNN(pl.LightningModule):
         x = torch.nn.functional.relu(x)
         x = self.fc2(x)
         x = torch.nn.functional.relu(x)
-        x = self.fc3(x)
         return x
+
+    def forward(self, inputs):
+        return self.fc3(self.encode(inputs))
     
     def training_step(self, batch, batch_idx):
         inputs, targets = batch

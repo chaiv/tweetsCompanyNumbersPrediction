@@ -33,7 +33,7 @@ Directions for future research include improving the performance of topic models
 
 The system formulates the prediction task as supervised text classification over aggregated tweets:
 
-1. **Tweets are joined with financial figures.** Each tweet is labelled with the change of the company's next reported metric (quarterly revenue, EPS, car sales or search engine market share), so that the label describes the development *after* the tweet was posted.
+1. **Tweets are joined with financial figures.** In the current prepared datasets, each tweet is labelled with the change of the reporting period that contains it (quarterly revenue, EPS, car sales or search engine market share). Because the figure is published after the period closes, this is a *nowcast* of the current quarter, not a forecast of the following quarter. A genuine next-quarter experiment must shift the target by one reporting period.
 2. **The percentage change is discretized into classes.** Two schemes are used: a binary scheme (`decrease` / `increase`) and a four-class scheme (`decrease`, `weak`, `moderate`, `strong increase`).
 3. **Tweets are aggregated into tweet groups** of N tweets sharing the same class, with N set to 5, 10 or 20. A group forms one training sample, since an individual tweet provides insufficient signal for the prediction task.
 4. **An LSTM classifier** operating on Top2Vec word embeddings predicts the class of a tweet group.
@@ -129,6 +129,227 @@ python trainNumbersPredictionModelStratifiedKFoldTemporalPerClass.py
 ```
 
 Each fold writes a checkpoint `tweetpredict_fold{k}.ckpt` and its test indices `test_idx_fold{k}.npy` to `getModelPath()`, prints a classification report and the MCC, and the run concludes with the mean MCC across all folds. TensorBoard logs are written to `companyTweets/modellogs`.
+
+For a leakage-resistant comparison of Top2Vec embeddings, a compact padding-safe BiLSTM and a
+seasonal/text hybrid, run:
+
+```bash
+python trainQuarterAlignedEmbeddingModel.py --experiment apple-eps
+```
+
+By default this fits on 2015-2017, uses 2018 only to select the epoch count, refits on 2015-2018
+and evaluates once on 2019. Tweet groups never cross a reporting-quarter boundary, every training
+quarter contributes the same number of groups, and the output reports both group-level metrics and
+one aggregated decision per independent quarter. The no-text majority and seasonal baselines are
+printed beside every model result. Other choices include `tesla-sales`, `amazon-revenue-binary` and
+`amazon-revenue-4class`.
+
+To measure the temporal shortcut directly, `python evaluateQuarterRecognition.py` trains a TF-IDF
+classifier to identify the exact reporting quarter of an Apple tweet group. This is a diagnostic of
+period-specific vocabulary, not a financial prediction.
+
+For the stronger multi-view ablation, run `python trainMultiViewQuarterModel.py --experiment
+apple-eps`. It compares hierarchical Top2Vec tweet vectors, frozen MiniLM sentence embeddings,
+leakage-conscious metadata, their fusion, and a fusion with an explicit seasonal prior. Final
+likes, retweets and comment counts are excluded because their observation time is unknown.
+
+For a pooled company-quarter experiment with substantially fewer duplicated targets, run
+`python trainQuarterSequenceModel.py`. It encodes chronological bins of current-quarter tweets
+with frozen MiniLM embeddings, processes them with a bidirectional LSTM, and separately processes
+the four preceding quarterly financial observations with a second LSTM. The `calendar`, `text`,
+`financial` and `fusion` ablations use only the locally configured tweet and financial CSV files.
+The `fusion-shuffled-text` negative control keeps the same architecture but deliberately breaks
+the text-to-quarter assignment within each company, so an apparent gain cannot automatically be
+attributed to genuine quarterly text content.
+
+The current quarter's financial value and percentage change are never model inputs: the target
+remains its four-class quarterly change. Accuracy and MCC are reported after tweet-bag predictions
+are averaged to one decision per independent company-quarter, over five seeds by default.
+
+For a broader future-only result, `python trainRollingFutureQuarterModel.py` evaluates the
+financial and text-fusion models with rolling test years 2017, 2018 and 2019. In every fold, all
+training quarters precede the validation year and the validation year precedes the test year.
+Metrics are aggregated over 36 independent future company-quarters and are also reported
+separately for Amazon, Apple and Tesla.
+
+For a text-focused, directly interpretable residual experiment, run:
+
+```bash
+python trainRelevantTextResidualModel.py --experiment amazon-revenue-4class
+```
+
+This pipeline first selects finance-related tweets without consulting the target: a keyword
+prefilter is reranked by a frozen MiniLM encoder and balanced over eight chronological bins of the
+quarter. The prediction network retains Top2Vec token IDs and uses a token-attention BiLSTM inside
+each tweet followed by a tweet-attention BiLSTM. Its text logits are learned as a gated residual
+over a strictly lagged financial/seasonal model, with modality dropout during training. Twelve
+independent text bags are averaged to one prediction for each company-quarter. Rolling-origin test
+years 2017, 2018 and 2019, three seeds, Accuracy and MCC, and a shuffled-quarter text control are
+written to `output/relevant_text_residual_results.json`. Available experiments are
+`amazon-revenue-4class`, `apple-eps` and `tesla-sales`; CUDA is selected automatically.
+
+`featureinterpretation/HierarchicalQuarterAttributions.py` applies Layer Integrated Gradients to
+the *scaled text contribution actually added to the fusion logits*. It preserves raw signed and
+absolute values at token and tweet level and can aggregate held-out tweet contributions by topic.
+This avoids the former per-group normalization, which made attribution magnitudes across groups
+incomparable. Important-word extraction now also uses the saved held-out split rather than a fixed
+prefix of the dataset.
+
+The pooled text-change experiment is run with:
+
+```bash
+python trainTextDeltaOrdinalModel.py
+```
+
+It aggregates up to 512 finance-relevant tweets in each of eight chronological bins (rather than
+training on a few duplicated tweet bags), and concatenates the current representation with its
+change from the previous quarter and the same quarter of the previous year. A shared multi-company
+GRU is pretrained text-only with two targets derived from the same quarterly CSV: three ordered
+class thresholds and continuous percentage-change regression. Its logits are then normalized and
+fused with the strictly lagged financial branch using an explicit 40% text weight that cannot be
+learned down to zero. The script evaluates rolling future years over five seeds and reports finance,
+text-only, fusion and a test-time shuffled-text control. `--text-weight 0.6` or `0.8` can be used for
+the stronger ablation; the default 40% setting is deliberately not selected on the test results.
+
+To test whether the correlations learned by the original Top2Vec LSTM contain reusable future
+signal, run:
+
+```bash
+python trainPastOnlyTeacherStudentModel.py
+```
+
+For each rolling test year, this trains the original two-layer mean-pooled LSTM teacher only on
+earlier labelled tweet groups. Its 256-dimensional pre-head representation is summarized per
+quarter through class probabilities, confidence, hidden norms and cosine similarity to
+past-quarter class prototypes. Current, previous-quarter and year-over-year text changes form one
+quarter-level feature row; raw hidden coordinates from separately trained company teachers are
+never mixed. A ridge student compares text-only prediction with a residual correction to the
+strictly lagged same-quarter-last-year financial baseline. The output reports Accuracy, MCC and
+MAE for finance, text, fusion and within-company shuffled text over the 36 independent 2017-2019
+company-quarters.
+
+The word vectors are frozen but were originally trained without labels on the full local tweet
+corpus. The teacher's supervised parameters and all prototype/statistical features are past-only,
+but this embedding initialization is therefore transductive. The target remains exclusively the
+current quarter's financial percentage-change class; no extra target or external dataset is used.
+
+The regularized enhanced variant is run with:
+
+```bash
+python trainEnhancedPastOnlyTeacherStudentModel.py
+```
+
+It adds a training-quarter identification head to the past-only financial-class teacher and a
+zero-initialized low-rank adapter while keeping the Top2Vec table frozen. The quarter student
+compares LSTM text, safe current-quarter metadata and both views together. Metadata comprises tweet
+volume, unique-writer diversity/concentration, within-quarter timing, and URL/cashtag/number/text
+ratios from the same local CSV; engagement counters are excluded. The immediately preceding
+validation year selects 2, 4 or 8 past-only PCA components, ridge regularization and a residual gate
+of 0%, 25%, 50% or 100%. A zero gate falls back exactly to the lagged financial baseline. Separate
+controls shuffle only LSTM text or all current-quarter signal within each company. Results are
+written to `output/enhanced_past_only_teacher_student_results.json` with Accuracy, MCC and MAE over
+the rolling 2017-2019 company-quarters.
+
+For a model that follows the original tweet-group idea but removes the financial model and word
+embeddings completely, run:
+
+```bash
+python trainPureTextQuarterModel.py
+```
+
+Every training sample is again a group of ten tweets carrying the current quarter's financial
+class, but groups never cross quarter boundaries and evaluated quarters are strictly later than
+training and validation quarters. Four independent text views are fitted only on past groups:
+word TF-IDF, character TF-IDF, class-specific important-word log odds, and a compact view of VADER
+sentiment, forward/uncertain language, punctuation, numbers, URLs, cashtags, author diversity and
+within-group timing. No financial value, financial lag, Top2Vec vector or neural teacher is read.
+Validation selects regularization, important-word temperature and convex late-fusion weights.
+Group probabilities are then averaged to exactly one prediction per company-quarter. The JSON
+output includes Accuracy, MCC, a within-company shuffled-quarter control, and the top past-only
+important words for every class, company and rolling fold so they can be used by the subsequent
+topic/important-word analysis.
+
+`python trainSemanticPureTextQuarterModel.py` is the anti-shortcut follow-up. It retains raw word
+TF-IDF as a control but removes URLs/domains, usernames, cashtags, years, dates, month/day names and
+tracking/newsletter boilerplate for the semantic view. A second view keeps only tweets with
+target-independent business-event language such as revenue, earnings, sales, deliveries, demand,
+margins, guidance or estimates. Its stable important-word view computes prevalence per past
+quarter rather than per duplicated group and accepts a positive class word only when it recurs in
+at least two past quarters of that class. Validation selects one complete view instead of fitting
+many fusion weights to only twelve validation quarters. The target and rolling future evaluation
+remain unchanged and no financial input or embedding is introduced.
+
+`python trainQualityFilteredPureTextQuarterModel.py` rebuilds the ten-tweet samples themselves
+before applying the semantic experiment. Only company or financial-event tweets are retained;
+exact normalized duplicates and common stock-promotion templates are removed, and each author is
+capped within each quarter before new chronological groups are formed. The output records retained
+tweet fractions and available group counts for every company/quarter. This separates a failure due
+to noisy generic Twitter traffic from a failure of genuinely company/metric-related language while
+preserving the same past-only selection, refit and future-quarter evaluation.
+
+`python trainTemporalAggregationPureTextModel.py` keeps the best finance-event text view but treats
+group-to-quarter aggregation as a validation-only choice. Alongside the ordinary probability mean,
+it evaluates group voting, geometric pooling, early or late half-quarter evidence, the last third
+of the quarter and the most confident quarter of groups, with optional probability-temperature
+scaling. The selected rule is refit on train plus validation groups before the future quarter is
+scored. This tests whether the useful language is concentrated at a particular point in the target
+quarter without exposing any future label during aggregation selection.
+
+`python trainOrdinalPureTextQuarterModel.py` retains the same four quarterly-number classes but
+learns them through three ordered sparse decisions: class greater than 0, greater than 1 and
+greater than 2. Raw, anti-shortcut semantic and finance-event TF-IDF are selected only on the
+preceding validation year. Its JSON reports the primary four-class Accuracy/MCC and, separately,
+the decrease-versus-increase direction implied by the same probabilities. The direction result is
+diagnostic and never replaces the four-class target.
+
+`python trainPooledTextDeltaQuarterModel.py` removes group-label pseudoreplication by training on
+one mean sparse-text row per independent company-quarter. Amazon, Apple and Tesla share a model;
+current text can be concatenated with its sparse change from the previous quarter and the same
+quarter one year earlier. Company identity is the only optional metadata. The experiment remains
+free of financial values, financial baselines, embeddings and external data.
+
+For target-context numbers mined directly from every local tweet, run:
+
+```bash
+python trainNumericTextSignalQuarterModel.py
+```
+
+This extracts signed percentages and robust absolute values only near Amazon revenue/net-sales,
+Apple EPS, or Tesla delivery/production language. It separately aggregates the whole quarter, the
+late third, reported language, forward estimates, early reports and late estimates. The rolling
+model uses 2015 onward for training, the immediately preceding year for selection, and untouched
+future test years 2017-2019. It does not read a financial CSV as an input model, use embeddings, or
+use external data; the primary target is still the four-class quarterly-number change.
+
+The transparent seasonal-plus-numeric model reaches 75.00% Accuracy / 0.663 MCC over 36 future
+company-quarters. An additional Tesla conflict gate reaches 80.56% / 0.739, versus 69.44% / 0.585
+when the complete numeric text bundle is shifted within each company. That final gate is explicitly
+marked exploratory in the JSON because it was designed after inspecting the same 2017-2019
+diagnostics. It is therefore evidence that the local text representation can reach the requested
+range on this evaluation, not an independent confirmatory estimate. The local 2020 coverage has
+only 6 Amazon, 17 Apple and 14 Tesla tweets in Q1 and cannot serve as a complete new holdout.
+With 29 correct predictions out of 36, the Wilson 95% interval is approximately 65.0%-90.2%.
+Against the fully shifted text bundle, four quarters improve and none worsen, but the paired exact
+two-sided p-value is 0.125. The JSON records this statistical audit so the exploratory point
+estimate cannot be mistaken for a precise or independently significant result.
+
+The matching dissertation-step-3 explanation is generated with:
+
+```bash
+python extractNumericQuarterTopicsAndImportantWords.py
+```
+
+It replays every stored rolling-fold selection and first verifies that the 80.56% Accuracy and
+0.739 MCC predictions are reproduced. For the selected numeric-text logistic branch it reports
+exact signed feature contributions (`standardized value * OVR coefficient`). Those aggregate
+features are connected to matched reporting, estimate, guidance, direction, metric and numeric
+cues. A quarter-stable important-word lexicon and a TF-IDF/NMF topic model are fitted separately
+for every rolling fold using only train plus validation quarters; they are then applied to the
+future test quarter. Important words are therefore past-only class associations and topics are
+contextual summaries, not falsely presented as causal contributions to the seasonal prior or the
+exploratory Tesla gate. The output
+`output/numeric_text_topics_important_words.json` contains terms, counts, feature values and topic
+descriptors only - no raw tweet bodies, authors, handles, URLs or tweet IDs.
 
 ### 6. Evaluate
 

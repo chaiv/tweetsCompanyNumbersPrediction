@@ -28,25 +28,18 @@ textEncoder = WordVectorsIDEncoder(word_vectors)
 tokenizer = TweetTokenizer(DefaultWordFilter())
 model = loadModel(DataDirHelper().getDataDir()+"companyTweets\\model\\amazonRevenueLSTMN5\\tweetpredict_fold1.ckpt",word_vectors,evalMode=True)
 df = pd.read_csv(DataDirHelper().getDataDir()+ 'companyTweets\\amazonTweetsWithNumbers.csv')
-df = df.head(50000)
 testSplitIndexes = np.load(DataDirHelper().getDataDir()+"companyTweets\\model\\amazonRevenueLSTMN5\\test_idx_fold1.npy")
-# tweetGroups,trueClasses = createTweetGroupsAndTrueClasses(
-#         df,
-#         5,
-#         testSplitIndexes,
-#         tokenizer,
-#         textEncoder
-#         )
-tweetGroups,trueClasses = createTweetGroupsAndTrueClassesWithoutSplitIndexes(
+tweetGroups,trueClasses = createTweetGroupsAndTrueClasses(
         df,
         5,
+        testSplitIndexes,
         tokenizer,
         textEncoder
         )
 predictor = Predictor(model,tokenizer ,textEncoder,BINARY_0_1,AttributionsCalculator(model,model.embedding))
 observed_class = 1
 prediction_classes = predictor.predictMultipleAsTweetGroupsInChunks(tweetGroups,1000)
-wordScoresWrappers = predictor.calculateWordScoresOfTweetGroupsInChunks(tweetGroups,observed_class=1,chunkSize=100,n_steps=500,internal_batch_size = 100)
+wordScoresWrappers = predictor.calculateWordScoresOfTweetGroupsInChunks(tweetGroups,observed_class=observed_class,chunkSize=100,n_steps=500,internal_batch_size = 100)
 importantWordsStore = createImportantWordStore(wordScoresWrappers,prediction_classes)
 importantWordsDf = importantWordsStore.to_dataframe()
 importantWordsDf.to_csv(DataDirHelper().getDataDir()+"companyTweets\\importantWordsClass"+str(observed_class)+"Amazon.csv")

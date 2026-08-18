@@ -12,7 +12,7 @@ from featureinterpretation.InterpretationDataframeUtil import addTopicOriginalWo
 from tweetpreprocess.nearduplicates.NearDuplicateDetector import NearDuplicateDetector
 
 topicExtractor = Top2VecTopicExtractor(Top2VecTopicModelCreator().load(DataDirHelper().getDataDir()+"companyTweets\\model\\amazonRevenueLSTMN5\\amazonTopicModelV2"))
-topic_words, word_scores, topic_nums = topicModel.topicModel.getTopicWordsScoresAndIds()
+topic_words, word_scores, topic_nums = topicExtractor.getTopicWordsScoresAndIds()
 firstNtopics = 20
 firstNTopicNums = topic_nums[:firstNtopics]
 firstNTopicWords = topic_words[:firstNtopics]
