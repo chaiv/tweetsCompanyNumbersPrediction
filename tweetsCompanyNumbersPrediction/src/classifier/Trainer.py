@@ -37,3 +37,7 @@ class Trainer(object):
             precision=16)
         trainer.fit(model, train_loader, val_loader)
         trainer.test(model, dataloaders=test_loader, ckpt_path="best")
+        # ModelCheckpoint appends -v1, -v2 ... when a file of that name already exists, so the path
+        # cannot be rebuilt from checkpointName. Callers have to evaluate the path returned here,
+        # otherwise a second run of a script scores the checkpoint of the first one.
+        return checkpoint_callback.best_model_path

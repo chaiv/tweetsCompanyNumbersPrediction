@@ -7,14 +7,17 @@ import torch
 import pandas as pd
 import numpy as np
 from tweetpreprocess.DataDirHelper import DataDirHelper
-from classifier.LSTMNN import LSTMNN
+from classifier.LSTMNN import LSTMNN, LAST_HIDDEN_STATE_POOLING
 from nlpvectors.DataframeSplitter import DataframeSplitter
 from classifier.TweetGroupDataset import TweetGroupDataset
 from classifier.CreateClassifierModel import CreateClassifierModel
 
 
-def loadModel(path,wordVectors,num_classes=2,evalMode=True):
-    model = CreateClassifierModel(word_vectors = wordVectors,num_classes = num_classes).createModel()
+def loadModel(path,wordVectors,num_classes=2,evalMode=True,pooling=LAST_HIDDEN_STATE_POOLING,padTokenIdx=None):
+    # pooling has to match the value the checkpoint was trained with, it changes how the token
+    # sequence is reduced and therefore what the trained weights mean.
+    model = CreateClassifierModel(word_vectors = wordVectors,num_classes = num_classes,
+                                  pooling = pooling, padTokenIdx = padTokenIdx).createModel()
     # model = Transformer(
     #         embeddings= Word2VecTransformerEmbedding(word_vectors =  torch.tensor(word_vectors.vectors), emb_size=300,pad_token_id = encoder.getPADTokenID()),
     #         lr=1e-4, n_outputs=2, vocab_size=encoder.getVocabularyLength(),channels= 300

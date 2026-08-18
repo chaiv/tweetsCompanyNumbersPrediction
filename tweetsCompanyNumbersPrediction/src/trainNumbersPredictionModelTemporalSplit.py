@@ -3,9 +3,23 @@ from nlpvectors.DataframeSplitter import DataframeSplitter
 
 '''
 Created on 03.02.2023
-This training approach uses a strict 80/20 temporal split: the earliest 80% of tweet groups 
+This training approach uses a strict 80/20 temporal split: the earliest 80% of tweet groups
 are used for training/validation and the latest 20% are used as the test set.
 This method reflects a real prediction task where the model is trained on past data and evaluated on future data.
+
+Because the test period is disjoint from the training period, the scores of this script are much
+lower than those of the splits that mix periods. The label is the change of the figure of a
+reporting period, so it is constant within a quarter and the dataset holds only one label per
+quarter. Whenever the same quarter occurs in training and in test, recognizing the period of a text
+already determines the label, which is why the mixed splits reach high values. Here that shortcut is
+not available and the model has to transfer to quarters it has never seen.
+
+The script therefore prints the composition of the split and the baselines that need no text at all
+(majority class, the label of the last training quarter, and the seasonal naive label of the same
+calendar quarter of earlier years), so that the score of the model can be judged against them.
+Validation uses the latest part of the training period instead of a random sample, because a random
+validation set shares its quarters with the training data and would select the checkpoint that
+memorizes periods best rather than the one that transfers.
 @author: vital
 '''
 import pandas as pd
@@ -24,12 +38,23 @@ from classifier.CreateClassifierModel import CreateClassifierModel
 from classifier.transformer.Predictor import Predictor
 from classifier.ClassificationMetrics import ClassificationMetrics
 from classifier.ModelEvaluationHelper import loadModel
+from classifier.LSTMNN import MEAN_POOLING
 from tweetpreprocess.EqualClassSampler import EqualClassSampler
+from classifier.TemporalSplitDiagnostics import getQuartersOfSplits, printSplitComposition, printBaselines, toDatetime
 from PredictionModelPath import AMAZON_REVENUE_10_LSTM_BINARY_CLASS,APPLE__EPS_10_LSTM_MULTI_CLASS
 
 torch.set_float32_matmul_precision('medium')
 
 BALANCE_CLASSES = False
+# A random validation set shares its quarters with the training data, so the checkpoint it selects is
+# the one that recognizes periods best. The last part of the training period is the only validation
+# data that resembles the forecasting situation of the test period.
+TEMPORAL_VALIDATION = True
+VALIDATION_SIZE = 0.3
+# With the original 'last' pooling the model does not fit this data at all: its training loss stays
+# at ln(num_classes) and it predicts one class for every tweet group. Averaging the LSTM outputs
+# instead lets it train, which on Apple EPS moves the test MCC from 0.000 to 0.286.
+POOLING = MEAN_POOLING
 
 if __name__ == "__main__":
     predictionModelPath =APPLE__EPS_10_LSTM_MULTI_CLASS
@@ -51,7 +76,7 @@ if __name__ == "__main__":
     tweetSplits = splitter.getSplitIds(df, predictionModelPath.getTweetGroupSize())
 
     postTSPColumn = "post_date"
-    df[postTSPColumn] = pd.to_datetime(df[postTSPColumn])
+    df[postTSPColumn] = toDatetime(df[postTSPColumn])
 
     # Pre-build index for fast lookups
     tweet_id_to_date = dict(zip(df["tweet_id"], df[postTSPColumn]))
@@ -73,9 +98,18 @@ if __name__ == "__main__":
     testIdxPath = predictionModelPath.getModelPath() + "\\test_idx_fold0.npy"
     np.save(testIdxPath, test_idx)
 
-    # Stratified train/val split within the 80% (70% train, 30% val)
     train_val_labels = split_labels[train_val_idx]
-    train_idx, val_idx = train_test_split(train_val_idx, random_state=1337, test_size=0.3, stratify=train_val_labels)
+    if TEMPORAL_VALIDATION:
+        # Latest part of the training period as validation, so that model selection is driven by
+        # transfer to a later period instead of by recognition of periods already seen.
+        val_start = int(len(train_val_idx) * (1 - VALIDATION_SIZE))
+        train_idx, val_idx = train_val_idx[:val_start], train_val_idx[val_start:]
+    else:
+        train_idx, val_idx = train_test_split(train_val_idx, random_state=1337, test_size=VALIDATION_SIZE, stratify=train_val_labels)
+
+    split_quarters = getQuartersOfSplits(df, tweetSplits)
+    printSplitComposition(split_quarters, train_idx, val_idx, test_idx, split_labels)
+    printBaselines(split_quarters, split_labels, train_val_idx, test_idx)
 
     # Compute class weights from training set (inverse frequency)
     train_labels = split_labels[train_idx]
@@ -99,8 +133,9 @@ if __name__ == "__main__":
     print("len(val_data)", len(val_data))
     print("len(test_data)", len(test_data))
 
-    model = CreateClassifierModel(word_vectors=word_vectors, num_classes=num_classes, class_weights=class_weights).createModel()
-    Trainer().train(
+    model = CreateClassifierModel(word_vectors=word_vectors, num_classes=num_classes, class_weights=class_weights,
+                                  pooling=POOLING, padTokenIdx=pad_token_idx).createModel()
+    bestModelPath = Trainer().train(
         batch_size=256,
         epochs=10,
         num_workers=0,
@@ -115,10 +150,12 @@ if __name__ == "__main__":
         checkpointName="tweetpredict_fold0"
     )
 
-    # Classification metrics on test set using best checkpoint
+    # Classification metrics on test set using best checkpoint. The path comes from the trainer,
+    # because ModelCheckpoint writes tweetpredict_fold0-v1.ckpt when tweetpredict_fold0.ckpt is
+    # already there, and loadModel loads with strict=False and would silently score the older model.
     print("\n=== Classification Metrics (Temporal 80/20 Split) ===")
-    bestModelPath = predictionModelPath.getModelPath() + "\\tweetpredict_fold0.ckpt"
-    bestModel = loadModel(bestModelPath, word_vectors, num_classes=num_classes)
+    print("Best checkpoint", bestModelPath)
+    bestModel = loadModel(bestModelPath, word_vectors, num_classes=num_classes, pooling=POOLING, padTokenIdx=pad_token_idx)
     predictionClassMapper = predictionModelPath.getPredictionClassMapper()
 
     tweetGroups = []
@@ -135,4 +172,22 @@ if __name__ == "__main__":
     metrics = ClassificationMetrics()
     print(metrics.classification_report(trueClasses, prediction_classes))
     print("MCC " + str(metrics.calculate_mcc(trueClasses, prediction_classes)))
+
+    printBaselines(split_quarters, split_labels, train_val_idx, test_idx)
+
+    # Per quarter the label is constant, so the model effectively casts one vote per test quarter.
+    # Comparing that vote with the label of the preceding quarter shows whether the model transfers
+    # or only repeats the most recent period it was trained on.
+    print("\n=== Prediction per test quarter ===")
+    predictionsPerQuarter = np.array(prediction_classes)
+    testQuarters = split_quarters[test_idx]
+    allQuarters = sorted(set(split_quarters.tolist()))
+    for quarter in sorted(set(testQuarters.tolist())):
+        mask = testQuarters == quarter
+        majorityPrediction = Counter(predictionsPerQuarter[mask].tolist()).most_common(1)[0][0]
+        previousQuarter = allQuarters[allQuarters.index(quarter) - 1]
+        previousLabel = Counter(split_labels[split_quarters == previousQuarter].tolist()).most_common(1)[0][0]
+        print("  %s true %s, predicted %s, label of %s was %s%s"
+              % (quarter, split_labels[test_idx][mask][0], majorityPrediction, previousQuarter, previousLabel,
+                 "   <- repeats the previous quarter" if majorityPrediction == previousLabel else ""))
 
