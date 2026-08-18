@@ -1,8 +1,10 @@
 # Was die alten Modelle gelernt haben - und worauf die aktuellen Ergebnisse wirklich beruhen
 
-Umfassende, laienverstaendliche Evaluation der alten `main`-Implementierung, der Claude-Opus-5-Diagnose, der aktuellen Quartalsmodelle sowie der Topic- und Important-Word-Analyse.
+Umfassende, laienverstaendliche Evaluation der alten `main`-Implementierung, der frueheren automatisierten Analyse, der aktuellen Quartalsmodelle sowie der Topic- und Important-Word-Analyse.
 
 Stand: 18. August 2026
+
+**Hinweis zur Erstellung:** Die Diagnose, die Codepruefung und das weitere Modelltraining wurden automatisiert mit ChatGPT 5.6 Sol sowie Claude Fable / Opus 5 durchgefuehrt.
 
 ## Kurzfassung
 
@@ -12,7 +14,7 @@ Die wichtigsten Ergebnisse sind:
 
 1. **Die alte Implementierung ist wissenschaftlich interessant.** Sie bildet ein ungewoehnlich breites Informationssystem ab: Tweets werden mit Berichtsperioden verbunden, zu Gruppen zusammengefasst, mit einem LSTM klassifiziert und anschliessend bis zu Woertern und Topics interpretiert. Besonders interessant ist der starke zeitliche und ereignisbezogene Fingerabdruck der Sprache.
 2. **Die alte Accuracy von etwa 0,87 ist kein sauberer Beleg fuer echte Zukunftsprognose.** Viele Tweetgruppen desselben Quartals wurden wie voneinander unabhaengige Testfaelle behandelt. Ausserdem konnte die Hauptauswertung fuer einen fruehen Testblock auch spaetere Textbloecke zum Training verwenden. Das Modell konnte deshalb Perioden und Quellen wiedererkennen, ohne eine unbekannte spaetere Quartalszahl vorhersagen zu muessen.
-3. **Claude Opus 5 hat die zentrale Evaluationsschwaeche im Kern richtig erkannt.** Einige Aussagen waren jedoch zu absolut oder sachlich ungenau. So gibt es nicht 20 verschiedene Klassenlabels, sondern 20 Quartalsergebnisse mit nur zwei oder vier moeglichen Klassen. Auch der gesamte Interpretationspfad war nicht automatisch korrekt.
+3. **Die fruehere automatisierte Analyse hat die zentrale Evaluationsschwaeche im Kern richtig erkannt.** Einige Aussagen waren jedoch zu absolut oder sachlich ungenau. So gibt es nicht 20 verschiedene Klassenlabels, sondern 20 Quartalsergebnisse mit nur zwei oder vier moeglichen Klassen. Auch der gesamte Interpretationspfad war nicht automatisch korrekt.
 4. **Das aktuelle beste Ergebnis betraegt 80,56 % Accuracy und MCC 0,7387 auf 36 spaeteren Company-Quarters.** Dieses Ergebnis gehoert zu einem Hybrid aus Saisonprior, numerischen Textsignalen und einem Tesla-Sonderzweig. Es ist kein reines Textmodell.
 5. **Der isolierte numerische Textzweig erreicht 50,00 % Accuracy und MCC 0,3224.** Die transparente Variante ohne den nachtraeglich entworfenen Tesla-Konflikt-Gate erreicht 75,00 % Accuracy und MCC 0,6633.
 6. **Die 80,56 % sind explorativ.** Der Tesla-Konflikt-Gate wurde nach Betrachtung der Fehler aus denselben Testjahren 2017 bis 2019 entworfen. Er muss auf neuen, vorher unberuehrten Quartalen bestaetigt werden.
@@ -34,7 +36,7 @@ Die wissenschaftlich korrekte Gesamtaussage lautet daher:
 5. [Warum die alte Auswertung hohe Werte liefern konnte](#5-warum-die-alte-auswertung-hohe-werte-liefern-konnte)
 6. [Was an der alten Implementierung wissenschaftlich interessant ist](#6-was-an-der-alten-implementierung-wissenschaftlich-interessant-ist)
 7. [Schwache und fehlerhafte Stellen in main](#7-schwache-und-fehlerhafte-stellen-in-main)
-8. [Pruefung der Claude-Opus-5-Analyse](#8-pruefung-der-claude-opus-5-analyse)
+8. [Pruefung der frueheren automatisierten Analyse](#8-pruefung-der-frueheren-automatisierten-analyse)
 9. [Das aktuelle Quartalsmodell](#9-das-aktuelle-quartalsmodell)
 10. [Training und Zukunftstest](#10-training-und-zukunftstest)
 11. [Ergebnisse und statistische Einordnung](#11-ergebnisse-und-statistische-einordnung)
@@ -530,13 +532,13 @@ Moegliche Reparaturen:
 
 Lightning kann bei vorhandenen Dateinamen versionierte Dateien wie `model-v1.ckpt` schreiben. Einige Skripte bauen danach den unversionierten Pfad manuell zusammen. Dadurch kann ein alter Checkpoint geladen werden.
 
-Der Trainer selbst testet mit `ckpt_path='best'`. Daher ist Claudes Aussage, jedes Skript werte zwingend einen alten Checkpoint aus, zu breit. Das Risiko in den manuellen Reload-Pfaden ist dennoch real.
+Der Trainer selbst testet mit `ckpt_path='best'`. Daher ist die pauschale Aussage, jedes Skript werte zwingend einen alten Checkpoint aus, zu breit. Das Risiko in den manuellen Reload-Pfaden ist dennoch real.
 
 ### 7.6 Datumsfehler
 
 Die Trainingsskripte verwenden `pd.to_datetime(post_date)` ohne `unit='s'`. Epoch-Sekunden werden dadurch als Nanosekunden interpretiert und landen im Jahr 1970.
 
-Die numerische Reihenfolge kann dabei erhalten bleiben, Kalenderjahr und Quartal sind jedoch falsch. Claudes Diagnose ist hier korrekt.
+Die numerische Reihenfolge kann dabei erhalten bleiben, Kalenderjahr und Quartal sind jedoch falsch. Die fruehere Diagnose ist hier korrekt.
 
 ### 7.7 Reproduzierbarkeit und Portabilitaet
 
@@ -561,7 +563,7 @@ Die Forschungsfrage bleibt relevant. Die alte konkrete Ausgabe darf aber nicht p
 
 ---
 
-## 8. Pruefung der Claude-Opus-5-Analyse
+## 8. Pruefung der frueheren automatisierten Analyse
 
 ### 8.1 Richtig oder im Kern richtig
 
@@ -596,7 +598,7 @@ Die Forschungsfrage bleibt relevant. Die alte konkrete Ausgabe darf aber nicht p
 | Das Target muesse zwingend auf Q+1 verschoben werden. | nur fuer einen literal next-quarter Forecast; nicht fuer einen Current-Quarter-Nowcast. |
 | Die negative Prognosediagnose mache alte Topics automatisch korrekt. | falsch; der Interpretationspfad muss separat repariert werden. |
 
-### 8.4 Gesamturteil zu Claude
+### 8.4 Gesamturteil zur frueheren Analyse
 
 Die Hauptkritik ist nicht halluziniert: Split und Zielstruktur erzeugen eine reale Abkuerzung. Zu weit gehen absolute Aussagen ueber alle LSTMs, alle Trainingspfade und die gesamte Interpretation.
 
@@ -1296,9 +1298,9 @@ Die alte `main`-Codebasis ist wissenschaftlich interessant, weil sie:
 
 Sie ist jedoch kein ueberzeugender Beleg fuer 87 % echte Zukunftsprognose. Hauptgruende sind Quartalspseudoreplikation, Training auf spaeteren Bloecken, fehlende Saisonbaseline, transduktive Embeddings und konkrete Codeprobleme.
 
-### Zur Claude-Analyse
+### Zur frueheren automatisierten Analyse
 
-Claude hat die zentrale Schwachstelle des Evaluationsdesigns richtig erkannt. Die Analyse wurde unzuverlaessig, wo sie aus einem berechtigten Befund universelle Aussagen ueber alle LSTMs, alle Checkpoints oder die gesamte Interpretationspipeline ableitete.
+Die fruehere automatisierte Analyse hat die zentrale Schwachstelle des Evaluationsdesigns richtig erkannt. Sie wurde unzuverlaessig, wo sie aus einem berechtigten Befund universelle Aussagen ueber alle LSTMs, alle Checkpoints oder die gesamte Interpretationspipeline ableitete.
 
 ### Zum aktuellen Modell
 
