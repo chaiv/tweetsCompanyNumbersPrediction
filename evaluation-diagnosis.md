@@ -1,10 +1,10 @@
 # Was die alten Modelle gelernt haben - und worauf die aktuellen Ergebnisse wirklich beruhen
 
-Umfassende, laienverstaendliche Evaluation der alten `main`-Implementierung, der frueheren automatisierten Analyse, der aktuellen Quartalsmodelle sowie der Topic- und Important-Word-Analyse.
+Umfassende, laienverstaendliche Evaluation der alten `main`-Implementierung, der direkten Code- und Ergebnispruefung, der aktuellen Quartalsmodelle sowie der Topic- und Important-Word-Analyse.
 
 Stand: 18. August 2026
 
-**Hinweis zur Erstellung:** Die Diagnose, die Codepruefung und das weitere Modelltraining wurden automatisiert mit ChatGPT 5.6 Sol sowie Claude Fable / Opus 5 durchgefuehrt.
+**Hinweis zur Erstellung:** Die Codepruefung, die experimentelle Rekonstruktion und das weitere Modelltraining wurden automatisiert mit ChatGPT 5.6 Sol sowie Claude Fable / Opus 5 durchgefuehrt.
 
 ## Kurzfassung
 
@@ -14,8 +14,8 @@ Die wichtigsten Ergebnisse sind:
 
 1. **Die alte Implementierung ist wissenschaftlich interessant.** Sie bildet ein ungewoehnlich breites Informationssystem ab: Tweets werden mit Berichtsperioden verbunden, zu Gruppen zusammengefasst, mit einem LSTM klassifiziert und anschliessend bis zu Woertern und Topics interpretiert. Besonders interessant ist der starke zeitliche und ereignisbezogene Fingerabdruck der Sprache.
 2. **Die alte Accuracy von etwa 0,87 ist kein sauberer Beleg fuer echte Zukunftsprognose.** Viele Tweetgruppen desselben Quartals wurden wie voneinander unabhaengige Testfaelle behandelt. Ausserdem konnte die Hauptauswertung fuer einen fruehen Testblock auch spaetere Textbloecke zum Training verwenden. Das Modell konnte deshalb Perioden und Quellen wiedererkennen, ohne eine unbekannte spaetere Quartalszahl vorhersagen zu muessen.
-3. **Die fruehere automatisierte Analyse hat die zentrale Evaluationsschwaeche im Kern richtig erkannt.** Einige Aussagen waren jedoch zu absolut oder sachlich ungenau. So gibt es nicht 20 verschiedene Klassenlabels, sondern 20 Quartalsergebnisse mit nur zwei oder vier moeglichen Klassen. Auch der gesamte Interpretationspfad war nicht automatisch korrekt.
-4. **Das aktuelle beste Ergebnis betraegt 80,56 % Accuracy und MCC 0,7387 auf 36 spaeteren Company-Quarters.** Dieses Ergebnis gehoert zu einem Hybrid aus Saisonprior, numerischen Textsignalen und einem Tesla-Sonderzweig. Es ist kein reines Textmodell.
+3. **Die direkte Codepruefung zeigt eine zentrale Evaluationsschwaeche.** Es gibt 20 Quartalsergebnisse pro Unternehmen, aber nur zwei oder vier moegliche Klassen. Weil Gruppen statt ganzer Quartale getrennt wurden und fuer fruehe Testbloecke spaetere Bloecke im Training liegen konnten, misst die alte Auswertung nicht sauber die Vorhersage unbekannter Zukunftsquartale. Auch der Interpretationspfad enthaelt konkrete technische Fehler.
+4. **Das aktuelle beste Ergebnis betraegt 80,56 % Accuracy und MCC 0,7387 auf 36 spaeteren Company-Quarters.** Dieses Ergebnis gehoert zu einem Hybrid aus Saisonprior, numerischen Textsignalen und einem Tesla-Sonderzweig. Der Aufbau uebernimmt Aggregation und Interpretierbarkeit aus dem alten System, trennt Saison, Textzahlen, Tesla-Level und Topics aber in kontrollierbare Zweige. Es ist kein reines Textmodell.
 5. **Der isolierte numerische Textzweig erreicht 50,00 % Accuracy und MCC 0,3224.** Die transparente Variante ohne den nachtraeglich entworfenen Tesla-Konflikt-Gate erreicht 75,00 % Accuracy und MCC 0,6633.
 6. **Die 80,56 % sind explorativ.** Der Tesla-Konflikt-Gate wurde nach Betrachtung der Fehler aus denselben Testjahren 2017 bis 2019 entworfen. Er muss auf neuen, vorher unberuehrten Quartalen bestaetigt werden.
 7. **Topics und Important Words sind jetzt zeitlich sauberer angebunden.** Exakte Modellattributionen werden von deskriptiven Topic-Erklaerungen getrennt. Topicmodelle und Wortlexika werden nur auf frueheren Quartalen trainiert und danach auf Zukunftsquartale angewandt.
@@ -36,8 +36,8 @@ Die wissenschaftlich korrekte Gesamtaussage lautet daher:
 5. [Warum die alte Auswertung hohe Werte liefern konnte](#5-warum-die-alte-auswertung-hohe-werte-liefern-konnte)
 6. [Was an der alten Implementierung wissenschaftlich interessant ist](#6-was-an-der-alten-implementierung-wissenschaftlich-interessant-ist)
 7. [Schwache und fehlerhafte Stellen in main](#7-schwache-und-fehlerhafte-stellen-in-main)
-8. [Pruefung der frueheren automatisierten Analyse](#8-pruefung-der-frueheren-automatisierten-analyse)
-9. [Das aktuelle Quartalsmodell](#9-das-aktuelle-quartalsmodell)
+8. [Direkte Code- und Ergebnispruefung](#8-direkte-code--und-ergebnispruefung)
+9. [Herleitung und Aufbau des aktuellen Quartalsmodells](#9-herleitung-und-aufbau-des-aktuellen-quartalsmodells)
 10. [Training und Zukunftstest](#10-training-und-zukunftstest)
 11. [Ergebnisse und statistische Einordnung](#11-ergebnisse-und-statistische-einordnung)
 12. [Topics und Important Words](#12-topics-und-important-words)
@@ -167,7 +167,7 @@ Der `main`-Branch wurde direkt aus den Git-Objekten gelesen. Ein Checkout war ni
 | --- | --- | --- |
 | Codefakt | Direkt im referenzierten Code sichtbar | `pd.to_datetime(post_date)` wird ohne `unit='s'` aufgerufen. |
 | Reproduziertes Ergebnis | Targets, Wahrscheinlichkeiten und Metriken liegen lokal vor und wurden erneut berechnet | 29 von 36 richtigen Company-Quarters, Accuracy 0,8056, MCC 0,7387. |
-| Berichteter Altbefund | Nur in der frueheren Analyse oder Dissertation berichtet | Die exakte alte Quartalserkennungsrate kann ohne damaliges Ergebnisartefakt nicht vollstaendig reproduziert werden. |
+| Berichteter Altbefund | Nur in der Dissertation oder einem historischen Ergebnisbericht dokumentiert | Die exakte alte Quartalserkennungsrate kann ohne damaliges Ergebnisartefakt nicht vollstaendig reproduziert werden. |
 
 ### 3.3 Warum es nur 36 primaere Testfaelle gibt
 
@@ -538,7 +538,7 @@ Der Trainer selbst testet mit `ckpt_path='best'`. Daher ist die pauschale Aussag
 
 Die Trainingsskripte verwenden `pd.to_datetime(post_date)` ohne `unit='s'`. Epoch-Sekunden werden dadurch als Nanosekunden interpretiert und landen im Jahr 1970.
 
-Die numerische Reihenfolge kann dabei erhalten bleiben, Kalenderjahr und Quartal sind jedoch falsch. Die fruehere Diagnose ist hier korrekt.
+Die numerische Reihenfolge kann dabei erhalten bleiben, Kalenderjahr und Quartal sind jedoch falsch. Das folgt direkt aus der Einheit des gespeicherten Zeitstempels und dem Verhalten von `pd.to_datetime`.
 
 ### 7.7 Reproduzierbarkeit und Portabilitaet
 
@@ -563,54 +563,126 @@ Die Forschungsfrage bleibt relevant. Die alte konkrete Ausgabe darf aber nicht p
 
 ---
 
-## 8. Pruefung der frueheren automatisierten Analyse
+## 8. Direkte Code- und Ergebnispruefung
 
-### 8.1 Richtig oder im Kern richtig
+### 8.1 Wie die Pruefung durchgefuehrt wurde
 
-| Aussage | Urteil | Begruendung |
+Die Pruefung wurde direkt aus dem Repository und den lokalen Ergebnisartefakten rekonstruiert:
+
+1. Der zu pruefende `main`-Stand wurde auf Commit `23a2fbb5ee1820b2ec8840816133ab823ef84bb6` fixiert.
+2. Der Targetfluss wurde vom Finanz-Join ueber die Klassenbildung bis zum Samplelabel verfolgt.
+3. Fuer jedes Sample wurde bestimmt, welche reale Beobachtung unabhaengig ist: nicht die Tweetgruppe, sondern das Company-Quarter.
+4. Die Splitskripte wurden daraufhin geprueft, ob ein Testquartal vollstaendig ausserhalb von Training und Validation bleibt und ob alle Trainingsdaten zeitlich davor liegen.
+5. Unueberwachte Vorverarbeitung wie Top2Vec wurde darauf geprueft, ob Testtexte vor dem Split in Vokabular oder Vektoren eingehen.
+6. LSTM-Batching, Padding, Datumsumwandlung und Checkpointladen wurden entlang der tatsaechlichen Aufrufpfade untersucht.
+7. Der Interpretationspfad wurde von Integrated Gradients ueber das Token-/Tweet-Mapping bis zur Topiczuordnung verfolgt.
+8. Fuer das neue System wurden gespeicherte Targets und Wahrscheinlichkeiten erneut geladen; Accuracy, MCC, Log Loss, Firmenmetriken, Wilson-Intervall und gepaarte Shuffle-Kontrolle wurden nachgerechnet.
+
+Damit werden drei Dinge getrennt: direkt sichtbare Codefakten, lokal reproduzierbare Ergebnisse und historische Angaben, fuer die das urspruengliche Ergebnisartefakt fehlt.
+
+### 8.2 Direkt aus dem Code belegte Befunde
+
+| Befund | Codeevidenz | Konsequenz |
 | --- | --- | --- |
-| Das Ziel ist innerhalb eines Quartals konstant. | richtig | Alle Texte eines Company-Quarters teilen dieselbe Zielrealisierung. |
-| Quarter-sharing Splits erlauben Periodenerkennung. | richtig | Gruppen, nicht Quartale, werden getrennt. |
-| Die Hauptauswertung verwendet spaetere Bloecke im Training. | richtig | Testblock `k`, Training alle anderen Bloecke. |
-| Eine Saisonbaseline ist notwendig. | richtig | Vergangene gleiche Kalenderquartale tragen ein starkes Signal. |
-| Das Datum wird als Nanosekunden interpretiert. | richtig | `unit='s'` fehlt. |
-| Fixe Checkpointnamen koennen einen alten Lauf auswerten. | richtig fuer bestimmte Pfade | Manueller unversionierter Reload nach Lightning-Checkpointing. |
-| Die Daten beweisen nicht, dass Tweets keine Finanzinformation enthalten. | richtig | Die Diagnose betrifft die Evaluation, nicht die Existenz eines Signals. |
+| Das Ziel ist innerhalb eines Company-Quarters konstant. | Der Connector ordnet allen Texten desselben Berichtsintervalls denselben Finanzwert zu. | Tweetgruppen desselben Quartals sind keine unabhaengigen Finanzfaelle. |
+| Die alte Gruppenbildung trennt Klassenbloecke, nicht ganze Quartale. | `DataframeSplitter.getSplitIds` schneidet fortlaufende Zeilen einer Klasse in Gruppen. | Andere Texte derselben Periode koennen das Periodenmuster bereits im Training zeigen. |
+| Das Haupt-KFold trainiert fuer Testblock `k` auf allen anderen Bloecken. | Das Splitskript schliesst nur den aktuellen Block aus. | Fuer fruehe Testbloecke koennen spaetere Texte im Training liegen. |
+| Top2Vec wird vor dem Forecast-Split auf dem Vollkorpus trainiert. | Das Topictraining liest das gesamte Dataframe. | Zukunftstexte beeinflussen Vokabular, Nachbarschaften und LSTM-Startvektoren transduktiv. |
+| Epoch-Sekunden werden ohne `unit='s'` konvertiert. | Direkter Aufruf von `pd.to_datetime(post_date)`. | Kalenderjahr und Quartal werden falsch als 1970 interpretiert. |
+| Bestimmte Reload-Pfade bauen einen unversionierten Checkpointnamen zusammen. | Manuelles Laden nach Lightning-Checkpointing. | Bei vorhandenen versionierten Dateien kann ein aelterer Checkpoint geladen werden. |
+| Der alte Interpretationspfad verwendet nicht durchgaengig die gespeicherten Testindizes und aggregiert teilweise falsch. | `df.head(50000)`, Sample-Normalisierung und wiederholte Gruppensummen. | Alte Important-Word-Ausgaben sind nicht automatisch reine Testerklaerungen. |
 
-### 8.2 Teilweise richtig, aber zu stark formuliert
+### 8.3 Praezise Grenzen der Schlussfolgerung
 
-| Aussage | Korrektur |
+| Frage | Was aus dem Repository folgt |
 | --- | --- |
-| „20 distinct labels“ | Es sind 20 Quartals-Outcomes, aber nur zwei oder vier Klassenwerte. |
-| „Das LSTM lernt in keiner Konfiguration“ | Bestimmte Laeufe kollabierten; nicht jede denkbare LSTM-Konfiguration wurde getestet. |
-| „Der letzte Hidden State ist die Ursache“ | Das konkrete Problem ist vor allem unmaskiertes Padding plus Endzustand. |
-| „Jedes Trainingsskript laedt einen alten Checkpoint“ | Vier manuelle Reload-Pfade sind gefaehrdet; der Trainer verwendet `best`. |
-| „91,8 % Quartalserkennung“ | Methodisch plausibler Altbefund, aber ohne eingechecktes Resultat hier nicht exakt reproduziert. |
-| „Alle Out-of-period-Protokolle zeigen keinen positiven Zusammenhang“ | In der alten Analyse berichtet, aber nicht fuer alle Datensaetze mit lokalen Rohartefakten erneut verifiziert. |
+| Gibt es 20 verschiedene Klassen? | Nein. Es gibt 20 Quartals-Outcomes pro Unternehmen, aber nur zwei oder vier Klassenwerte. |
+| Ist der letzte LSTM-Hidden-State immer falsch? | Nein. Problematisch ist hier die Kombination aus Endzustand und unmaskiertem Padding. |
+| Beweist ein kollabierter Lauf, dass kein LSTM lernen kann? | Nein. Er belegt nur das Verhalten der geprueften Konfiguration. |
+| Laedt jedes Trainingsskript zwingend einen alten Checkpoint? | Nein. Gefaehrdet sind die manuellen Reload-Pfade; der Trainer verwendet `ckpt_path='best'`. |
+| Beweist der alte Split, dass Text nutzlos ist? | Nein. Er verhindert nur, den beobachteten Wert sauber als Zukunftsgeneralisierung zu interpretieren. |
+| Muss das Target zwingend Q+1 sein? | Nein. Q+1 ist fuer einen Next-Quarter-Forecast noetig; ein Current-Quarter-Nowcast ist eine andere legitime Aufgabe. |
+| Werden Topicergebnisse durch eine schwache Forecast-Evaluation automatisch richtig oder falsch? | Nein. Topicfit, Attribution und Testzuordnung muessen separat geprueft werden. |
 
-### 8.3 Falsch, unbelegt oder fuer das Projekt nicht zwingend
+### 8.4 Was ohne historische Artefakte offen bleibt
 
-| Aussage | Urteil |
-| --- | --- |
-| Die Interpretation-Pipeline sei mechanisch sauber. | falsch; mehrere konkrete Codefehler widersprechen dem. |
-| Die publizierten 0,87/0,77 seien niemals aus Text entstanden. | nicht beweisbar; der konkrete Mechanismus des historischen Checkpoints ist ohne Artefakt offen. |
-| Mehr als 20 Ziele erforderten einen nichtquartalsweisen Target. | nicht noetig; mehr Jahre, Unternehmen oder externe Holdouts erhoehen ebenfalls die Zahl unabhaengiger Faelle. |
-| Das Target muesse zwingend auf Q+1 verschoben werden. | nur fuer einen literal next-quarter Forecast; nicht fuer einen Current-Quarter-Nowcast. |
-| Die negative Prognosediagnose mache alte Topics automatisch korrekt. | falsch; der Interpretationspfad muss separat repariert werden. |
+Aus dem sichtbaren Code allein laesst sich nicht sicher bestimmen:
 
-### 8.4 Gesamturteil zur frueheren Analyse
+- welcher exakte Checkpoint die publizierten 0,87/0,77 erzeugt hat,
+- ob eine berichtete Quartalserkennungsrate von 91,8 % mit genau diesem Datenstand reproduzierbar ist,
+- wie sich jede nicht eingecheckte LSTM-Konfiguration verhalten hat,
+- welcher Anteil der alten Korrelation aus Finanzinformation, Saison, Quelle oder Periodenerkennung stammt.
 
-Die Hauptkritik ist nicht halluziniert: Split und Zielstruktur erzeugen eine reale Abkuerzung. Zu weit gehen absolute Aussagen ueber alle LSTMs, alle Trainingspfade und die gesamte Interpretation.
+Deshalb lautet der direkte Befund nicht „Text funktioniert nicht“, sondern:
 
-Die praezise Einordnung lautet:
-
-> Starke Diagnose des Evaluationsdesigns, aber zu breite Aussagen ueber Architektur, Experimente und Codequalitaet.
+> Das alte Evaluationsdesign kann echte Textinformation nicht sauber von Quartals-, Saison- und Quellenwiedererkennung trennen. Genau diese Komponenten muessen im neuen System getrennt modelliert und kontrolliert werden.
 
 ---
 
-## 9. Das aktuelle Quartalsmodell
+## 9. Herleitung und Aufbau des aktuellen Quartalsmodells
 
-### 9.1 Ziel und Daten
+### 9.1 Wie das neue System aus dem alten abgeleitet wurde
+
+Das neue System wurde nicht unabhaengig von der alten Arbeit erfunden. Es uebernimmt deren wissenschaftlich starke Ideen, entfernt aber genau die Abkuerzungen, die eine Zukunftsaussage unklar machten.
+
+| Beobachtung oder Baustein im alten System | Entscheidung im neuen System | Warum diese Aenderung notwendig ist |
+| --- | --- | --- |
+| Das fachliche Ziel ist die Veraenderung einer Unternehmenskennzahl. | Das Vierklassen-Quartalstarget bleibt erhalten. | Die Forschungsfrage soll nicht durch Aktienkurse oder andere leichter verfuegbare Targets ersetzt werden. |
+| Viele schwache Texte muessen gemeinsam betrachtet werden. | Texte werden weiterhin aggregiert, jetzt aber einmal pro Company-Quarter. | Die Aggregationsidee bleibt erhalten, ohne ein Finanzereignis durch viele Tweetgruppen kuenstlich zu vervielfachen. |
+| Gruppensamples konnten dasselbe Quartal zwischen Train und Test teilen. | Die primaere Auswertungseinheit ist das vollstaendige Company-Quarter. | Alle Texte einer Zielrealisierung bleiben auf derselben Seite des Splits. |
+| Das klassenweise KFold konnte spaetere Bloecke zum Training eines frueheren Tests verwenden. | Rolling-Origin-Splits verwenden nur Jahre vor dem Testjahr. | Das Protokoll entspricht einer realistischen zeitlichen Anwendung. |
+| Top2Vec wurde auf dem Vollkorpus trainiert. | Das primaere Vorhersagemodell verwendet keine auf Testtexten gefitteten Embeddings. | Transduktive Zukunftsinformation wird aus der Hauptauswertung entfernt. |
+| Das LSTM war fuer nur wenige unabhaengige Quartale sehr gross und durch Padding schwer interpretierbar. | Der Textzweig verwendet robuste Quartalsaggregate und regularisierte logistische Regression. | Das Modell passt zur kleinen effektiven Stichprobe und liefert exakt zerlegbare Featurebeitraege. |
+| Die alten hohen Werte deuteten auf einen starken Temporal-Fingerprint hin. | Texte werden in `all`, `late_third`, `reported`, `forward_estimate`, `early_reported` und `late_forward_estimate` getrennt. | Zeit- und Ereignissignale werden explizit gemessen, statt unkontrolliert im Embedding zu stecken. |
+| Unternehmens- und Kennzahlenbegriffe waren semantisch zentral. | Firmen- und metrikspezifische Marker selektieren zielnahe Texte. | Allgemeines Marktrauschen wird reduziert, waehrend die urspruengliche Text-Hypothese erhalten bleibt. |
+| Saisonalitaet konnte im alten Split implizit aus der Periode gelernt werden. | Ein eigener Saisonprior wird als sichtbarer Modellzweig und Baseline berechnet. | Saisonleistung wird nicht mehr faelschlich dem Text zugeschrieben. |
+| Tesla-Texte enthalten haeufig absolute Produktions-, Liefer- und Schaetzlevel. | Ein separater Forward-Level-Zweig berechnet erwartete Veraenderungen aus fruehen und spaeten Textleveln. | Die wirtschaftliche Struktur des Tesla-Targets unterscheidet sich von Amazon-Umsatz und Apple-EPS. |
+| Der alte Interpretationspfad war vom tatsaechlichen Testpfad entkoppelt. | Lineare Attribution, Cue-Woerter, past-only Important Words und past-only NMF-Topics werden getrennt ausgegeben. | Jede Erklaerung erhaelt einen klaren Evidenzstatus und verwendet keine Testlabels zum Fit. |
+| Vollstaendige Texte waren fuer Demo und Interpretation leicht im Code sichtbar. | Neue Ergebnisartefakte speichern nur Aggregate, Begriffe und Topicgewichte. | Reproduzierbare Erklaerungen sollen ohne Weitergabe vollstaendiger Posts moeglich sein. |
+
+Die Architektur ist damit keine voellige Abkehr vom alten System. Sie ist eine kontrollierte Zerlegung seiner vermischten Signale:
+
+```text
+altes gemeinsames Sprachsignal
+        |
+        +-- saisonale Wiederholung ----------> expliziter Saisonprior
+        +-- zielnahe Zahlen und Erwartungen -> numerischer Textzweig
+        +-- Tesla-Levelveraenderung ----------> Forward-Level-Zweig
+        +-- Themen und Begriffe --------------> past-only Erklaerungspfad
+```
+
+### 9.2 Aufbau in zehn Schritten
+
+1. **Target einfrieren:** Fuer jedes Unternehmen bleibt genau die dokumentierte Quartalskennzahl und deren Vierklassenveraenderung das Ziel.
+2. **Unabhaengige Einheit festlegen:** Alle Texte eines Unternehmensquartals werden zu einem einzigen Fall zusammengefasst.
+3. **Zeitachse vor dem Featurefit teilen:** Training, Validation und Test werden nach ganzen Jahren als Rolling Origin definiert.
+4. **Zielnahe Texte auswaehlen:** Ein Text muss einen Unternehmens- und einen Kennzahlmarker enthalten.
+5. **Informationszeitpunkt trennen:** Fruehe, spaete, berichtete und erwartungsbezogene Texte werden in getrennten Ansichten aggregiert.
+6. **Textsignal separat lernen:** Nur die Trainingsquartale bestimmen Skalierung, Regularisierung und Koeffizienten des numerischen Textklassifikators.
+7. **Saison separat berechnen:** Historische Klassen desselben Kalenderquartals bilden einen geglaetteten Prior, der ohne Text auskommt.
+8. **Zweige kontrolliert fusionieren:** Saison- und Textwahrscheinlichkeiten werden mit festen oder auf Validation bestimmten Regeln kombiniert.
+9. **Firmenspezifische Struktur begrenzen:** Nur Tesla erhaelt den Forward-Level-Zweig; der post hoc entwickelte Konflikt-Gate wird ausdruecklich als explorativ markiert.
+10. **Erklaerung an die Vorhersage koppeln:** Jede finale Entscheidung speichert die Wahrscheinlichkeiten aller Zweige und trennt exakte Attribution von deskriptiven Topics.
+
+Diese Reihenfolge ist entscheidend. Wuerde beispielsweise das Topicmodell vor dem Jahressplit oder die Skalierung auf allen Quartalen gefittet, waere die alte Leakage-Problematik in neuer Form wieder vorhanden.
+
+### 9.3 Wo die Entscheidungen im aktuellen Code umgesetzt sind
+
+| Wissenschaftliche Entscheidung | Aktuelle Implementierung | Pruefbarer Effekt |
+| --- | --- | --- |
+| Ein Fall entspricht einem Company-Quarter. | `build_company_data` in `trainNumericTextSignalQuarterModel.py` | Texte, Target und Quartalsfeatures werden ueber einen eindeutigen Quartalsschluessel verbunden. |
+| Nur zielnahe Texte erzeugen Zahlenfeatures. | `contains_company_and_metric` und `numeric_quarter_features` in `NumericQuarterTextFeatures.py` | Jeder beruecksichtigte Text erfuellt Firmen- und Kennzahlenmuster; das Ergebnis ist ein fester Featurevektor. |
+| Train, Validation und Test folgen der Zeit. | `rolling_fold` | Der Fold erzeugt Jahreslisten, fittet Kandidaten nur auf der Vergangenheit und bewertet das folgende Testjahr. |
+| Der reine Textzweig bleibt separat messbar. | `fit_numeric_model`, `candidate_predictions` und `select_numeric_candidate` | Textwahrscheinlichkeiten und Textmetriken werden vor jeder Fusion gespeichert. |
+| Saison wird nicht als Text ausgegeben. | `seasonal_probabilities` | Der Prior verwendet ausschliesslich fruehere Labels desselben Kalenderquartals. |
+| Fusion und Tesla-Sonderlogik sind explizit. | `fuse_probabilities`, `tesla_forward_fusion` und `tesla_conflict_gate` | Wahrscheinlichkeiten vor und nach jedem Zweig koennen getrennt reproduziert werden. |
+| Unsicherheit und Textkontrolle werden mitgespeichert. | `wilson_interval` und `paired_accuracy_audit` | Intervall, abweichende richtige Entscheidungen und exakter gepaarter p-Wert werden aus den 36 Faellen berechnet. |
+| Erklaerungen folgen dem tatsaechlichen Modell. | `linear_class_feature_contributions`, `model_linked_cue_words`, `fit_past_only_important_words` und `PastOnlyNmfTopics` | Exakte lineare Beitraege bleiben von deskriptiven Wort- und Topicassoziationen getrennt. |
+| Ergebnis und Datenschutz werden beim Export geprueft. | `replay_models` und `_forbidden_output_key_audit` in `extractNumericQuarterTopicsAndImportantWords.py` | Gespeicherte Klassen muessen reproduziert werden; Rohtext- und Identifikatorfelder werden blockiert. |
+
+Diese Zuordnung macht die Herleitung falsifizierbar: Jede methodische Aussage besitzt einen konkreten Codepfad und ein beobachtbares Ergebnisartefakt.
+
+### 9.4 Ziel und Daten
 
 Das Ziel bleibt die vierstufige Veraenderung der Quartalskennzahl. Verwendet werden Amazon, Apple und Tesla.
 
@@ -624,7 +696,7 @@ Nicht als aktuelle Eingabefeatures verwendet werden:
 
 Vergangene Zielklassen werden fuer Modelltraining und Saisonprior verwendet.
 
-### 9.2 Zielnahe Textselektion
+### 9.5 Zielnahe Textselektion
 
 Ein Text geht in die numerische Aggregation ein, wenn er sowohl einen Unternehmensmarker als auch einen Kennzahlmarker enthaelt.
 
@@ -638,7 +710,7 @@ Beispiele:
 
 Das Ergebnis speichert keine vollstaendigen Texte. Es speichert nur aggregierte Features.
 
-### 9.3 Sechs Textansichten
+### 9.6 Sechs Textansichten
 
 | Ansicht | Inhalt | Hypothese |
 | --- | --- | --- |
@@ -649,7 +721,7 @@ Das Ergebnis speichert keine vollstaendigen Texte. Es speichert nur aggregierte 
 | `early_reported` | Reportingsprache im ersten Drittel | Proxy fuer alten Referenzstand |
 | `late_forward_estimate` | Schaetzungen im letzten Drittel | Proxy fuer erwarteten neuen Stand |
 
-### 9.4 Featurefamilien
+### 9.7 Featurefamilien
 
 Aus jeder Ansicht werden unter anderem berechnet:
 
@@ -663,7 +735,7 @@ Aus jeder Ansicht werden unter anderem berechnet:
 - robuste absolute Kennzahllevel,
 - Differenzen zwischen fruehen, spaeten, berichteten und erwarteten Levels.
 
-### 9.5 Synthetisches Beispiel
+### 9.8 Synthetisches Beispiel
 
 Angenommen, fruehe Texte nennen einen berichteten Lieferstand von 70.000 Einheiten. Spaete Schaetzungen nennen 81.000.
 
@@ -673,7 +745,7 @@ estimated_change = (81.000 / 70.000 - 1) x 100 = 15,7 %
 
 15,7 % faellt in Klasse 2. Das ist Feature Engineering aus Text, nicht das Auslesen des echten Testtargets.
 
-### 9.6 Numerischer Textklassifikator
+### 9.9 Numerischer Textklassifikator
 
 Die Quartalsfeatures werden:
 
@@ -687,25 +759,25 @@ Validation waehlt:
 - aktuelle Features allein oder mit zeitlichen Differenzen,
 - optionale Firmenidentitaet.
 
-### 9.7 Saisonprior
+### 9.10 Saisonprior
 
 Fuer ein neues Q2 betrachtet der Saisonprior nur fruehere Q2-Labels desselben Unternehmens und erzeugt daraus eine geglaettete Klassenverteilung.
 
 Er verwendet keine Finanzwerte als Input, aber historische Targets. Darum ist er kein Textfeature.
 
-### 9.8 Fusion
+### 9.11 Fusion
 
 Der allgemeine Hybrid mischt Saison- und Textwahrscheinlichkeiten mit festem Gewicht.
 
 Bei Tesla kommt ein Forward-Level-Signal hinzu. Es leitet aus spaeten Schaetzleveln und fruehen berichteten Levels eine erwartete Veraenderung ab.
 
-### 9.9 Tesla-Konflikt-Gate
+### 9.12 Tesla-Konflikt-Gate
 
 Der Gate erkennt zwei spezielle Konfliktmuster zwischen Basismodell und numerischem Textmodell. In diesen Faellen ersetzt er die Vorhersage durch die numerische Textverteilung.
 
 Der Gate verbessert 75,00 % auf 80,56 %. Seine Schwellen wurden jedoch nach Betrachtung der Fehler von 2017 bis 2019 entworfen. Deshalb ist er explorativ und nicht bestaetigend.
 
-### 9.10 Warum kein CUDA benoetigt wird
+### 9.13 Warum kein CUDA benoetigt wird
 
 Das aktuelle beste Modell ist kein LSTM. Regex-Aggregation, Skalierung und logistische Regression laufen auf CPU. CUDA war fuer die frueheren neuronalen Modelle relevant, nicht fuer den aktuellen 80,56-%-Lauf.
 
@@ -1022,7 +1094,7 @@ Die Claim Ladder trennt technische Machbarkeit, empirische Beobachtung, Hypothes
 | --- | --- | --- |
 | Die Gesamtpipeline ist technisch realisierbar. | belegt | Lokale Texte koennen mit Berichtsperioden verbunden, gruppiert, klassifiziert und bis zu Woertern und Topics zurueckverfolgt werden. |
 | Textgruppen enthalten starke Klassenkorrelationen. | im alten Split belegt | Unter den damaligen Gruppierungs- und Splitbedingungen ist die Zielklasse stark separierbar. |
-| Sprache kodiert Zeit, Ereignisse und Marktregime. | starke Hypothese | Alte hohe Werte sowie Saison- und Shuffle-Diagnosen motivieren einen Temporal-Fingerprint-Test. |
+| Sprache kodiert Zeit, Ereignisse und Marktregime. | starke Hypothese | Alte hohe Werte sowie Saison- und Shuffle-Kontrollen motivieren einen Temporal-Fingerprint-Test. |
 | Bestimmte Woerter und Topics sind interpretativ relevant. | Kandidaten | Stabilitaet muss auf past-only Fits und Zukunftstests erneut gemessen werden. |
 | Text sagt unbekannte spaetere Quartale mit 87 % voraus. | nicht belegt | Die alte 0,87 darf nicht als strikte Zukunftsgeneralisierung interpretiert werden. |
 | Das aktuelle reine Textmodell erreicht 80,56 %. | falsch | 80,56 % gehoeren zum Hybrid; numerischer Text allein erreicht 50,00 %. |
@@ -1298,9 +1370,9 @@ Die alte `main`-Codebasis ist wissenschaftlich interessant, weil sie:
 
 Sie ist jedoch kein ueberzeugender Beleg fuer 87 % echte Zukunftsprognose. Hauptgruende sind Quartalspseudoreplikation, Training auf spaeteren Bloecken, fehlende Saisonbaseline, transduktive Embeddings und konkrete Codeprobleme.
 
-### Zur frueheren automatisierten Analyse
+### Zur direkten Code- und Ergebnispruefung
 
-Die fruehere automatisierte Analyse hat die zentrale Schwachstelle des Evaluationsdesigns richtig erkannt. Sie wurde unzuverlaessig, wo sie aus einem berechtigten Befund universelle Aussagen ueber alle LSTMs, alle Checkpoints oder die gesamte Interpretationspipeline ableitete.
+Die direkte Pruefung belegt die zentralen Schwachstellen ueber konkrete Daten- und Aufrufpfade: Das Target wird auf Gruppenebene wiederholt, der Hauptsplit kann Perioden teilen und spaetere Bloecke verwenden, Top2Vec sieht den Vollkorpus und mehrere Interpretationsschritte sind technisch fehlerhaft. Daraus folgt eine notwendige Neueinordnung der alten Accuracy, aber keine universelle Aussage, dass Text oder jede LSTM-Architektur unbrauchbar sei.
 
 ### Zum aktuellen Modell
 

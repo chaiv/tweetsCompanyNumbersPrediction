@@ -1,10 +1,10 @@
 # What the Old Models Learned—and What the Current Results Actually Rest On
 
-A comprehensive, plain-language evaluation of the old `main` implementation, the earlier automated analysis, the current quarterly models, and the topic and important-word analysis.
+A comprehensive, plain-language evaluation of the old `main` implementation, the direct code and result audit, the current quarterly models, and the topic and important-word analysis.
 
 Status: August 18, 2026
 
-**Creation note:** The diagnosis, code review, and subsequent model training were performed automatically using ChatGPT 5.6 Sol and Claude Fable / Opus 5.
+**Creation note:** The code audit, experimental reconstruction, and subsequent model training were performed automatically using ChatGPT 5.6 Sol and Claude Fable / Opus 5.
 
 ## Executive Summary
 
@@ -14,8 +14,8 @@ The main findings are:
 
 1. **The old implementation is scientifically interesting.** It represents an unusually broad information system: tweets are linked to reporting periods, aggregated into groups, classified with an LSTM, and then interpreted down to words and topics. The strong temporal and event-related fingerprint in the language is particularly interesting.
 2. **The old accuracy of approximately 0.87 is not clean evidence of genuine future forecasting.** Many tweet groups from the same quarter were treated as if they were independent test cases. In addition, the main evaluation could train on later text blocks when testing an earlier block. The model could therefore recognize periods and sources without having to predict an unknown later quarterly value.
-3. **The earlier automated analysis correctly identified the central evaluation weakness.** Some statements were nevertheless too absolute or factually imprecise. There are not 20 different class labels, for example, but 20 quarterly outcomes with only two or four possible classes. The entire interpretation path was not automatically correct either.
-4. **The current best result is 80.56% accuracy and MCC 0.7387 on 36 later company-quarters.** This result belongs to a hybrid of a seasonal prior, numerical text signals, and a Tesla-specific branch. It is not a pure-text model.
+3. **The direct code audit establishes a central evaluation weakness.** There are 20 quarterly outcomes per company, but only two or four possible classes. Because groups rather than whole quarters were separated, and later blocks could be in training for early test blocks, the old evaluation does not cleanly measure prediction of unknown future quarters. The interpretation path also contains concrete technical errors.
+4. **The current best result is 80.56% accuracy and MCC 0.7387 on 36 later company-quarters.** This result belongs to a hybrid of a seasonal prior, numerical text signals, and a Tesla-specific branch. Its design retains aggregation and interpretability from the old system while separating seasonality, textual numbers, Tesla levels, and topics into controllable branches. It is not a pure-text model.
 5. **The isolated numerical text branch reaches 50.00% accuracy and MCC 0.3224.** The transparent variant without the subsequently designed Tesla conflict gate reaches 75.00% accuracy and MCC 0.6633.
 6. **The 80.56% result is exploratory.** The Tesla conflict gate was designed after inspecting errors from the same 2017–2019 test years. It must be confirmed on new, previously untouched quarters.
 7. **Topics and important words are now connected in a more temporally valid way.** Exact model attributions are separated from descriptive topic explanations. Topic models and word lexicons are fitted only on earlier quarters and then applied to future quarters.
@@ -36,8 +36,8 @@ The scientifically accurate overall statement is therefore:
 5. [Why the Old Evaluation Could Produce High Scores](#5-why-the-old-evaluation-could-produce-high-scores)
 6. [What Is Scientifically Interesting About the Old Implementation](#6-what-is-scientifically-interesting-about-the-old-implementation)
 7. [Weak and Faulty Parts of `main`](#7-weak-and-faulty-parts-of-main)
-8. [Review of the Earlier Automated Analysis](#8-review-of-the-earlier-automated-analysis)
-9. [The Current Quarterly Model](#9-the-current-quarterly-model)
+8. [Direct Code and Result Audit](#8-direct-code-and-result-audit)
+9. [Derivation and Architecture of the Current Quarterly Model](#9-derivation-and-architecture-of-the-current-quarterly-model)
 10. [Training and Future Testing](#10-training-and-future-testing)
 11. [Results and Statistical Interpretation](#11-results-and-statistical-interpretation)
 12. [Topics and Important Words](#12-topics-and-important-words)
@@ -167,7 +167,7 @@ The `main` branch was read directly from Git objects. No checkout was needed, so
 | --- | --- | --- |
 | Code fact | Directly visible in the referenced code | `pd.to_datetime(post_date)` is called without `unit='s'`. |
 | Reproduced result | Targets, probabilities, and metrics are available locally and were recomputed | 29 of 36 company-quarters correct, accuracy 0.8056, MCC 0.7387. |
-| Reported historical finding | Reported only in the earlier analysis or dissertation | The exact historical quarter-recognition rate cannot be fully reproduced without its original result artifact. |
+| Reported historical finding | Documented only in the dissertation or a historical result report | The exact historical quarter-recognition rate cannot be fully reproduced without its original result artifact. |
 
 ### 3.3 Why There Are Only 36 Primary Test Cases
 
@@ -538,7 +538,7 @@ The trainer itself tests with `ckpt_path='best'`. The blanket claim that every s
 
 The training scripts use `pd.to_datetime(post_date)` without `unit='s'`. Epoch seconds are consequently interpreted as nanoseconds and placed in 1970.
 
-The numerical order may remain intact, but calendar year and quarter are wrong. The earlier diagnosis is correct here.
+The numerical order may remain intact, but calendar year and quarter are wrong. This follows directly from the stored timestamp's unit and the behavior of `pd.to_datetime`.
 
 ### 7.7 Reproducibility and Portability
 
@@ -563,54 +563,126 @@ The research question remains relevant. The old concrete output cannot, however,
 
 ---
 
-## 8. Review of the Earlier Automated Analysis
+## 8. Direct Code and Result Audit
 
-### 8.1 Correct or Correct in Substance
+### 8.1 How the Audit Was Performed
 
-| Claim | Assessment | Reasoning |
+The audit was reconstructed directly from the repository and the local result artifacts:
+
+1. The examined `main` revision was fixed at commit `23a2fbb5ee1820b2ec8840816133ab823ef84bb6`.
+2. The target flow was traced from the financial join through class construction to the sample label.
+3. For each sample, the genuinely independent observation was identified: not the tweet group, but the company-quarter.
+4. The split scripts were checked to determine whether a test quarter remains completely outside training and validation and whether all training data are temporally earlier.
+5. Unsupervised preprocessing such as Top2Vec was checked for test-text influence on vocabularies or vectors before the split.
+6. LSTM batching, padding, date conversion, and checkpoint loading were inspected along the actual call paths.
+7. The interpretation path was traced from Integrated Gradients through token/tweet mapping to topic assignment.
+8. For the new system, stored targets and probabilities were loaded again; accuracy, MCC, log loss, company metrics, the Wilson interval, and the paired shuffle control were recomputed.
+
+This separates three categories: code facts visible directly, locally reproducible results, and historical statements for which the original result artifact is unavailable.
+
+### 8.2 Findings Established Directly from the Code
+
+| Finding | Code evidence | Consequence |
 | --- | --- | --- |
-| The target is constant within a quarter. | Correct | All texts in a company-quarter share the same target realization. |
-| Quarter-sharing splits permit period recognition. | Correct | Groups rather than quarters are separated. |
-| The primary evaluation uses later blocks in training. | Correct | Test block `k`, training on all other blocks. |
-| A seasonal baseline is necessary. | Correct | Earlier instances of the same calendar quarter carry a strong signal. |
-| The date is interpreted as nanoseconds. | Correct | `unit='s'` is missing. |
-| Fixed checkpoint names can evaluate an older run. | Correct for certain paths | Manual unversioned reload after Lightning checkpointing. |
-| The data do not prove that tweets contain no financial information. | Correct | The diagnosis concerns the evaluation, not whether a signal exists. |
+| The target is constant within a company-quarter. | The connector assigns the same financial value to all texts in the same reporting interval. | Tweet groups from the same quarter are not independent financial cases. |
+| The old grouping separates class blocks, not whole quarters. | `DataframeSplitter.getSplitIds` cuts consecutive rows of a class into groups. | Other texts from the same period can already expose the period pattern in training. |
+| The primary K-fold trains on all blocks other than test block `k`. | The split script excludes only the current block. | Later texts can be in training for early test blocks. |
+| Top2Vec is trained on the full corpus before the forecast split. | Topic training reads the complete DataFrame. | Future texts affect vocabulary, neighborhoods, and LSTM initialization transductively. |
+| Epoch seconds are converted without `unit='s'`. | Direct call to `pd.to_datetime(post_date)`. | Calendar year and quarter are incorrectly interpreted as 1970. |
+| Certain reload paths construct an unversioned checkpoint name. | Manual loading after Lightning checkpointing. | If versioned files exist, an older checkpoint can be loaded. |
+| The old interpretation path does not consistently use stored test indices and partly aggregates incorrectly. | `df.head(50000)`, per-sample normalization, and repeated group sums. | Old important-word outputs are not automatically test-only explanations. |
 
-### 8.2 Partly Correct, but Overstated
+### 8.3 Precise Limits of the Conclusions
 
-| Claim | Correction |
+| Question | What follows from the repository |
 | --- | --- |
-| “20 distinct labels” | There are 20 quarterly outcomes, but only two or four class values. |
-| “The LSTM does not learn in any configuration” | Certain runs collapsed; not every conceivable LSTM configuration was tested. |
-| “The last hidden state is the cause” | The concrete issue is primarily unmasked padding combined with the final state. |
-| “Every training script loads an old checkpoint” | Four manual reload paths are at risk; the trainer uses `best`. |
-| “91.8% quarter recognition” | A methodologically plausible historical finding, but not exactly reproduced here without a committed result. |
-| “All out-of-period protocols show no positive association” | Reported in the old analysis, but not reverified for all datasets using local raw artifacts. |
+| Are there 20 different classes? | No. There are 20 quarterly outcomes per company, but only two or four class values. |
+| Is the final LSTM hidden state always wrong? | No. The problem here is the combination of the final state and unmasked padding. |
+| Does one collapsed run prove that no LSTM can learn? | No. It establishes only the behavior of the tested configuration. |
+| Does every training script necessarily load an old checkpoint? | No. The manual reload paths are at risk; the trainer uses `ckpt_path='best'`. |
+| Does the old split prove that text is useless? | No. It only prevents the observed score from being interpreted cleanly as future generalization. |
+| Must the target necessarily be Q+1? | No. Q+1 is required for a next-quarter forecast; a current-quarter nowcast is a different legitimate task. |
+| Does weak forecast evaluation automatically make topic results right or wrong? | No. Topic fitting, attribution, and test assignment must be evaluated separately. |
 
-### 8.3 Wrong, Unsupported, or Not Required for This Project
+### 8.4 What Remains Unknown Without Historical Artifacts
 
-| Claim | Assessment |
-| --- | --- |
-| The interpretation pipeline is mechanically sound. | Wrong; several concrete code errors contradict it. |
-| The published 0.87/0.77 results could never have come from text. | Not provable; without the artifact, the exact mechanism of the historical checkpoint remains unknown. |
-| Obtaining more than 20 targets requires a non-quarterly target. | Unnecessary; more years, companies, or external holdouts also increase the number of independent cases. |
-| The target must be shifted to Q+1. | Only for a literal next-quarter forecast, not for a current-quarter nowcast. |
-| The negative forecast diagnosis automatically makes the old topics correct. | Wrong; the interpretation path must be repaired separately. |
+The visible code alone cannot determine with certainty:
 
-### 8.4 Overall Assessment of the Earlier Analysis
+- which exact checkpoint produced the published 0.87/0.77,
+- whether a reported quarter-recognition rate of 91.8% can be reproduced with this exact data revision,
+- how every uncommitted LSTM configuration behaved,
+- what share of the old correlation came from financial information, seasonality, source, or period recognition.
 
-The main criticism is not hallucinated: the split and target structure create a real shortcut. What goes too far are absolute statements about all LSTMs, all training paths, and the entire interpretation system.
+The direct finding is therefore not “text does not work,” but:
 
-The precise assessment is:
-
-> A strong diagnosis of the evaluation design, but overbroad conclusions about the architecture, experiments, and code quality.
+> The old evaluation design cannot cleanly separate genuine textual information from quarter, season, and source recognition. These components must be modeled and controlled separately in the new system.
 
 ---
 
-## 9. The Current Quarterly Model
+## 9. Derivation and Architecture of the Current Quarterly Model
 
-### 9.1 Target and Data
+### 9.1 How the New System Was Derived from the Old One
+
+The new system was not invented independently of the old work. It retains the scientifically strong ideas while removing the shortcuts that made the future-prediction claim ambiguous.
+
+| Observation or component in the old system | Decision in the new system | Why this change is necessary |
+| --- | --- | --- |
+| The substantive target is the change in a company metric. | The four-class quarterly target is retained. | The research question should not be replaced with stock prices or another more readily available target. |
+| Many weak texts must be considered together. | Texts are still aggregated, but now once per company-quarter. | The aggregation idea is retained without artificially multiplying one financial event into many tweet groups. |
+| Group samples could share the same quarter across training and test. | The primary evaluation unit is the complete company-quarter. | All texts belonging to one target realization remain on the same side of the split. |
+| Per-class K-fold could train on later blocks when testing an earlier block. | Rolling-origin splits use only years preceding the test year. | The protocol now corresponds to a realistic temporal application. |
+| Top2Vec was trained on the full corpus. | The primary prediction model uses no embeddings fitted on test texts. | Transductive future information is removed from the primary evaluation. |
+| The LSTM was large relative to the small number of independent quarters and difficult to interpret because of padding. | The text branch uses robust quarterly aggregates and regularized logistic regression. | The model matches the small effective sample and provides exactly decomposable feature contributions. |
+| The old high scores suggested a strong temporal fingerprint. | Text is separated into `all`, `late_third`, `reported`, `forward_estimate`, `early_reported`, and `late_forward_estimate` views. | Temporal and event signals are measured explicitly instead of remaining uncontrolled inside an embedding. |
+| Company and metric terms were semantically central. | Company- and metric-specific markers select target-relevant texts. | General market noise is reduced while preserving the original text hypothesis. |
+| The old split could learn seasonality implicitly from the period. | A separate seasonal prior is computed as a visible model branch and baseline. | Seasonal performance is no longer incorrectly attributed to text. |
+| Tesla texts frequently contain absolute production, delivery, and estimate levels. | A separate forward-level branch calculates expected changes from early and late textual levels. | The economic structure of the Tesla target differs from Amazon revenue and Apple EPS. |
+| The old interpretation path was disconnected from the actual test path. | Linear attribution, cue words, past-only important words, and past-only NMF topics are reported separately. | Each explanation has a clear evidential status and no test labels are used during fitting. |
+| Complete texts were easy to expose through demos and interpretation. | New result artifacts store only aggregates, terms, and topic weights. | Reproducible explanations should be possible without distributing complete posts. |
+
+The architecture is therefore not a complete departure from the old system. It is a controlled decomposition of signals that were previously mixed together:
+
+```text
+old combined language signal
+        |
+        +-- seasonal repetition -------------> explicit seasonal prior
+        +-- target-relevant numbers/expectations -> numerical text branch
+        +-- Tesla level change --------------> forward-level branch
+        +-- topics and terms ----------------> past-only explanation path
+```
+
+### 9.2 Construction in Ten Steps
+
+1. **Freeze the target:** For each company, the documented quarterly metric and its four-class change remain the sole target.
+2. **Define the independent unit:** All texts from one company-quarter are combined into one case.
+3. **Split time before fitting features:** Training, validation, and test are defined by complete years in a rolling-origin design.
+4. **Select target-relevant texts:** A text must contain both a company marker and a metric marker.
+5. **Separate information timing:** Early, late, reported, and expectation-related texts are aggregated into distinct views.
+6. **Learn the text signal separately:** Only training quarters determine scaling, regularization, and coefficients for the numerical text classifier.
+7. **Compute seasonality separately:** Historical classes from the same calendar quarter form a smoothed prior that requires no text.
+8. **Fuse branches in a controlled way:** Seasonal and text probabilities are combined through fixed rules or rules selected on validation data.
+9. **Limit company-specific structure:** Only Tesla receives the forward-level branch; the post hoc conflict gate is explicitly labeled exploratory.
+10. **Tie explanation to prediction:** Every final decision stores probabilities from all branches and separates exact attribution from descriptive topics.
+
+The order is essential. If, for example, the topic model were fitted before the yearly split or scaling were fitted on all quarters, the old leakage problem would reappear in a new form.
+
+### 9.3 Where These Decisions Are Implemented in the Current Code
+
+| Scientific decision | Current implementation | Observable effect |
+| --- | --- | --- |
+| One case corresponds to one company-quarter. | `build_company_data` in `trainNumericTextSignalQuarterModel.py` | Texts, target, and quarterly features are joined through a unique quarter key. |
+| Only target-relevant texts generate numerical features. | `contains_company_and_metric` and `numeric_quarter_features` in `NumericQuarterTextFeatures.py` | Every included text satisfies company and metric patterns; the output is a fixed feature vector. |
+| Training, validation, and test follow time. | `rolling_fold` | The fold creates year lists, fits candidates only on the past, and evaluates the following test year. |
+| The pure text branch remains separately measurable. | `fit_numeric_model`, `candidate_predictions`, and `select_numeric_candidate` | Text probabilities and text metrics are stored before any fusion. |
+| Seasonality is not reported as text. | `seasonal_probabilities` | The prior uses only earlier labels from the same calendar quarter. |
+| Fusion and Tesla-specific logic are explicit. | `fuse_probabilities`, `tesla_forward_fusion`, and `tesla_conflict_gate` | Probabilities before and after every branch can be reproduced separately. |
+| Uncertainty and the text control are stored. | `wilson_interval` and `paired_accuracy_audit` | The interval, discordant correct decisions, and exact paired p-value are calculated from the 36 cases. |
+| Explanations follow the actual model. | `linear_class_feature_contributions`, `model_linked_cue_words`, `fit_past_only_important_words`, and `PastOnlyNmfTopics` | Exact linear contributions remain separate from descriptive word and topic associations. |
+| Results and privacy are checked at export. | `replay_models` and `_forbidden_output_key_audit` in `extractNumericQuarterTopicsAndImportantWords.py` | Stored classes must be reproduced; raw-text and identifier fields are blocked. |
+
+This mapping makes the derivation falsifiable: every methodological statement has a concrete code path and an observable result artifact.
+
+### 9.4 Target and Data
 
 The target remains the four-level change in a quarterly business metric. Amazon, Apple, and Tesla are included.
 
@@ -624,7 +696,7 @@ The following are not used as current input features:
 
 Past target classes are used for model training and the seasonal prior.
 
-### 9.2 Target-Relevant Text Selection
+### 9.5 Target-Relevant Text Selection
 
 A text enters the numerical aggregation if it contains both a company marker and a metric marker.
 
@@ -638,7 +710,7 @@ Examples:
 
 The result does not store complete texts. It stores only aggregated features.
 
-### 9.3 Six Text Views
+### 9.6 Six Text Views
 
 | View | Content | Hypothesis |
 | --- | --- | --- |
@@ -649,7 +721,7 @@ The result does not store complete texts. It stores only aggregated features.
 | `early_reported` | Reporting language in the first third | Proxy for the old reference level |
 | `late_forward_estimate` | Estimates in the final third | Proxy for the expected new level |
 
-### 9.4 Feature Families
+### 9.7 Feature Families
 
 The following are among the values computed from each view:
 
@@ -663,7 +735,7 @@ The following are among the values computed from each view:
 - robust absolute metric levels,
 - differences between early, late, reported, and expected levels.
 
-### 9.5 Synthetic Example
+### 9.8 Synthetic Example
 
 Suppose early texts mention a reported delivery level of 70,000 units. Late estimates mention 81,000.
 
@@ -673,7 +745,7 @@ estimated_change = (81,000 / 70,000 - 1) x 100 = 15.7%
 
 15.7% falls into class 2. This is feature engineering from text, not retrieval of the true test target.
 
-### 9.6 Numerical Text Classifier
+### 9.9 Numerical Text Classifier
 
 The quarterly features are:
 
@@ -687,25 +759,25 @@ Validation selects:
 - current features alone or combined with temporal differences,
 - optional company identity.
 
-### 9.7 Seasonal Prior
+### 9.10 Seasonal Prior
 
 For a new Q2, the seasonal prior considers only earlier Q2 labels from the same company and uses them to produce a smoothed class distribution.
 
 It does not use financial values as input, but it does use historical targets. It is therefore not a text feature.
 
-### 9.8 Fusion
+### 9.11 Fusion
 
 The general hybrid combines seasonal and text probabilities with a fixed weight.
 
 For Tesla, a forward-level signal is added. It derives an expected change from late estimate levels and early reported levels.
 
-### 9.9 Tesla Conflict Gate
+### 9.12 Tesla Conflict Gate
 
 The gate recognizes two specific conflict patterns between the base model and the numerical text model. In those cases, it replaces the prediction with the numerical text distribution.
 
 The gate improves accuracy from 75.00% to 80.56%. Its thresholds were designed after inspecting the errors from 2017–2019, however. It is therefore exploratory rather than confirmatory.
 
-### 9.10 Why CUDA Is Not Required
+### 9.13 Why CUDA Is Not Required
 
 The current best model is not an LSTM. Regex aggregation, scaling, and logistic regression run on the CPU. CUDA was relevant to the earlier neural models, not the current 80.56% run.
 
@@ -1298,9 +1370,9 @@ The old `main` codebase is scientifically interesting because it:
 
 It is not, however, convincing evidence of 87% genuine future forecasting. The main reasons are quarterly pseudoreplication, training on later blocks, the missing seasonal baseline, transductive embeddings, and concrete code problems.
 
-### The Earlier Automated Analysis
+### The Direct Code and Result Audit
 
-The earlier automated analysis correctly identified the central weakness in the evaluation design. It became unreliable where it generalized from a justified finding to universal claims about all LSTMs, all checkpoints, or the entire interpretation pipeline.
+The direct audit establishes the central weaknesses through concrete data and call paths: the target is repeated at group level, the primary split can share periods and use later blocks, Top2Vec sees the full corpus, and several interpretation steps contain technical errors. This requires the old accuracy to be reinterpreted, but it does not imply that text or every LSTM architecture is universally useless.
 
 ### The Current Model
 
