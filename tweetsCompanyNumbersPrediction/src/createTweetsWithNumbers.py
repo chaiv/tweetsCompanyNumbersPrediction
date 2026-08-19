@@ -18,7 +18,9 @@ predictionModelPath = TESLA_CAR_SALES_10_LSTM_MULTI_CLASS
 tweets = pd.read_csv (DataDirHelper().getDataDir()+ "companyTweets\CompanyTweets.csv")
 numbers = pd.read_csv (predictionModelPath.getFinancialNumbersPath())
 classCalculator = FiguresMultiClassCalculator()
-textfiltetedTweetsWithNumbers = FeatureDataframePipeline().createTweetWithNumbersDf(tweets,numbers,TweetQueryParams(companyNames=predictionModelPath.getNasdaqTag()),classCalculator)
+textfiltetedTweetsWithNumbers = FeatureDataframePipeline().createTweetWithNumbersDf(
+    tweets, numbers, TweetQueryParams(companyNames=predictionModelPath.getNasdaqTag()),
+    classCalculator, removeExactDuplicates=True)
 print(textfiltetedTweetsWithNumbers)
 textfiltetedTweetsWithNumbers.to_csv(predictionModelPath.getDataframePath())
 

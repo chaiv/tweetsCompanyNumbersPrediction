@@ -3,21 +3,31 @@ Created on 17.04.2023
 
 @author: vital
 '''
+from __future__ import annotations
+
 from gensim.corpora import Dictionary
 from gensim.models import CoherenceModel
 from sklearn.metrics.pairwise import cosine_similarity
-from nlpvectors.AbstractTokenizer import AbstractTokenizer
-from topicmodelling.TopicExtractor import AbstractTopicExtractor
 from sklearn.metrics import silhouette_score
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from nlpvectors.AbstractTokenizer import AbstractTokenizer
+    from topicmodelling.TopicExtractor import AbstractTopicExtractor
 
 class TopicEvaluation(object):
     '''
     '''
 
 
-    def __init__(self, topicModel : AbstractTopicExtractor,tokenizer:AbstractTokenizer):
+    def __init__(self, topicModel : AbstractTopicExtractor,tokenizer:AbstractTokenizer,
+                 coherenceMeasure='c_v'):
         self.topicModel = topicModel
         self.tokenizer = tokenizer
+        # Gensim defaults to c_v.  The original implementation omitted this argument while the
+        # thesis called the reported values UCI coherence (c_uci).  Keeping c_v as the explicit
+        # default preserves the historical code behaviour and makes alternative metrics auditable.
+        self.coherenceMeasure = coherenceMeasure
     
 
     
@@ -26,7 +36,8 @@ class TopicEvaluation(object):
         documents = [self.tokenizer.tokenize(doc) for doc in documents]
         dictionary = Dictionary(documents)
         #cm = CoherenceModel(topics=topic_words, corpus=corpus, dictionary=dictionary, coherence='u_mass') 
-        cm = CoherenceModel(topics=topic_words, texts=documents, dictionary=dictionary)
+        cm = CoherenceModel(topics=topic_words, texts=documents, dictionary=dictionary,
+                            coherence=self.coherenceMeasure)
         coherence = cm.get_coherence()
         return coherence
     
@@ -51,8 +62,3 @@ class TopicEvaluation(object):
     
     #def getCosineSimilarityMatrix(self):
     #    return cosine_similarity(self.topicModel.get_topic_vectors())
-    
-    
-    
-    
-        

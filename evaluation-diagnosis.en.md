@@ -2,7 +2,7 @@
 
 A comprehensive, plain-language evaluation of the old `main` implementation, the direct code and result audit, the current quarterly models, and the topic and important-word analysis.
 
-Status: August 18, 2026
+Status: August 20, 2026
 
 **Creation note:** The code audit, experimental reconstruction, and subsequent model training were performed automatically using ChatGPT 5.6 Sol and Claude Fable / Opus 5.
 
@@ -616,6 +616,70 @@ The visible code alone cannot determine with certainty:
 The direct finding is therefore not “text does not work,” but:
 
 > The old evaluation design cannot cleanly separate genuine textual information from quarter, season, and source recognition. These components must be modeled and controlled separately in the new system.
+
+### 8.5 Audit Step 1: Document Version and Published Protocol
+
+The directly reviewed dissertation file contains 236 PDF pages. Its title pages and PDF metadata date it to 2026 and March 10, 2026. Page references in this analysis use the printed page numbers.
+
+Page 114 describes ten-fold cross-validation in which every input sample serves as both training and test data across folds, with batch size 100. Of the committed scripts, `trainNumbersPredictionModelOnlySubsequentTweetsOrder.py` is the closest match (`KFold(n_splits=10, shuffle=True, random_state=1337)`, batch size 100). This protocol separates neither time nor quarters and therefore cannot establish genuine future forecasting.
+
+The evidential limit matters: without a run manifest, exact historical commit, configuration dump, and checkpoint, it is not provable that this exact script produced every published number. It is the most plausible mapping in the available repository.
+
+### 8.6 Audit Step 2: Dissertation Tables and Statements
+
+- **Table 9** (binary class frequencies, p. 112): the Amazon row reports 16 decreases and 18 increases, or 34 quarters where only 24 exist. The archived CSV gives 6/18; Table 10 itself reports six decreases on the following page. The running text for Amazon and Apple apparently also counts the baseline row whose change is undefined.
+- **Tesla in Table 9:** 8/16 is reproduced exactly by applying the ratio threshold `>1.0` to percentage values. The two increases below one percent (2015Q3: +0.62%, 2018Q1: +0.37%) are then incorrectly counted as decreases. The archived binary tweet labels are not affected.
+- **Table 10** (multi-class frequencies, p. 113): its values agree with the archived CSVs and documented class boundaries for all three companies.
+- **Table 16** (pp. 123–124): FNN-binary Tesla@20 and LSTM-binary Apple@20 have the same five-tuple `(0.61, 0.67, 0.60, 0.67, 0.27)`. This is suspicious and compatible with a copy artifact, but cannot be proved without run records. Sample sizes, confidence intervals, and significance statements are absent.
+- **Table 17** (p. 125): the prose announces Apple and Tesla, but the table also contains Amazon and then declares Amazon the best result.
+- **Tables 11–13 versus code:** the documented and implemented FNN input dimension, LSTM dropout, transformer dimension, and batch size do not fully agree. No committed configuration reproduces every documented setting exactly.
+- **Topic coherence:** `TopicEvaluation` created Gensim's `CoherenceModel` without a `coherence` argument. Gensim therefore used its `c_v` default, not `c_uci`, while the thesis labels the results UCI coherence. Unless a different uncommitted evaluation path was used, the historical code values must be treated as `c_v`. The qualitative labels “decent quality” and “underperforming” also lack a documented baseline.
+
+### 8.7 Audit Step 3: Data, Grouping, and Label Findings
+
+- **Duplicates:** the dissertation requires removal before training and states in the conclusion that exact duplicates were filtered. The old labelled-dataframe generation did not contain that step. In the binary Apple file, 194,278 of 1,425,013 rows repeat an earlier `body` (13.63%); in the binary Amazon file, 113,934 of 718,715 do so (15.85%). The Amazon multi-class file has the same row count but only 66,549 repetitions (9.26%), revealing additional artifact or version drift.
+- **Label-dependent grouping:** `getSplitIds` filters by class before constructing tweet groups. The same inputs cannot be constructed on unlabeled future data. At group size 10, 27 of 142,503 Apple multi-class groups and 28 of 71,873 Amazon multi-class groups cross at least one calendar-quarter boundary.
+- **Apple class as a period proxy:** after `EqualClassSampler`, 99.922% of Apple class 1 comes from 2015Q3; 0.078% lies in 2015Q2 because of the archived time/interval boundary. The class is therefore almost, but not entirely, one quarter.
+- **Binary/multi-class inversion:** binary Apple MCC reaches at most 0.31, while four-class MCC on the same quantity reaches 0.80. This is a warning sign compatible with period recognition, not proof against genuine text signal. Separate models can differ because of balancing, optimisation, calibration, and label noise.
+- **Label-definition drift:** the archived `change_4` columns roughly reflect 0/10/25 boundaries, while code and dissertation use 0/15/30. Archived and recomputed classes consequently disagree in three Amazon and four Tesla rows.
+
+### 8.8 Audit Step 4: Balancing and Model Mechanics
+
+`EqualClassSampler` keeps the first `n` rows from each class. For Apple multi-class, `n = 93,686`: class 0 is 100% 2015Q1; class 1 is 99.922% 2015Q3; class 2 is 99.878% 2016Q3; class 3 is 72.268% 2015Q4 and 27.589% 2016Q4, plus small boundary shares. If the published run used this sampler as described on p. 114, the model saw essentially no tweets after 2016Q4. This creates a strong period proxy and requires explanation alongside interpretations based on 2017–2019 events. The “if” is essential because no run manifest survives.
+
+The old architecture judgements also require qualification:
+
+- The FNN avoids the old LSTM's last-hidden-state-after-padding defect but averages over PAD positions without masking.
+- Transformer position 0 is not an inserted CLS token; it is the first real token. The transformer also receives no `src_key_padding_mask`, so PAD tokens participate in attention.
+- Both architectures can learn, but their mixed-protocol scores remain blends of possible substantive, period, source, and duplicate signals.
+- The identical metric five-tuple in Table 16 proves neither a copy error nor the correctness of the other 53 rows. Confusion matrices or individual predictions would be required.
+
+### 8.9 Audit Step 5: Scientific Strengths Worth Preserving
+
+The direct audit confirms several positive points:
+
+1. The cross-validation protocol is described concretely enough for its limits to be audited from the document itself.
+2. Table 16 shows all 54 combinations in its grid and includes many low MCC values; weak results were not wholly hidden.
+3. Table 10 is correct, and the exploration chapter quantified the duplicate problem itself.
+4. The combined prediction/topic/important-word path is an original idea because it connects forecasting with interpretable hypotheses about language change.
+5. The repository contains a broad test suite and reproducible intermediate artifacts. This makes the present audit possible, even though the historical evaluation protocol itself was not sufficiently tested.
+
+### 8.10 Audit Step 6: Implemented Corrections and Verification
+
+The following changes correct directly reproducible code problems without reinterpreting historical result numbers:
+
+| Correction | File(s) | Verification |
+| --- | --- | --- |
+| Exact and optional near-duplicate removal in the dataset pipeline | `pipeline/FeatureDataframePipeline.py`, `createTweetsWithNumbers.py` | The API default remains compatible; dataset generation explicitly enables exact removal; an end-to-end test checks removal before the financial join. |
+| Half-open class intervals and the closed gap below zero | `tweetnumbersconnector/FinancialFiguresClassifier.py`, `tweetpreprocess/FiguresMultiClassCalculator.py` | Boundary and regression checks cover the documented classes. |
+| Explicit ratio/percentage semantics | `tweetpreprocess/FiguresIncreaseDecreaseClassCalculator.py` | Percentage mode correctly labels +0.62% and +0.37% as increases. |
+| Warning for stale `change_4` columns | `tweetpreprocess/FiguresMultiClassCalculator.py` | The Amazon and Tesla disagreements are reported visibly. |
+| Safer checkpoint loading with CPU fallback, `map_location`, and key warnings | `classifier/ModelEvaluationHelper.py` | The hard-coded CUDA dependency and silent state-dictionary mismatch were removed. |
+| Checkpoint path returned by `Trainer.train` and correct epoch-second parsing | three temporal training scripts | A versioned best checkpoint and correct calendar time are used. |
+| Label-free chronological grouping with an optional period boundary | `nlpvectors/DataframeSplitter.py` | Tests cover label independence and restart at quarter boundaries; historical scores are not retroactively repaired. |
+| Configurable LSTM dropout | `classifier/LSTMNN.py`, `classifier/CreateClassifierModel.py` | `0.0` preserves existing behaviour; the documented dropout variant can be constructed. |
+| Explicit topic coherence | `topicmodelling/TopicEvaluation.py` | `c_v` remains the historical code default; `c_uci` can be selected explicitly. |
+| Regression tests for classes, grouping, pipeline, and topic metric | `tests/` | The full suite passes 119 of 119 tests. |
 
 ---
 

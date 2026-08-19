@@ -14,8 +14,29 @@ from tweetpreprocess.wordfiltering.TextFilter import TextFilter
 from tweetpreprocess.TweetTextFilterTransformer import TweetTextFilterTransformer
 from tweetpreprocess.FiguresPercentChangeCalculator import FiguresPercentChangeCalculator
 from tweetpreprocess.FiguresIncreaseDecreaseClassCalculator import FiguresIncreaseDecreaseClassCalculator
+from tweetpreprocess.TweetQueryParams import TweetQueryParams
+from pipeline.FeatureDataframePipeline import FeatureDataframePipeline
 
 class PipelineTest(unittest.TestCase):
+
+    def testPipelineCanRemoveExactDuplicatesBeforeFinancialJoin(self):
+        tweets = pd.DataFrame([
+            ('1', 1641038400, 'same text', 'COMP'),
+            ('2', 1641038460, 'same text', 'COMP'),
+            ('3', 1641038520, 'unique text', 'COMP')
+        ], columns=['tweet_id', 'post_date', 'body', 'ticker_symbol'])
+        figures = pd.DataFrame([
+            ('01/01/2022 00:00:00', '31/03/2022 23:59:59', 2.0)
+        ], columns=['from_date', 'to_date', 'percent_change'])
+
+        result = FeatureDataframePipeline().createTweetWithNumbersDf(
+            tweets, figures, TweetQueryParams(companyName='COMP'),
+            FiguresIncreaseDecreaseClassCalculator(
+                valueColumnName='percent_change', valuesAreRatios=False),
+            removeExactDuplicates=True)
+
+        self.assertEqual(['1', '3'], result['tweet_id'].tolist())
+        self.assertEqual([1.0, 1.0], result['class'].tolist())
 
 
     def testPipelineSteps(self):

@@ -15,7 +15,7 @@ class FinancialFiguresMultiClassClassifier:
         - classes (list of dict): List of dictionaries where each dictionary represents a class.
           Format: {"class_name": int, "from": float, "to": float}
           Example: [
-              {"class_name": 0, "from": -float('inf'), "to": -0.01},
+              {"class_name": 0, "from": -float('inf'), "to": 0},
               {"class_name": 1, "from": 0, "to": 10},
               {"class_name": 2, "from": 10, "to": 20},
               {"class_name": 3, "from": 20, "to": float('inf')}
@@ -45,8 +45,11 @@ class FinancialFiguresMultiClassClassifier:
                 raise ValueError("'from' and 'to' must be numeric values.")
 
     def classify(self, value):
+        # Half-open intervals [from, to). With bounds inclusive on both sides, adjacent classes
+        # overlapped at shared boundary values, and the old boundaries (to=-0.01, from=0) left a
+        # gap in which values such as -0.005 received no class at all.
         for class_def in self.classes:
-            if class_def["from"] <= value <= class_def["to"]:
+            if class_def["from"] <= value < class_def["to"]:
                 return class_def["class_name"]
         return None
     

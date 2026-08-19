@@ -55,6 +55,9 @@ class DataframeSplitter(object):
         return grouped_tweets_df
     
     def getSplitIds(self, df, split_size,idColumnName = "tweet_id", classColumnName="class"):
+        # NOTE: every group is built from consecutive tweets OF THE SAME CLASS, so constructing the
+        # inputs already requires the target label. On unlabeled data, as at prediction time, such
+        # groups cannot be formed; getSplitIdsByTime below groups without consulting the label.
         # Create an empty list to store the resulting splits
         splits = []
         
@@ -82,6 +85,22 @@ class DataframeSplitter(object):
                 splitIds = splitDf[idColumnName].tolist() 
                 splits.append(splitIds)
 
-        return splits    
-         
-        
+        return splits
+
+    def getSplitIdsByTime(self, df, split_size, idColumnName="tweet_id",
+                          periodColumnName=None):
+        """Group consecutive rows without consulting the target class.
+
+        The dataframe order is treated as chronological.  When ``periodColumnName`` is supplied,
+        groups are restarted at every reporting-period boundary; this is the safe training form for
+        quarter-constant targets.  Without it, the result is suitable for unlabeled inference but a
+        group may cross a target-period boundary and must not simply inherit its first row's label.
+        """
+        splits = []
+        dataframes = [df]
+        if periodColumnName is not None:
+            dataframes = [periodDf for _, periodDf in df.groupby(periodColumnName, sort=False)]
+        for periodDf in dataframes:
+            for i in range(0, len(periodDf), split_size):
+                splits.append(periodDf.iloc[i:i + split_size][idColumnName].tolist())
+        return splits

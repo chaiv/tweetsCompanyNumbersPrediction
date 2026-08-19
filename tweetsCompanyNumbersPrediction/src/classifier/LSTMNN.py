@@ -26,13 +26,15 @@ class LSTMNN(pl.LightningModule):
 
     def __init__(self, emb_size, word_vectors, num_classes, class_weights=None,
                  pooling=LAST_HIDDEN_STATE_POOLING, padTokenIdx=None,
-                 freeze_embeddings=False):
+                 freeze_embeddings=False, lstmDropout=0.0):
         super().__init__()
         if pooling == MEAN_POOLING and padTokenIdx is None:
             raise ValueError("padTokenIdx is required for mean pooling, it defines which positions are padding")
         self.embedding = torch.nn.Embedding.from_pretrained(
             torch.tensor(word_vectors.vectors), freeze=freeze_embeddings)
-        self.lstm = torch.nn.LSTM(emb_size, hidden_size=512, num_layers=2, batch_first=True)
+        # lstmDropout makes the architecture documented in the thesis (Table 12, dropout=0.2)
+        # constructible; the default 0.0 keeps the behaviour of existing checkpoints.
+        self.lstm = torch.nn.LSTM(emb_size, hidden_size=512, num_layers=2, batch_first=True, dropout=lstmDropout)
         self.fc1 = torch.nn.Linear(512, 512)
         self.fc2 = torch.nn.Linear(512, 256)
         self.fc3 = torch.nn.Linear(256, num_classes)
@@ -64,14 +66,14 @@ class LSTMNN(pl.LightningModule):
 
     def forward(self, inputs):
         return self.fc3(self.encode(inputs))
-    
+
     def training_step(self, batch, batch_idx):
         inputs, targets = batch
         outputs = self(inputs)
         loss = torch.nn.functional.cross_entropy(outputs, targets, weight=self.class_weights)
         self.log('train_loss', loss, on_step=True, on_epoch=True, prog_bar=True, logger=True)
         return loss
-    
+
     def validation_step(self, batch, batch_idx):
         inputs, targets = batch
         outputs = self(inputs)
@@ -79,14 +81,14 @@ class LSTMNN(pl.LightningModule):
         #loss = torch.nn.functional.cross_entropy(outputs, targets, weight=self.class_weights)
         self.log('valid_loss', loss, on_step=True, on_epoch=True, prog_bar=True, logger=True)
         return loss
-    
+
     def test_step(self, batch, batch_idx):
         inputs, targets = batch
         outputs = self(inputs)
         loss = torch.nn.functional.cross_entropy(outputs, targets)
         self.log('test_loss', loss, on_step=True, on_epoch=True, prog_bar=True, logger=True)
         return {'test_loss': loss}
-    
+
     def configure_optimizers(self):
         optimizer = torch.optim.Adam(self.parameters(), lr=0.001)
         return optimizer

@@ -18,6 +18,7 @@ from tests import DateToTSPTest
 from tests import PipelineTest
 from tests import TweetDataframeSorterTest
 from tests import FiguresIncreaseDecreaseClassCalculatorTest
+from tests import FiguresClassBoundariesTest
 from tests import FeatureDataframeCreatorTest
 from tests import TweetTextFilterTransformerTest
 from tests import TestPredictor
@@ -33,6 +34,7 @@ from tests import QuarterAlignedEmbeddingModelTest, MultiViewQuarterModelTest, Q
     RelevantTextResidualModelTest, TextDeltaOrdinalModelTest, PastOnlyTeacherStudentTest, \
     EnhancedPastOnlyTeacherStudentTest, PureTextQuarterModelTest, \
     NumericQuarterTextExplanationsTest
+from tests import TopicEvaluationConfigurationTest
 
 
 loader = unittest.TestLoader()
@@ -41,6 +43,7 @@ suite  = unittest.TestSuite()
 suite.addTests(loader.loadTestsFromModule(tweetnumbersconnectortest))
 suite.addTests(loader.loadTestsFromModule(nlpvectorstest))
 suite.addTests(loader.loadTestsFromModule(FiguresDiscretizerTest))
+suite.addTests(loader.loadTestsFromModule(FiguresClassBoundariesTest))
 suite.addTests(loader.loadTestsFromModule(HyperlinkRemoverTest))
 suite.addTests(loader.loadTestsFromModule(StopWordsFilterTest))
 suite.addTests(loader.loadTestsFromModule(TextFilterTest))
@@ -65,6 +68,7 @@ suite.addTests(loader.loadTestsFromModule(TestDataframeSplitter))
 suite.addTests(loader.loadTestsFromModule(TestKFold))
 suite.addTests(loader.loadTestsFromModule(TestNearDuplicateDetector))
 suite.addTests(loader.loadTestsFromModule(TestDuplicateDetector))
+suite.addTests(loader.loadTestsFromModule(TopicEvaluationConfigurationTest))
 suite.addTests(loader.loadTestsFromModule(QuarterAlignedEmbeddingModelTest))
 suite.addTests(loader.loadTestsFromModule(MultiViewQuarterModelTest))
 suite.addTests(loader.loadTestsFromModule(QuarterSequenceModelTest))

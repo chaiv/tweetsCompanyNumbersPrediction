@@ -23,6 +23,7 @@ from classifier.CreateClassifierModel import CreateClassifierModel
 from classifier.transformer.Predictor import Predictor
 from classifier.ClassificationMetrics import ClassificationMetrics
 from classifier.ModelEvaluationHelper import loadModel
+from classifier.TemporalSplitDiagnostics import toDatetime
 from tweetpreprocess.EqualClassSampler import EqualClassSampler
 from PredictionModelPath import AMAZON_REVENUE_10_LSTM_BINARY_CLASS,AMAZON_REVENUE_10_LSTM_MULTI_CLASS,\
     AMAZON_REVENUE_20_LSTM_MULTI_CLASS, TESLA_CAR_SALES_10_LSTM_MULTI_CLASS, \
@@ -53,7 +54,9 @@ if  __name__ == "__main__":
     tweetSplits = splitter.getSplitIds(df, predictionModelPath.getTweetGroupSize())
 
     postTSPColumn = "post_date"
-    df[postTSPColumn] = pd.to_datetime(df[postTSPColumn])
+    # post_date holds epoch seconds; pd.to_datetime without unit reads them as nanoseconds
+    # and maps every tweet to 1970 (the ordering survives, the calendar does not).
+    df[postTSPColumn] = toDatetime(df[postTSPColumn])
 
     # Pre-build index for fast lookups
     tweet_id_to_date = dict(zip(df["tweet_id"], df[postTSPColumn]))
@@ -130,7 +133,7 @@ if  __name__ == "__main__":
 
         # Re-create model for each fold with class weights for training loss
         model = CreateClassifierModel(word_vectors=word_vectors, num_classes=num_classes, class_weights=class_weights).createModel()
-        Trainer().train(
+        bestModelPath = Trainer().train(
             batch_size=256,
             epochs=10,
             num_workers=2,
@@ -147,7 +150,9 @@ if  __name__ == "__main__":
 
         # Classification metrics on test set using best checkpoint
         print(f"\n=== Fold {fold} Classification Metrics ===")
-        bestModelPath = predictionModelPath.getModelPath() + f"\\tweetpredict_fold{fold}.ckpt"
+        # The path comes from the trainer: ModelCheckpoint writes tweetpredict_fold{k}-v1.ckpt when
+        # the file already exists, and rebuilding the name by hand would score the previous run.
+        print("Best checkpoint", bestModelPath)
         bestModel = loadModel(bestModelPath, word_vectors, num_classes=num_classes)
         predictionClassMapper = predictionModelPath.getPredictionClassMapper()
 

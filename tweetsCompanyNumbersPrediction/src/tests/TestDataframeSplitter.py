@@ -128,6 +128,24 @@ class TestDataframeSplitter(unittest.TestCase):
         self.assertEqual([1],result[1])
         self.assertEqual([3],result[2])
         self.assertEqual([2],result[3])
+
+    def testSplitIdsByTimeDoesNotConsultClass(self):
+        df = pd.DataFrame({
+            'tweet_id': [0, 1, 2, 3, 4],
+            'class': ['A', 'B', 'A', 'B', 'A']
+        })
+
+        self.assertEqual([[0, 1], [2, 3], [4]], self.splitter.getSplitIdsByTime(df, 2))
+
+    def testSplitIdsByTimeRestartsAtReportingPeriodBoundary(self):
+        df = pd.DataFrame({
+            'tweet_id': [0, 1, 2, 3, 4],
+            'quarter': ['2020Q1', '2020Q1', '2020Q1', '2020Q2', '2020Q2'],
+            'class': ['A', 'A', 'A', 'B', 'B']
+        })
+
+        splits = self.splitter.getSplitIdsByTime(df, 2, periodColumnName='quarter')
+        self.assertEqual([[0, 1], [2], [3, 4]], splits)
   
 
 if __name__ == "__main__":
