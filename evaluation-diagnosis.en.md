@@ -15,11 +15,12 @@ The main findings are:
 1. **The old implementation is scientifically interesting.** It represents an unusually broad information system: tweets are linked to reporting periods, aggregated into groups, classified with an LSTM, and then interpreted down to words and topics. The strong temporal and event-related fingerprint in the language is particularly interesting.
 2. **The old accuracy of approximately 0.87 is not clean evidence of genuine future forecasting.** Many tweet groups from the same quarter were treated as if they were independent test cases. In addition, the main evaluation could train on later text blocks when testing an earlier block. The model could therefore recognize periods and sources without having to predict an unknown later quarterly value.
 3. **The direct code audit establishes a central evaluation weakness.** There are 20 quarterly outcomes per company, but only two or four possible classes. Because groups rather than whole quarters were separated, and later blocks could be in training for early test blocks, the old evaluation does not cleanly measure prediction of unknown future quarters. The interpretation path also contains concrete technical errors.
-4. **The current best result is 80.56% accuracy and MCC 0.7387 on 36 later company-quarters.** This result belongs to a hybrid of a seasonal prior, numerical text signals, and a Tesla-specific branch. Its design retains aggregation and interpretability from the old system while separating seasonality, textual numbers, Tesla levels, and topics into controllable branches. It is not a pure-text model.
-5. **The isolated numerical text branch reaches 50.00% accuracy and MCC 0.3224.** The transparent variant without the subsequently designed Tesla conflict gate reaches 75.00% accuracy and MCC 0.6633.
-6. **The 80.56% result is exploratory.** The Tesla conflict gate was designed after inspecting errors from the same 2017–2019 test years. It must be confirmed on new, previously untouched quarters.
-7. **Topics and important words are now connected in a more temporally valid way.** Exact model attributions are separated from descriptive topic explanations. Topic models and word lexicons are fitted only on earlier quarters and then applied to future quarters.
-8. **The branch is not yet completely free of tweet content.** Large raw datasets are not committed, but some demo and test files still contain complete or tweet-like texts.
+4. **The old LSTM clearly learns a classification signal, but not stably.** Fold 0 reaches 86.91% accuracy, while Fold 2 reaches 88.88% accuracy and MCC 0.7785. MCC values of this size are incompatible with merely predicting the majority class. Across all ten folds, however, the means are only 76.99% accuracy and MCC 0.5531; two folds collapse almost to chance. It remains unknown how much of the learned signal is genuine textual information and how much is quarter, source, seasonality, or duplicate recognition.
+5. **The current best result is 80.56% accuracy and MCC 0.7387 on 36 later company-quarters.** This result belongs to a hybrid of a seasonal prior, numerical text signals, and a Tesla-specific branch. Its design retains aggregation and interpretability from the old system while separating seasonality, textual numbers, Tesla levels, and topics into controllable branches. It is not a pure-text model.
+6. **The isolated numerical text branch reaches 50.00% accuracy and MCC 0.3224.** The transparent variant without the subsequently designed Tesla conflict gate reaches 75.00% accuracy and MCC 0.6633.
+7. **The 80.56% result is exploratory.** The Tesla conflict gate was designed after inspecting errors from the same 2017–2019 test years. It must be confirmed on new, previously untouched quarters.
+8. **Topics and important words are now connected in a more temporally valid way.** Exact model attributions are separated from descriptive topic explanations. Topic models and word lexicons are fitted only on earlier quarters and then applied to future quarters.
+9. **The branch is not yet completely free of tweet content.** Large raw datasets are not committed, but some demo and test files still contain complete or tweet-like texts.
 
 The scientifically accurate overall statement is therefore:
 
@@ -680,6 +681,84 @@ The following changes correct directly reproducible code problems without reinte
 | Configurable LSTM dropout | `classifier/LSTMNN.py`, `classifier/CreateClassifierModel.py` | `0.0` preserves existing behaviour; the documented dropout variant can be constructed. |
 | Explicit topic coherence | `topicmodelling/TopicEvaluation.py` | `c_v` remains the historical code default; `c_uci` can be selected explicitly. |
 | Regression tests for classes, grouping, pipeline, and topic metric | `tests/` | The full suite passes 119 of 119 tests. |
+
+### 8.11 Audit Step 7: New Training of the Historical Amazon LSTM
+
+To test the 0.87 accuracy and 0.77 MCC reported in Table 16, the old Amazon model was trained again. The experiment continues to use only the binary quarterly target for the change in Amazon revenue. It does not replace that target with stock prices or another auxiliary quantity.
+
+#### Reproduced Configuration
+
+- Amazon binary revenue change,
+- ten tweets grouped by class per input sample,
+- balancing to 359,616 tweets or 35,962 tweet groups,
+- `KFold(n_splits=10, shuffle=True, random_state=1337)`,
+- 30% validation within each training fold using `random_state=1337`,
+- ten epochs and batch size 100,
+- two LSTM layers with hidden size 512,
+- a newly initialized model for every fold,
+- FP16 training on an NVIDIA RTX 4090,
+- accuracy and MCC on each fold's independent test partition.
+
+The complete code-faithful run with LSTM dropout `0.0` produced:
+
+| Fold | Accuracy | MCC | Interpretation |
+| ---: | ---: | ---: | --- |
+| 0 | 0.8691 | 0.7387 | published accuracy approximately reached |
+| 1 | 0.7695 | 0.5800 | substantially weaker |
+| 2 | **0.8888** | **0.7785** | published MCC quality reached |
+| 3 | 0.8370 | 0.6837 | solid individual result |
+| 4 | 0.4903 | 0.0000 | optimization collapsed |
+| 5 | 0.8323 | 0.6705 | solid individual result |
+| 6 | 0.8304 | 0.6893 | solid individual result |
+| 7 | 0.8201 | 0.6532 | solid individual result |
+| 8 | 0.8590 | 0.7235 | close to the published accuracy |
+| 9 | 0.5028 | 0.0140 | almost collapsed |
+| **Mean** | **0.7699** | **0.5531** | complete ten-fold result |
+
+#### Does the Model Learn Anything at All?
+
+Yes. These new results contradict the blanket claim that the old LSTM cannot learn from the text representations:
+
+- Several independently trained folds perform substantially above chance.
+- Fold 2 reaches MCC 0.7785. An MCC of this size requires substantive discrimination of both classes; it cannot be produced merely by predicting the most frequent class.
+- Even the mean over all ten folds remains clearly positive at MCC 0.5531 despite including two collapsed optimization runs.
+- The high values occur in newly trained models and are therefore not merely an artifact of loading one surviving historical checkpoint.
+
+The scientific criticism is therefore not “the model learns nothing.” It is:
+
+> The LSTM learns a strong classification signal in the available text groups. The old evaluation design cannot determine how much of that signal is textual information that transfers to unknown future quarters and how much comes from quarter time, seasonality, source patterns, recurring phrases, or duplicates.
+
+This distinction is essential. A model can classify mixed-protocol test groups very well while performing substantially worse on a wholly unknown later quarter.
+
+The standard deviations are 0.1400 for accuracy and 0.2777 for MCC. This large variation is itself an important result: the old last-hidden-state LSTM can learn high scores, but does not reach them reliably across the tested folds.
+
+#### Check Using the Dropout Documented in Table 12
+
+Table 12 specifies LSTM dropout `0.2`, whereas the old code constructor implicitly used `0.0`. The document-faithful variant was therefore also started:
+
+| Fold | Accuracy | MCC |
+| ---: | ---: | ---: |
+| 0 | 0.8713 | 0.7430 |
+| 1 | 0.8357 | 0.6764 |
+| 2 | 0.5133 | 0.0000 |
+
+This additional run was stopped after Fold 2. Dropout improved Fold 1 but did not prevent Fold 2 from collapsing, so it failed its purpose as a stability check. These three values must not be reported as a complete ten-fold mean.
+
+#### What Role Does the Seed Play?
+
+Two kinds of seed must be distinguished:
+
+1. The split seed determines which tweet groups appear in each fold.
+2. The training seed controls weight initialization, batch order, and dropout masks, among other effects.
+
+The training seed can materially affect whether the old LSTM converges. It therefore probably explains part of the difference between surviving checkpoints and the new run. It does not automatically explain the published aggregate, however: selecting the seed with the best test metric after the fact would be test-set tuning. A valid multi-seed analysis would train several predeclared initializations per fold, select exclusively on validation performance, and evaluate the test partition only once afterward.
+
+#### What the Reproduction Shows About the Published 0.87/0.77
+
+- The scale of the result is technically plausible: newly trained individual folds reach 0.87 accuracy or more than 0.77 MCC.
+- The combination is not reproduced in the new complete ten-fold mean.
+- The historical metric path manually sets `fold = 0` and contains no visible aggregation across all ten test folds. It is therefore plausible, but not provable without the old run manifest, that Table 16 reports one selected checkpoint or a different aggregation.
+- The high individual-fold scores remain results of the mixed, label-dependent grouping protocol. They are not strict forecasts of unknown future quarters.
 
 ---
 
@@ -1352,18 +1431,38 @@ The run processed a total of:
 
 The quarter-balanced cap of 250 documents applies to the topic and word models. The prediction features themselves remain unchanged.
 
-### 17.3 Tests
+### 17.3 Reproduce the Historical Amazon LSTM
+
+Complete ten-fold training following the old code, but with an independently initialized model for every fold:
+
+```bash
+python trainHistoricalAmazonLSTM.py --folds 10 --lstm-dropout 0.0 --no-reuse-model-across-folds
+```
+
+The dropout variant documented in Table 12 can be tested with `--lstm-dropout 0.2`. The script stores the checkpoint, test indices, accuracy, and MCC for every completed fold. An interrupted run can be continued with `--start-fold N`.
+
+The two surviving but incomplete historical checkpoint series can be evaluated separately without overwriting them:
+
+```bash
+python reproduceHistoricalAmazonLSTM.py
+```
+
+Result files from the new experiment:
+
+```text
+output/old-model-reproduction/retrained-10fold-seed-1337/metrics.json
+output/old-model-reproduction/retrained-10fold-dropout-0.2-seed-1337/metrics.json
+```
+
+### 17.4 Tests
 
 ```bash
 python -m unittest tests.alltestsuite
 ```
 
-The most recent complete run passed:
+The most recent complete run passed 119 of 119 registered tests.
 
-- 111 registered tests,
-- 19 additional tests.
-
-### 17.4 Important Current Files
+### 17.5 Important Current Files
 
 | Subject | File |
 | --- | --- |
@@ -1372,8 +1471,10 @@ The most recent complete run passed:
 | Exact attribution and past-only topics | [`NumericQuarterTextExplanations.py`](tweetsCompanyNumbersPrediction/src/featureinterpretation/NumericQuarterTextExplanations.py) |
 | Replay and explanation output | [`extractNumericQuarterTopicsAndImportantWords.py`](tweetsCompanyNumbersPrediction/src/extractNumericQuarterTopicsAndImportantWords.py) |
 | Explanation tests | [`NumericQuarterTextExplanationsTest.py`](tweetsCompanyNumbersPrediction/src/tests/NumericQuarterTextExplanationsTest.py) |
+| Historical ten-fold LSTM training | [`trainHistoricalAmazonLSTM.py`](tweetsCompanyNumbersPrediction/src/trainHistoricalAmazonLSTM.py) |
+| Evaluation of surviving old checkpoints | [`reproduceHistoricalAmazonLSTM.py`](tweetsCompanyNumbersPrediction/src/reproduceHistoricalAmazonLSTM.py) |
 
-### 17.5 Central `main` Code Evidence
+### 17.6 Central `main` Code Evidence
 
 The line references refer to `main` commit `23a2fbb5ee1820b2ec8840816133ab823ef84bb6`.
 
@@ -1394,7 +1495,7 @@ The line references refer to `main` commit `23a2fbb5ee1820b2ec8840816133ab823ef8
 | LLM topic comparison | `topicmodelling/llmcomparison/LLMTopicsCompare.py:43-99` |
 | Near-duplicate detection | `tweetpreprocess/nearduplicates/NearDuplicateDetector.py:34-66` |
 
-### 17.6 New Result Artifacts and Privacy
+### 17.7 New Result Artifacts and Privacy
 
 The new explanation file stores:
 
@@ -1432,11 +1533,11 @@ The old `main` codebase is scientifically interesting because it:
 - combines manual, neural, and LLM perspectives,
 - exposes a strong temporal fingerprint in the language.
 
-It is not, however, convincing evidence of 87% genuine future forecasting. The main reasons are quarterly pseudoreplication, training on later blocks, the missing seasonal baseline, transductive embeddings, and concrete code problems.
+It is not, however, convincing evidence of 87% genuine future forecasting. The main reasons are quarterly pseudoreplication, training on later blocks, the missing seasonal baseline, transductive embeddings, and concrete code problems. This explicitly does not mean that the model learns nothing: the new historical training establishes a strong classification signal and shows that the reported scale is technically attainable in individual mixed-protocol test folds. One fold reaches 86.91% accuracy; another reaches 88.88% accuracy and MCC 0.7785. Because of large variation and two collapsed folds, however, the complete ten-fold means are only 76.99% accuracy and MCC 0.5531. Transfer of the learned signal to exclusively later, unknown quarters therefore remains unresolved.
 
 ### The Direct Code and Result Audit
 
-The direct audit establishes the central weaknesses through concrete data and call paths: the target is repeated at group level, the primary split can share periods and use later blocks, Top2Vec sees the full corpus, and several interpretation steps contain technical errors. This requires the old accuracy to be reinterpreted, but it does not imply that text or every LSTM architecture is universally useless.
+The direct audit establishes the central weaknesses through concrete data and call paths: the target is repeated at group level, the primary split can share periods and use later blocks, Top2Vec sees the full corpus, and several interpretation steps contain technical errors. This requires the old accuracy to be reinterpreted, but it does not imply that text or the LSTM cannot learn. On the contrary, the new reproduction establishes learning. What it does not establish is that this learned signal generalizes as a pure-text forecast to unknown future quarters.
 
 ### The Current Model
 
