@@ -55,11 +55,12 @@ erreichen im Walk-forward-Test MCC +0,291, während das Vollvokabular negativ bl
 dies nur für Gruppen, die tatsächlich ein Kalenderwort enthalten; insgesamt liegt der MCC dort fast
 bei null. Der Befund ist stark, aber nicht universell.
 
-**Falsch mit System.** Außerhalb der Stichprobe waren die Modelle nicht bloß nutzlos, sie waren
-schlechter als Raten. Der Grund ist fast mechanisch: Ein Modell, das ein Quartal nie gesehen hat,
-greift zum ähnlichsten, und das ist das unmittelbar vorangehende - aber die Finanzlabels kippen
-von einem Quartal zum nächsten, also ist "wie beim letzten Mal" zuverlässig falsch. Eine Münze
-hätte es besser gemacht.
+**Das Modell lernt ein zeitliches Persistenzsignal.** Im Walk-forward-Test entsprechen 72,0% der
+Apple- und 70,7% der Amazon-Vorhersagen dem Label des unmittelbar vorhergehenden Quartals. Dies
+deutet darauf hin, dass das Vollvokabular-Modell vor allem das jüngste bekannte Sprachregime
+erkennt. Da die Finanzklassen zwischen benachbarten Quartalen häufig wechseln, überträgt sich
+dieses tatsächlich gelernte Zeitsignal nicht zuverlässig auf das zukünftige Ziel. Das ist kein
+Beleg für fehlendes Lernen, sondern für ein starkes, aber für die Prognose fehlgerichtetes Signal.
 
 **Das beste Experiment kann auf vier Zeitfenster kollabiert sein.** Wurde der im Repository sichtbare
 `EqualClassSampler` im publizierten Lauf wie dokumentiert benutzt, reduzierte er den Apple-Pool fast
@@ -183,22 +184,35 @@ schwach extrahiert. Da der TF-IDF-Vektorisierer vor den Folds auf dem gesamten Z
 wurde und nur eine Modellfamilie geprüft ist, darf daraus keine allgemeine Unmöglichkeit abgeleitet
 werden.
 
-## 5. Warum die geprüften Werte außerhalb des Zeitraums negativ werden
+## 5. Warum ein gelerntes Zeitsignal zu negativen MCC-Werten führen kann
 
-Die Vorhersagen des Modells mit vollem Vokabular stimmen außerhalb des Trainingszeitraums in 72%
-der Fälle (Apple) bzw. 71% (Amazon) mit dem Label des **Vorquartals** überein, mit der Wahrheit
-aber nur in 38% bzw. 21%. Außerhalb des Zeitraums ist das Modell ein Persistenzprognostiker:
-Ungesehene Quartale ähneln am meisten dem unmittelbar vorangehenden Quartal, also liefert das
-Modell dessen Label.
+Die Vorhersagen des Vollvokabular-Modells stimmen im Walk-forward-Test in 72,0% der Fälle bei Apple
+und 70,7% bei Amazon mit dem Label des **Vorquartals** überein. Mit der richtigen Klasse stimmen sie
+hingegen nur in 37,8% beziehungsweise 20,5% der Fälle überein. Gemessen wurde damit eine starke
+Vorquartalsähnlichkeit der Vorhersagen. Die weitergehende Erklärung, dass das Modell hauptsächlich
+das jüngste bekannte Sprachregime erkennt, ist ein plausibler Mechanismus, aber kein direkter
+Nearest-Neighbor-Nachweis.
 
-Die Labels alternieren jedoch annähernd: Apple `0 0 2 3 | 0 0 2 3 | ...`, Amazon
-`3 0 1 1 | 3 0 1 1 | ...`.
-Benachbarte Quartale teilen ihr Label nur in 32% (Apple) bzw. 21% (Amazon) der Fälle. Ein
-Persistenzprognostiker auf einem alternierenden Ziel liegt systematisch falsch: MCC -0,146 und
--0,176, schlechter als Zufall. Das liefert einen konkreten Mechanismus für die negativen Werte der
-geprüften linearen Modelle. Als allgemeine Hypothese folgt daraus: Auf saisonal alternierenden
-Zielen kann ein auf driftendem Text trainierter Epochenähnlichkeitsklassifikator außerhalb der
-Stichprobe anti-prädiktiv werden.
+Eine separat konstruierte reine Persistenzregel weist jeder Gruppe die Klasse des Vorquartals zu.
+Sie erreicht bei Apple Accuracy 0,298/MCC -0,146 und bei Amazon 0,165/-0,176. Der Grund liegt in der
+Zielstruktur: Benachbarte Quartale besitzen nur in 32% (Apple) beziehungsweise 21% (Amazon) der
+Fälle dieselbe Klasse. Ein nützliches zeitliches Signal wird dadurch zu einem schlechten
+Finanzsignal, wenn die Zielklassen saisonal wechseln.
+
+"Schlechter als Raten" wäre dennoch zu pauschal. Bei vier Klassen hätte ein gleichverteilter
+Zufallsprädiktor erwartbar 25% Accuracy und einen MCC nahe null. Apples Vollvokabular-Accuracy von
+37,8% liegt über dieser einfachen Accuracy-Referenz, während Amazon mit 20,5% darunter liegt. Die
+negativen MCC-Werte oben gehören außerdem zur reinen Persistenzregel, nicht zu einer exakten
+Gleichsetzung des Vollvokabular-Modells mit dieser Regel. MCC unter null bedeutet hier eine
+anti-prädiktive Zuordnung relativ zur tatsächlichen Klassenstruktur, nicht, dass jede beliebige
+Zufallsvorhersage in jeder Metrik besser wäre.
+
+Der Befund zeigt daher nicht, dass das Modell nichts lernt. Er zeigt, dass es ein starkes und
+nachvollziehbares, für die Zukunftsprognose jedoch fehlgerichtetes Signal lernt. Da der
+TF-IDF-Vektorisierer in dieser Probe vorab auf dem Gesamtzeitraum angepasst wurde, sollten die
+exakten Werte zusätzlich mit foldweisem Fit bestätigt werden. Als allgemeine Hypothese bleibt:
+Ein auf driftendem Text trainierter Epochenähnlichkeitsklassifikator kann auf saisonal wechselnden
+Zielen außerhalb der Stichprobe anti-prädiktiv werden.
 
 ## 6. Kalenderwörter sind der stabilste geprüfte übertragbare Textinhalt
 

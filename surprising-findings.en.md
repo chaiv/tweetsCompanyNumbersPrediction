@@ -52,10 +52,12 @@ alignment, and targeted numeric extraction remain open.
 that actually contain a calendar word; overall MCC is nearly zero. The finding is strong but not
 universal.
 
-**Being wrong in a pattern.** Out of sample, the models were not merely useless; they were worse
-than guessing. The reason is almost mechanical: a model that has never seen a quarter reaches for
-the most similar one, which is the quarter just before - but the financial labels flip from one
-quarter to the next, so "same as last time" is reliably wrong. A coin would have done better.
+**The model learns a temporal persistence signal.** In the walk-forward test, 72.0% of Apple and
+70.7% of Amazon predictions match the immediately preceding quarter's label. This suggests that
+the full-vocabulary model mainly recognises the most recent known language regime. Because the
+financial classes frequently change between adjacent quarters, this genuinely learned temporal
+signal does not transfer reliably to the future target. This is not evidence of absent learning,
+but of a strong signal that is misaligned with the forecasting task.
 
 **The best experiment may have collapsed to four time windows.** If the visible
 `EqualClassSampler` was used in the published run as documented, it reduced the Apple pool almost
@@ -171,20 +173,34 @@ while own-quarter accuracy stays flat. The announcement therefore enters the tex
 extracted by this representation. Because the TF-IDF vectorizer was fitted on the full period before
 the folds and only one model family was tested, this is not a general impossibility result.
 
-## 5. Why the tested out-of-period scores turn negative
+## 5. Why a learned time signal can produce negative MCC values
 
-The full-vocabulary model's out-of-period predictions agree with the **previous** quarter's label
-72% of the time (Apple) and 71% (Amazon), but with the truth only 38% and 21%. Out of period, the
-model is a persistence forecaster: unseen quarters look most like the quarter just before them, so
-the model returns that quarter's label.
+In the walk-forward test, the full-vocabulary model's predictions agree with the **previous**
+quarter's label in 72.0% of Apple and 70.7% of Amazon cases. They agree with the correct class in
+only 37.8% and 20.5% of cases. What is measured is therefore a strong previous-quarter resemblance
+in the predictions. The further explanation that the model primarily recognises the most recent
+known language regime is a plausible mechanism, not direct evidence of nearest-neighbour behaviour.
 
-But the labels approximately alternate: Apple `0 0 2 3 | 0 0 2 3 | ...`, Amazon
-`3 0 1 1 | 3 0 1 1 | ...`.
-Adjacent quarters share a label in only 32% (Apple) and 21% (Amazon) of cases. A persistence
-forecaster on an alternating target is systematically wrong: MCC -0.146 and -0.176, worse than
-chance. This supplies a concrete mechanism for the negative scores of the tested linear models. The
-broader hypothesis is that an era-similarity classifier trained on drifting text can become
-anti-predictive out of sample when its target alternates seasonally.
+A separately constructed pure persistence rule assigns every group the previous quarter's class.
+It reaches accuracy 0.298/MCC -0.146 for Apple and 0.165/-0.176 for Amazon. This follows from the
+target structure: adjacent quarters share a class in only 32% of Apple and 21% of Amazon cases. A
+useful temporal signal therefore becomes a poor financial signal when the target classes change
+seasonally.
+
+"Worse than guessing" would still be too broad. With four classes, a uniformly random predictor
+has expected accuracy of 25% and MCC near zero. Apple's full-vocabulary accuracy of 37.8% exceeds
+that simple accuracy reference, whereas Amazon's 20.5% falls below it. The negative MCC values above
+also belong to the pure persistence rule, not to an exact identification of the full-vocabulary
+model with that rule. An MCC below zero here means an anti-predictive mapping relative to the actual
+class structure; it does not mean that every arbitrary random prediction would beat the model on
+every metric.
+
+The finding therefore does not show that the model learns nothing. It shows that the model learns a
+strong and interpretable signal that is misaligned with future forecasting. Because this probe
+fitted its TF-IDF vectorizer on the full period in advance, the exact values should additionally be
+confirmed with per-fold fitting. The broader hypothesis remains that an era-similarity classifier
+trained on drifting text can become anti-predictive out of sample when the target changes
+seasonally.
 
 ## 6. Calendar words are the most stable transferable text content tested
 
