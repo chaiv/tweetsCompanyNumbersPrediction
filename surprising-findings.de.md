@@ -6,51 +6,54 @@ festgestellt, was die publizierten Modelle nicht messen. Dieses Dokument hält f
 stattdessen enthalten - Befunde, nach denen in der Dissertation nicht gefragt wurde und die die
 meisten Leser nicht erwarten würden.
 
-Jede Zahl unten stammt aus den Skripten in `tweetsCompanyNumbersPrediction/src/probes/`, ausgeführt
-auf den archivierten gelabelten Dataframes (Gruppen aus 10 aufeinanderfolgenden Tweets, keine Labels
-zur Gruppenbildung, TF-IDF-Merkmale und ein linearer Klassifikator, sofern nicht anders angegeben).
-Nichts davon ist die Interpretation eines Modells; alles ist eine Messung.
+Die Zahlen stammen aus den Skripten in `tweetsCompanyNumbersPrediction/src/probes/`, den gespeicherten
+Ergebnisartefakten und den am 21. August 2026 ergänzten Kontrollläufen auf den archivierten
+gelabelten Dataframes. Die Probes bilden Gruppen aus zehn aufeinanderfolgenden Tweets ohne Labels
+zur Gruppenbildung und verwenden, sofern nicht anders angegeben, TF-IDF-Merkmale und einen linearen
+Klassifikator. Dieses Dokument trennt reproduzierte Messwerte, plausible Mechanismen und noch zu
+prüfende Hypothesen ausdrücklich voneinander.
 
-**Hinweis zur Erstellung:** Die Untersuchungen und diese Zusammenfassung wurden mit Claude Fable 5
-erstellt; die Analysen liefen direkt auf den Repository-Daten.
+**Hinweis zur Erstellung:** Die ursprünglichen Probes und die erste Zusammenfassung wurden mit
+Claude Fable 5 erstellt. ChatGPT 5.6 Sol prüfte anschließend Dissertation, Code und Messwerte,
+reproduzierte die Kernexperimente und ergänzte strengere Cross-Company-Kontrollen. Alle lokalen
+Analysen liefen direkt auf den Repository-Daten.
 
 ---
 
 ## Warum diese Befunde überraschend sind, in einfachen Worten
 
-**Tweets sind eine Uhr.** Die meisten Menschen nehmen an, dass eine Handvoll kurzer Beiträge über
-ein Unternehmen aus fast jeder Zeit stammen könnte. Das stimmt nicht. Zehn Beiträge tragen genug
-kleine Spuren - einen Produktnamen, einen Monat, einen Kurs, ein Ereignis, den Absender - um sie in
-zwei von drei Fällen der richtigen Woche zuzuordnen. Niemand schreibt das Datum absichtlich in seine
-Tweets; es steht trotzdem darin.
+**Tweets sind eine Uhr.** Zehn Beiträge tragen genug kleine Spuren - einen Produktnamen, einen Monat,
+einen Kurs, ein Ereignis, den Absender - um sie in einem gemischten Split, der Beispiele aus jeder
+bekannten Woche in Training und Test enthält, in zwei von drei Fällen der richtigen von 262 Wochen
+zuzuordnen. Das ist keine Datierung einer noch nie gesehenen Zukunftswoche, aber ein ungewöhnlich
+starker zeitlicher Fingerabdruck.
 
-**Die Uhr funktioniert über Unternehmen hinweg.** Man würde erwarten, dass Tweets über Apple und
-Tweets über Amazon wenig gemeinsam haben. Doch ein Modell, das nur Apple-Tweets gesehen hat, kann
-trotzdem sagen, aus welchem Quartal ein Amazon-Tweet stammt. Die Nachrichten des Tages, der Slang
-des Jahres und dieselben automatisierten Accounts tauchen überall auf; das "Wann" ist eine
-Eigenschaft der ganzen Plattform, nicht eines Unternehmens.
+**Die Uhr funktioniert über Unternehmen hinweg.** Ein Teil des ursprünglichen Transfers stammt von
+Tweets, die in mehreren Unternehmensdateien identisch vorkommen. Nach Entfernung aller solcher
+Tweet-IDs und mit einem nur auf dem Quellunternehmen angepassten Vokabular erreicht Apple auf Amazon
+aber weiterhin 51,0% Quartalsgenauigkeit. Das "Wann" ist damit nicht nur eine Eigenschaft eines
+Unternehmens, sondern auch des gemeinsamen Markt- und Plattformdiskurses.
 
-**Die Menge besteht überwiegend aus Maschinen.** Der Datensatz wird als öffentliche Meinung über
-fünf Unternehmen beschrieben. Tatsächlich hat ein Prozent der Accounts mehr als die Hälfte aller
-Beiträge geschrieben, und die aktivsten Accounts sind automatisierte Nachrichten- und
-Börsenalarm-Feeds. Was die Modelle über "die Öffentlichkeit" gelernt haben, haben sie zum
-großen Teil von Software gelernt.
+**Das Korpus enthält ein gemeinsames Informationsbroker-Netz.** Ein Prozent der Accounts schreibt
+mehr als die Hälfte aller Beiträge. Nach Entfernung identischer Cross-Company-Tweets stammen noch
+60,3% der Apple-, 86,4% der Amazon- und 68,8% der Tesla-Beiträge von 14.143 Autoren, die über alle
+drei Unternehmen schreiben. Viele hochaktive Quellen wirken wie Nachrichten-, Trading- oder
+Feed-Accounts; eine formale Bot-Klassifikation wurde jedoch nicht durchgeführt.
 
-**Die publizierten Zahlen waren genau so hoch wie der Kalender allein.** Eine Regel, die gar keinen
-Text liest - "dieses Quartal im Jahr läuft meistens so" - erreicht dieselbe Accuracy und
-Korrelation, die die Dissertation für ihre besten Modelle berichtet. Das ist kein Zufall: Die
-Modelle hatten den Kalender im Text gefunden, weil der Kalender das Lauteste darin ist.
+**Der Kalender dominiert ehrliche Zukunftstests.** Auf demselben Q+1-Walk-forward-Test erreicht eine
+Regel ohne Text für Apple 83,2% Accuracy/MCC 0,745 und für Amazon 79,9%/0,735; das lineare Textmodell
+erreicht nur 40,2%/0,001 beziehungsweise 23,9%/-0,106. Diese Zahlen sind wegen des anderen Protokolls
+nicht direkt mit den historischen 87%/0,77 gleichzusetzen, zeigen aber die Stärke der Saisonbaseline.
 
-**Das Modell konnte nicht einmal Ergebnisse lesen, die schon öffentlich waren.** Man würde
-erwarten, dass ein Modell aus Tweets zumindest erkennen kann, dass Apple gerade ein gutes Quartal
-gemeldet hat, denn genau darüber wird getwittert. Es kann es nicht, jedenfalls nicht mit dieser Art
-von Modell. Das beantwortet die Frage, ob die Methode oder das Material das Problem war: Das
-Material trägt die Botschaft nicht in einer Form, die ein solches Modell lesen kann.
+**Ein lineares Vollvokabular-Modell gewinnt selbst verkündete Ergebnisse nicht stabil zurück.** Bei
+Apple steigt die Accuracy für das Vorquartalslabel um die Ergebniswoche herum sichtbar an, bleibt
+aber insgesamt schwach. Das zeigt eine Informationsspur, nicht ihre Abwesenheit. Stärkere
+Repräsentationen, bessere zeitliche Ausrichtung und gezielte Zahlenextraktion bleiben offen.
 
-**Zweiundvierzig Wörter schlagen 150.000.** Behält man nur die Namen von Monaten und Jahreszeiten,
-erhält man für ungesehene Quartale einen besseren Prognostiker als mit dem gesamten Vokabular.
-Alles andere im Text hilft außerhalb des Zeitraums, in dem es gelernt wurde, nicht - es schadet
-sogar, weil es das Modell am falschen Zeitraum verankert.
+**Bei Apple schlagen zweiundvierzig Kalenderwörter das Vollvokabular.** Monats- und Saisonwörter
+erreichen im Walk-forward-Test MCC +0,291, während das Vollvokabular negativ bleibt. Bei Amazon gilt
+dies nur für Gruppen, die tatsächlich ein Kalenderwort enthalten; insgesamt liegt der MCC dort fast
+bei null. Der Befund ist stark, aber nicht universell.
 
 **Falsch mit System.** Außerhalb der Stichprobe waren die Modelle nicht bloß nutzlos, sie waren
 schlechter als Raten. Der Grund ist fast mechanisch: Ein Modell, das ein Quartal nie gesehen hat,
@@ -58,15 +61,15 @@ greift zum ähnlichsten, und das ist das unmittelbar vorangehende - aber die Fin
 von einem Quartal zum nächsten, also ist "wie beim letzten Mal" zuverlässig falsch. Eine Münze
 hätte es besser gemacht.
 
-**Das beste Experiment war ein Spiel mit vier Zeitfenstern.** Der Balancierungsschritt hat das
-Vorzeigeexperiment stillschweigend auf vier Fenster in 2015 und 2016 reduziert. Das Modell mit 85
-Prozent wurde im Grunde gefragt: "Stammt das aus dem Frühjahr 2015, dem Herbst 2015, dem Herbst
-2016 oder aus der Weihnachtszeit?" - eine Frage, die der Text mühelos beantwortet.
+**Das beste Experiment kann auf vier Zeitfenster kollabiert sein.** Wurde der im Repository sichtbare
+`EqualClassSampler` im publizierten Lauf wie dokumentiert benutzt, reduzierte er den Apple-Pool fast
+vollständig auf vier Fenster in 2015 und 2016. Ohne historisches Run-Manifest ist dieser Mechanismus
+sehr plausibel, aber nicht endgültig beweisbar.
 
-**Das Einzige, was funktioniert, ist gar keine Sprache.** Das einzige echte Signal im ganzen Projekt
-sind Zahlen, die Menschen in Tweets über Tesla-Auslieferungen zitieren - Schätzungen und
-durchgesickerte Werte, die schon existierten, bevor jemand sie twitterte. Der Text ist ein Bote, der
-eine Zahl überbringt, keine Menge, die etwas spürt.
+**Der spannendste bisher gefundene Zukunftskanal sind typisierte Zahlen.** Bei Tesla tragen in Tweets
+zitierte Auslieferungsschätzungen einen explorativen Zusatznutzen. Das ist noch nicht bestätigt
+(gepaarter exakter Test p = 0,125), weist aber auf eine konkrete Architektur hin: Kennzahl, Einheit,
+Bezugszeitraum, Schätzung/Istwert und Veröffentlichungszeitpunkt statt bloßer Wortvektoren.
 
 ---
 
@@ -82,14 +85,17 @@ zuordnen:
 | Monat | 60 | 0,807 | 0,017 |
 | ISO-Woche | 262 | **0,666** | 0,004 |
 
-In zwei von drei Fällen lassen sich zehn Tweets der richtigen von 262 Wochen zuordnen. Das ist der
-Mechanismus hinter jedem hohen Wert der Dissertation: Das Finanzlabel ist innerhalb eines Quartals
-konstant, der Text identifiziert das Quartal, und die publizierte Auswertung teilte Quartale
-zwischen Training und Test.
+In zwei von drei Fällen lassen sich zehn Tweets der richtigen von 262 bereits im Training
+repräsentierten Wochen zuordnen. Das belegt Periodenerkennung, nicht Generalisierung auf eine neue
+Woche. Sie ist ein plausibler Hauptmechanismus hoher gemischter Ergebnisse: Das Finanzlabel ist
+innerhalb eines Quartals konstant, der Text identifiziert den Zeitraum, und die publizierte
+Auswertung teilte Quartale zwischen Training und Test. Welcher Anteil eines konkreten historischen
+Scores daraus stammt, ist ohne dessen Einzelvorhersagen nicht bestimmbar.
 
-Die Uhr steckt in der Sprache selbst, nicht nur in automatisierten Accounts. Nach Entfernung des
-obersten Prozents der Accounts und aller exakten Duplikate - was rund 60% aller Tweets entfernt -
-liegt die Accuracy immer noch bei 0,817 für das Quartal und 0,648 für die Woche.
+Die Uhr steckt nicht nur in den aktivsten Quellen und Wiederholungen. Nach Entfernung des obersten
+Prozents der Accounts und Deduplizierung - gemeinsam werden rund 60% aller Tweets entfernt - liegt
+die Accuracy immer noch bei 0,817 für das Quartal und 0,648 für die Woche. Da diese Kontrolle
+Aktivität, Autoridentität und Duplikate gleichzeitig verändert, isoliert sie keinen reinen Botanteil.
 
 ## 2. Die Uhr überträgt sich zwischen Unternehmen
 
@@ -101,20 +107,39 @@ Ein Quartalsklassifikator, der nur auf Apple-Tweets trainiert wurde, datiert Ama
 | Amazon | 0,604 | 0,889 | 0,477 |
 | Tesla | 0,494 | 0,561 | 0,818 |
 
-Zufall ist 0,05. Apple auf Amazon: exaktes Quartal 66%, innerhalb eines Quartals 82%. Nach
-Entfernung der Top-Accounts und Duplikate sinkt die Übertragung auf etwa die Hälfte (Apple auf
-Amazon 0,53, Amazon auf Apple 0,48), bleibt aber zehnmal über Zufall. Etwa die Hälfte der
-unternehmensübergreifenden Uhr ist gemeinsame Sprache; die andere Hälfte sind dieselben
-automatisierten Accounts, die über mehrere Unternehmen posten.
+Zufall bei gleichverteilten Klassen ist 0,05. Apple auf Amazon: exaktes Quartal 66%, innerhalb eines
+Quartals 82%. Dieser erste Test passte das gemeinsame Vokabular allerdings auf alle Unternehmen an,
+und 8,6-17,0% der Tweet-IDs überschneiden sich je Unternehmenspaar. Er belegt daher noch keinen
+sauberen Transfer.
+
+Eine strengere Kontrolle entfernte jede Tweet-ID, die in mehr als einer Unternehmensdatei vorkommt,
+und passte das Vokabular ausschließlich auf dem Quellunternehmen an:
+
+| Trainiert auf | Apple | Amazon | Tesla |
+| --- | ---: | ---: | ---: |
+| Apple | - | **0,510** | 0,311 |
+| Amazon | **0,489** | - | 0,344 |
+| Tesla | 0,360 | **0,423** | - |
+
+Damit bleibt ein starker gemeinsamer Plattform- und Marktzustand bestehen. Nach Entfernung der
+Cross-Company-Duplikate stammen 60,3% der Apple-, 86,4% der Amazon- und 68,8% der Tesla-Tweets von
+14.143 Autoren, die über alle drei Unternehmen schreiben. Entfernt man zusätzlich jeden Autor, der
+in mehreren Unternehmensmengen vorkommt, bleiben einzelne Richtungen über der jeweiligen
+Mehrheitsbaseline: Apple auf Amazon 0,204 statt 0,083, Amazon auf Apple 0,166 statt 0,112 und Tesla
+auf Amazon 0,206 statt 0,083. Andere Richtungen liegen näher an der Baseline. Das spricht für zwei
+Schichten: ein dominantes gemeinsames Informationsbroker-Netz und eine schwächere allgemeine
+Epochensprache.
 
 Was die Uhr im Rohtext trägt: explizite Daten und Monatsnamen, Aktienkursniveaus (`114`, `117`,
 `172`, `210` - der Kurs ist ein Zeitstempel), Produkteinführungen (`iphone6s`, `pixel`,
 `homepod`, `iphone11`), Ereignisse (`blackmonday`, `election`, `trump`) und mitgenannte Ticker, die
-in einer bestimmten Saison in Mode waren (`nflx`, `bynd`, `roku`). Die Pipeline der Dissertation
-entfernt Ziffern und erreicht trotzdem 91,8% Quartalsgenauigkeit; die Uhr überlebt also auch ohne
-Kurse.
+in einer bestimmten Saison in Mode waren (`nflx`, `bynd`, `roku`). Eine historische
+Quartalserkennungsrate von 91,8% wird berichtet, ist mit den vorhandenen Artefakten aber nicht
+reproduzierbar. Das aktuelle Diagnoseprogramm, das sein TF-IDF-Vokabular nur auf Trainingsgruppen
+anpasst, erreicht mit Seed 1337 eine Accuracy von 0,730. Die Uhr bleibt stark; 91,8% dürfen nicht als
+aktuell bestätigter Wert erscheinen.
 
-## 3. Das Korpus besteht überwiegend aus sprechenden Maschinen
+## 3. Das Korpus wird von wenigen professionellen Quellen dominiert
 
 | Unternehmen | Autoren | Top-10-Accounts schreiben | Oberstes Prozent schreibt |
 | --- | ---: | ---: | ---: |
@@ -122,23 +147,26 @@ Kurse.
 | Amazon | 42.512 | 14,1% | 54,4% |
 | Tesla | 46.563 | 9,7% | 54,4% |
 
-Die Top-Accounts sind automatisierte Feeds: `_peripherals` und `computer_hware` (je rund 91.000
-Tweets), `MacHashNews`, `PortfolioBuzz`, `retail_Dbt`, `ExactOptionPick`, `TradingGuru` - und die
-letzten drei posten über mehrere Unternehmen. Der Datensatz wird in der Dissertation und auf Kaggle
-als öffentliche Meinung beschrieben; der Großteil ist algorithmische Feed-Ausgabe.
+Zu den Top-Accounts gehören `_peripherals` und `computer_hware` (je rund 91.000 Tweets),
+`MacHashNews`, `PortfolioBuzz`, `retail_Dbt`, `ExactOptionPick` und `TradingGuru`; mehrere posten über
+verschiedene Unternehmen. Die Dissertation stellt selbst fest, dass ihre zehn häufigsten Quellen
+Finanznachrichten-Accounts und keine typischen Einzelpersonen sind. Die neue Erkenntnis ist daher
+nicht deren bloße Existenz, sondern die extreme Konzentration und das unternehmensübergreifende
+Netz. Ob einzelne Accounts Bots, teilautomatisierte Feeds oder manuell betriebene professionelle
+Quellen sind, wurde nicht klassifiziert.
 
 Die eigenen Interpretationsergebnisse der Dissertation zeigen das bereits. Zu den für Apple
 berichteten "wichtigsten Wörtern" gehören `cultofmac`, `DeidreZune` und `TechCrunch` -
-Account-Handles. Integrated Gradients hat korrekt berichtet, dass die Evidenz des Modells darin
-bestand, wer wann gepostet hat; die narrative Deutung ("Apple-zentrierte Medien, die Innovation
-betonen") wurde darauf gesetzt.
+Account-Handles. Integrated Gradients zeigt damit, dass die Modellentscheidung auf Quellenmarker
+reagieren kann. Die Attribution erklärt, worauf das Modell reagiert hat; sie beweist weder, dass der
+Account selbst die Finanzänderung erklärt, noch dass die anschließend formulierte ökonomische
+Erzählung kausal ist.
 
-## 4. Selbst bereits verkündete Ergebnisse lassen sich nicht aus dem Text gewinnen
+## 4. Ein lineares Textmodell gewinnt selbst verkündete Ergebnisse nicht stabil zurück
 
-Die Kennzahl eines Quartals wird im Folgequartal verkündet (Apple und Amazon in Woche 4-5,
-Tesla-Auslieferungen in den ersten Tagen). Tweets aus Quartal Q diskutieren also das Ergebnis von
-Q-1. Wenn die Methode überhaupt Finanzinhalte extrahieren könnte, müsste sie das wiederfinden.
-Walk-forward, ausschließlich auf ungesehenen Quartalen:
+Eine Kennzahl wird typischerweise nach Ende ihres wirtschaftlichen Quartals verkündet. Tweets aus
+Quartal Q können daher das Ergebnis von Q-1 diskutieren. Als Negativkontrolle wurde geprüft, ob ein
+lineares TF-IDF-Modell dieses bereits öffentliche Label im Walk-forward-Setting zurückgewinnt:
 
 | Ziel | Apple | Amazon | Tesla |
 | --- | ---: | ---: | ---: |
@@ -146,13 +174,16 @@ Walk-forward, ausschließlich auf ungesehenen Quartalen:
 | Vorquartal - bereits verkündet und diskutiert | **-0,134** | **-0,083** | **-0,044** |
 | Folgequartal (echte Prognose) | -0,004 | -0,111 | -0,018 |
 
-Werte sind MCC. Nicht einmal die öffentliche, bereits verkündete Zahl lässt sich mit einem
-Bag-of-Words-Modell aus diesem Korpus gewinnen. Die einzige Spur: Apples Accuracy auf dem
+Werte sind MCC. Das geprüfte Bag-of-Words-Modell gewinnt das öffentliche Vorquartalslabel nicht
+stabil zurück. Eine Spur bleibt: Apples Accuracy auf dem
 Vorquartalslabel steigt von 0,21 in Woche 1 des Quartals auf 0,31 in Woche 5 - Apples
 Ergebniswoche - und auf etwa 0,34 spät im Quartal, während die Accuracy auf dem eigenen Quartal
-flach bleibt. Die Verkündung gelangt in den Text. Sie ist viel zu schwach, um nutzbar zu sein.
+flach bleibt. Die Verkündung gelangt also in den Text, wird durch diese Repräsentation aber nur
+schwach extrahiert. Da der TF-IDF-Vektorisierer vor den Folds auf dem gesamten Zeitraum angepasst
+wurde und nur eine Modellfamilie geprüft ist, darf daraus keine allgemeine Unmöglichkeit abgeleitet
+werden.
 
-## 5. Warum jeder Wert außerhalb des Zeitraums negativ ist, nicht null
+## 5. Warum die geprüften Werte außerhalb des Zeitraums negativ werden
 
 Die Vorhersagen des Modells mit vollem Vokabular stimmen außerhalb des Trainingszeitraums in 72%
 der Fälle (Apple) bzw. 71% (Amazon) mit dem Label des **Vorquartals** überein, mit der Wahrheit
@@ -160,14 +191,16 @@ aber nur in 38% bzw. 21%. Außerhalb des Zeitraums ist das Modell ein Persistenz
 Ungesehene Quartale ähneln am meisten dem unmittelbar vorangehenden Quartal, also liefert das
 Modell dessen Label.
 
-Die Labels alternieren jedoch: Apple `0 0 2 3 | 0 0 2 3 | ...`, Amazon `3 0 1 1 | 3 0 1 1 | ...`.
+Die Labels alternieren jedoch annähernd: Apple `0 0 2 3 | 0 0 2 3 | ...`, Amazon
+`3 0 1 1 | 3 0 1 1 | ...`.
 Benachbarte Quartale teilen ihr Label nur in 32% (Apple) bzw. 21% (Amazon) der Fälle. Ein
 Persistenzprognostiker auf einem alternierenden Ziel liegt systematisch falsch: MCC -0,146 und
--0,176, schlechter als Zufall. Das erklärt jede negative Zahl des Audits und geht über dieses
-Projekt hinaus: Auf saisonal alternierenden Zielen ist maschinelles Lernen auf driftendem Text
-außerhalb der Stichprobe nicht neutral - es ist anti-prädiktiv.
+-0,176, schlechter als Zufall. Das liefert einen konkreten Mechanismus für die negativen Werte der
+geprüften linearen Modelle. Als allgemeine Hypothese folgt daraus: Auf saisonal alternierenden
+Zielen kann ein auf driftendem Text trainierter Epochenähnlichkeitsklassifikator außerhalb der
+Stichprobe anti-prädiktiv werden.
 
-## 6. Der einzige übertragbare Inhalt des Textes ist der Kalender selbst
+## 6. Kalenderwörter sind der stabilste geprüfte übertragbare Textinhalt
 
 Vokabular-Ablation im Walk-forward-Setting:
 
@@ -177,14 +210,15 @@ Vokabular-Ablation im Walk-forward-Setting:
 | Voll ohne Kalender-Tokens | -0,13 bis -0,17 |
 | Nur Kalender-Tokens | **+0,20** |
 
-Das Entfernen der Kalenderwörter macht das Modell schlechter; Kalenderwörter allein liefern den
-einzigen positiven Wert. Ein Vokabular aus nur 42 Monats- und Saisonwörtern erreicht bei Apple
-insgesamt MCC +0,29 und **+0,43 auf den 45% der Gruppen, die einen Monat nennen** (Amazon: +0,34
-auf diesen Gruppen, -0,37 auf den übrigen). Zweiundvierzig Wörter schlagen 150.000. Das beste
-ehrliche Textmodell ist ein Monatsnamenleser - und es erreicht nur die Hälfte der saisonalen
-Baseline (0,76), weil 55% der Gruppen gar keinen Monat nennen.
+Das Entfernen der Kalenderwörter macht das Apple-Modell schlechter; Kalenderwörter allein liefern
+dort den einzigen positiven Wert der geprüften Ablation. Ein festes Vokabular aus nur 42 Monats-
+und Saisonwörtern erreicht bei Apple insgesamt MCC +0,29 und **+0,43 auf den 45% der Gruppen, die
+ein solches Wort nennen**. Bei Amazon beträgt der Gesamt-MCC nur +0,005; auf Gruppen mit
+Kalenderwort steigt er auf +0,34, auf den übrigen fällt er auf -0,37. Für Apple schlagen 42 feste
+Wörter damit das rund 60.000 Tokens große Vollvokabular. Selbst dort erreicht das Modell nur einen
+Teil der reinen Saisonbaseline (MCC 0,76), weil 55% der Gruppen kein Kalenderwort nennen.
 
-## 7. Sprache driftet gleichmäßig und kehrt nicht mit den Jahreszeiten wieder
+## 7. Auf Zentroid-Ebene driftet Sprache gleichmäßig ohne saisonale Spitze
 
 Kosinus-Ähnlichkeit zwischen den quartalsweisen TF-IDF-Zentroiden:
 
@@ -196,11 +230,12 @@ Kosinus-Ähnlichkeit zwischen den quartalsweisen TF-IDF-Zentroiden:
 
 Der Abfall ist monoton, etwa 2-3 Punkte pro Quartal, bei Tesla am langsamsten. Sprache aus demselben
 Kalenderquartal ein Jahr später (Abstand 4) ist **nicht** ähnlicher als Sprache drei Quartale
-entfernt: Es gibt auf Zentroid-Ebene keine saisonale Wiederkehr der Sprache. Weihnachtsgerede ist zu
-schwach, um das saisonale Label zu tragen; das tun nur explizite Kalenderwörter. Die Uhr ist
-monoton: Text verrät *wann*, aber aus dem Thema allein nie *welche Jahreszeit*.
+entfernt: Es gibt auf Zentroid-Ebene keine zusätzliche saisonale Spitze. Die Uhr ist in dieser
+groben Darstellung überwiegend monoton: Text verrät stark *wann*; eine Wiederkehr der gesamten
+Themensprache nach vier Quartalen ist in diesem Test nicht sichtbar. Das schließt schwächere
+saisonale Teilthemen nicht aus.
 
-## 8. Die dokumentierte Balancierung hat das Vorzeigeexperiment auf vier Kalenderfenster kollabiert
+## 8. Die dokumentierte Balancierung kann das Vorzeigeexperiment auf vier Fenster reduzieren
 
 `EqualClassSampler` behält die ersten n Tweets je Klasse, wobei n die Größe der kleinsten Klasse
 ist. Auf die zeitlich sortierten Apple-4-Klassen-Daten angewendet (n = 93.686):
@@ -212,11 +247,12 @@ ist. Auf die zeitlich sortierten Apple-4-Klassen-Daten angewendet (n = 93.686):
 | 2 "moderate increase" | 100% aus 2016Q3 |
 | 3 "strong increase" | 72% aus 2015Q4, 28% aus 2016Q4 |
 
-Das beste publizierte Ergebnis (Apple@10, vier Klassen, Accuracy 0,85, MCC 0,80) hat also die
-Aufgabe "unterscheide 2015Q1, 2015Q3, 2016Q3 und die Weihnachtssaisons 2015/2016" gemessen, und das
-Modell hat praktisch keinen Tweet nach 2016Q4 gesehen. Die Dissertation gibt auf Seite 114 an, dass
-die Balancierung vor dem Split erfolgte; das Repository enthält keine andere
-Balancierungsimplementierung.
+Falls der publizierte Apple-Lauf diesen Sampler wie auf Seite 114 beschrieben verwendete, maß das
+beste Ergebnis (Apple@10, vier Klassen, Accuracy 0,85, MCC 0,80) im Wesentlichen die Aufgabe
+"unterscheide 2015Q1, 2015Q3, 2016Q3 und die Weihnachtssaisons 2015/2016"; der Pool enthielt dann
+praktisch keinen Tweet nach 2016Q4. Das Repository enthält keine andere sichtbare
+Balancierungsimplementierung. Ohne historisches Run-Manifest, exakten Commit und damaligen
+Zwischenartefakt bleibt die Zuordnung sehr plausibel, aber bedingt.
 
 ## 9. Das neue Hybridmodell, zerlegt: Kalender plus zitierte Zahlen
 
@@ -238,63 +274,121 @@ Richtung (Anstieg gegen Rückgang) erreicht der saisonale Prior allein 0,9167 / 
 mit dem vollen Hybrid. Der allgemeine Hybrid mit gemischtem Text (MCC 0,5473) schlägt knapp
 denselben Hybrid mit echtem Text (0,5466).
 
-Die ehrliche Beschreibung in einem Satz: der Kalender für Apple und Amazon, in Tweets zitierte
-Auslieferungszahlen für Tesla, plus ein von Hand eingestelltes Gate. Der Tesla-Anteil ist real
-(Mischen senkt ihn von 8 auf 4) und das einzige echte textbasierte Signal des Projekts. Seine Natur
-ist entscheidend: Tesla-Auslieferungen sind eine Kennzahl, die die Öffentlichkeit vor der
-Veröffentlichung numerisch zitiert - Analystenschätzungen, Guidance, durchgesickerte Zahlen - und
-die Tweets geben diese Zahlen weiter. Der Text wirkt als Träger von Zahlen, die jemand bereits
-kannte, nicht als Quelle von Schwarmwissen. EPS und Umsatz werden nicht als Niveaus getwittert, und
-für sie gibt es nichts.
+Die ehrliche Kurzbeschreibung lautet: der Kalender für Apple und Amazon, in Tweets zitierte
+Auslieferungszahlen für Tesla, plus ein von Hand eingestelltes Gate. Das Mischen der Textmerkmale
+senkt Tesla von 8 auf 4 richtige Quartale; gegenüber der gepaarten Mischkontrolle gibt es vier nur
+vom echten Text korrekt gelöste Fälle und keinen umgekehrten Fall. Der exakte zweiseitige Test ergibt
+jedoch p = 0,125, und das Gate wurde nach Sichtung der Testjahre entworfen. Das Tesla-Ergebnis ist
+deshalb ein vielversprechender, aber unbestätigter Kandidat.
+
+Seine Natur ist wissenschaftlich besonders interessant: Tesla-Auslieferungen sind eine Kennzahl,
+die vor der Veröffentlichung numerisch geschätzt wird. Tweets können Analystenschätzungen, Guidance
+oder andere vorab zirkulierende Werte weitertragen. Der Text ist dann nicht bloß Stimmung, sondern
+ein Transportkanal strukturierter numerischer Information. Ob dieser Kanal über einen eingefrorenen
+Holdout hinweg zusätzlichen Nutzen gegenüber dem Analystenkonsens liefert, ist die entscheidende
+offene Frage.
+
+### Zielzeitpunkt: Amazon ist anders ausgerichtet
+
+Die Amazon-Finanz-CSV ist gegenüber dem wirtschaftlichen Berichtsquartal um ein Quartal nach vorn
+verschoben: 29,33 Mrd. USD aus Amazons Q4/2014 stehen im Datensatz als 2015Q1; 22,72 Mrd. USD aus
+Q1/2015 als 2015Q2. Die Dissertation beschreibt entsprechend, dass die als Q1 geführten Höchstwerte
+aus dem Weihnachtsgeschäft des Vorquartals stammen. Dadurch können Amazon-Tweets im sogenannten
+Zielquartal die Veröffentlichung des Zielwerts bereits enthalten. Diese Aufgabe ist teilweise
+Report-Reaktion beziehungsweise Rekonstruktion, nicht ausschließlich Prognose.
+
+Künftige Auswertungen müssen daher je Ziel drei Zeiten getrennt speichern: wirtschaftliches
+Berichtsquartal, Veröffentlichungszeitpunkt und erlaubter Forecast-Cutoff. Das Target kann weiterhin
+die Quartalszahl bleiben; nur die Informationsmenge vor der Vorhersage wird korrekt begrenzt.
 
 ## 10. Was die ursprünglichen Modelle aus den Wortvektoren gelernt haben
 
-Die Korrelation zwischen Embedding-Inhalt und Label war real und stark. Sie lief über die Zeit:
+Die Korrelation zwischen Embedding-Inhalt und Label war im gemischten Split real und stark. Als
+Mechanismusskizze, nicht als mathematische Korrelationsidentität, lässt sie sich so darstellen:
 
 ```text
-corr(Embedding-Inhalt, Label) = corr(Embedding-Inhalt, Zeitraum) x Identitaet(Zeitraum -> Label)
+Embedding-Inhalt -> Zeitraum -> im Datensatz festes Quartalslabel
 ```
 
-Der erste Faktor ist groß - Text stempelt sich selbst auf die Woche genau. Der zweite ist innerhalb
-der Stichprobe exakt - ein Quartal, ein Label. Die trainierbare Embedding-Tabelle (63 Millionen
+Die erste Verbindung ist groß - Text stempelt sich innerhalb bekannter Perioden fein. Die zweite
+ist innerhalb der Stichprobe deterministisch - ein Quartal, ein Label. Die trainierbare
+Embedding-Tabelle (63 Millionen
 Parameter bei Apple, gegenüber 3,8 Millionen im LSTM) diente als Nachschlagewerk von
 Zeitraummarkern zu Labels, mit der bereits in den vortrainierten Vektoren latenten Epochenstruktur
-als Vorsprung. Außerhalb des Zeitraums bricht der zweite Faktor weg, das Modell fällt auf die
-nächstliegende Epoche zurück, und die alternierenden Labels machen daraus Anti-Prädiktion.
+als möglichem Vorsprung. Außerhalb des Zeitraums kann diese Zuordnung brechen; die beobachtete
+Annäherung an die vorige Epoche und die alternierenden Labels erklären dann die Anti-Prädiktion der
+linearen Kontrollen. Zusätzlich wurden die historischen Word2Vec-Repräsentationen vor der
+Kreuzvalidierung auf dem Vollkorpus trainiert und waren damit transduktiv.
+
+### Was der dritte Dissertationsschritt tatsächlich leisten kann
+
+Die Topic-/Important-Word-Stufe ist wissenschaftlich wertvoll, aber anders als ursprünglich
+gedeutet. Viele manuelle Topics - Brexit, Wahl, COVID-19 oder Hongkong-Proteste - sind einmalige
+Zeitanker. Ein Topic-zu-Klasse-Zusammenhang kann deshalb erneut `Topic -> Zeitraum -> Quartalslabel`
+statt einen wirtschaftlichen Wirkungskanal abbilden. Integrated Gradients erklärt zudem die
+Vorhersage des Modells, nicht die Ursache der realen Kennzahl.
+
+Dokument und Implementierung stimmen auch bei der Auswahl nicht vollständig überein: Die
+Dissertation beschreibt zehn besonders ähnliche Tweetgruppen; der sichtbare Code sucht zehn
+ähnliche gelernte Topics, übernimmt alle ihnen zugeordneten Dokumente und bildet danach
+labelabhängige Gruppen. Einzelne narrative Erklärungen sind rückblickend konstruiert; besonders
+deutlich ist die Deutung von Tweets aus dem bis 2020 reichenden Korpus über die erst 2021 entstandene
+`#AppleToo`-Bewegung.
+
+Positiv neu gerahmt kann dieser Schritt einen dynamischen Ereignis- und Quellenatlas liefern:
+past-only Topics je Quartal, Topic-Prävalenz über die Zeit, getrennte professionelle und individuelle
+Quellen sowie Important Words als Beschreibung der Modellreaktion. Erst eine anschließend auf
+unberührten Quartalen geprüfte Änderung der Topic-Prävalenz darf als Forecast-Kandidat gelten.
 
 ## 11. Was nicht behauptet wird
 
-- Nicht, dass Tweets keine Information über Unternehmen enthalten. Die Aussage ist, dass dieses
-  Korpus, diese Labels und diese Repräsentation keine extrahierbare finanzielle Richtung
-  enthalten - nicht für das laufende Quartal, nicht für das nächste und nicht einmal für das
-  bereits verkündete vorige.
+- Nicht, dass Tweets keine Information über Unternehmen enthalten. Belegt ist nur, dass die
+  geprüften linearen Vollvokabular-Modelle unter Walk-forward-Evaluation keine stabile finanzielle
+  Richtung extrahierten. Die Apple-Ergebniswochenspur und das Tesla-Zahlensignal sprechen gerade
+  gegen eine allgemeine Informationslosigkeit.
 - Nicht, dass das Tesla-Signal bestätigt ist. Es beruht auf 4-6 Quartalen, p = 0,125 gegen die
   Mischkontrolle, mit einem auf den Testjahren entworfenen Gate.
 - Nicht, dass die Datierungsgenauigkeiten Obergrenzen sind. Stärkere Modelle würden genauer
   datieren.
-- Die Untersuchungen nutzten Roh-Tweettexte mit Ziffern; die Pipeline der Dissertation entfernt
-  Ziffern. Der Quartalswert mit der Dissertationspipeline (91,8%) ist die vergleichbare Zahl.
+- Nicht, dass die aktivsten Accounts nachweislich Bots sind. Belegt sind Konzentration,
+  Quellenüberschneidung, Nachrichten-/Feed-Charakter vieler Top-Accounts und Duplikate.
+- Mehrere TF-IDF-Probes passten Vokabular und IDF vorab auf dem Vollzeitraum an. Die 42 festen
+  Kalenderwörter sind davon nicht betroffen; exakte Vollvokabular-Walk-forward-Zahlen sind jedoch
+  transduktiv und sollten mit foldweisem Fit wiederholt werden.
+- Die historische Quartalserkennungsrate von 91,8% ist berichtet, aber nicht reproduziert. Das
+  aktuelle trainingsseitig angepasste Diagnoseprogramm erreicht 73,0% bei Seed 1337.
 
 ## 12. Wozu diese Befunde taugen
 
 1. **Ein methodisches Ergebnis für das Feld.** Social-Media-Text stempelt sich selbst so fein, dass
-   jedes zeitveränderliche Label ohne kausalen Inhalt aus dem Text vorhersagbar ist. Zufällige
+   ein zeitveränderliches Label bei zufälligen zeitgemischten Splits aus Text vorhersagbar
+   erscheinen kann, selbst wenn der Text keinen kausalen Inhalt zum Ziel enthält. Zufällige
    Splits über die Zeit lassen die Zeit durchsickern. Dieses Projekt ist eine ungewöhnlich saubere,
    vollständig quantifizierte Fallstudie.
 2. **Eine Neurahmung des Interpretationskapitels.** Die Important-Word- und Topic-Pipeline ist eine
    diskriminative Schlüsselwortanalyse nach Zeitraum. Umbenannt in "für jedes Fenster
-   charakteristische Begriffe", bereinigt um automatisierte Accounts und je Quartal statt je Klasse
+   charakteristische Begriffe", quellenstratifiziert und je Quartal statt je Klasse
    berechnet, überleben ihre qualitativen Beobachtungen; als "Treiber finanzieller Veränderung"
    nicht.
-3. **Eine Richtung für eine konfirmatorische Studie.** Der eine Kanal, der funktioniert hat -
+3. **Eine Richtung für eine konfirmatorische Studie.** Der bisher explorativ positive Kanal -
    öffentlich vor der Veröffentlichung zitierte Zahlen - verweist auf Kennzahlen, die öffentlich
-   numerisch geschätzt werden. Das ist eine prüfbare Hypothese mit eingefrorenen Merkmalen und
-   einem unberührten Holdout.
+   numerisch geschätzt werden. Das ist eine prüfbare, aber noch unbestätigte Hypothese mit
+   eingefrorenen Merkmalen und einem unberührten Holdout.
+4. **Ein neuer Forschungsgegenstand: das Informationsbroker-Netz.** Die hohe Autorüberschneidung
+   zeigt, dass das Korpus eine gemeinsame marktweite Informationsinfrastruktur abbildet. Daraus
+   lassen sich Quellenzuverlässigkeit, Lead-Lag-Beziehungen, Nachrichtenweitergabe und
+   unternehmensübergreifende Regime untersuchen - unabhängig davon, ob ein Quartalsforecast gelingt.
+5. **Ein positives Architekturprinzip.** Der starke Zeitencoder muss nicht verworfen werden. Er kann
+   als expliziter Störgrößenzweig modelliert werden, während ein zweiter, gegenüber Zeit und Quelle
+   möglichst invariantes Residuum die Quartalszahl vorhersagt. Erst dessen Zusatznutzen wäre ein
+   glaubwürdiges finanzielles Textsignal.
 
 ## 13. Vorgeschlagene Richtungen für weitere Studien
 
-Jede Richtung folgt aus einem der obigen Befunde und ist mit den vorhandenen Daten und der
-vorhandenen Pipeline machbar; die ersten drei brauchen keinerlei neue Daten.
+Jede Richtung folgt aus einem der obigen Befunde. Zeit-, Quellen-, Topic- und
+Repräsentationskontrollen sind mit den vorhandenen Daten möglich. Exakte Release-Zeitpunkte,
+Analystenkonsens oder zusätzliche Unternehmen erfordern ergänzende Metadaten beziehungsweise neue
+Finanzreihen; das Target bleibt in allen Forecast-Varianten eine Quartalskennzahl.
 
 1. **Das Zeit-Leakage-Audit als publizierte Methode.** Die Datierungsuntersuchungen zu einem
    allgemeinen Test machen: Bevor einer Studie "Text sagt X vorher" geglaubt wird, sind zu
@@ -303,22 +397,28 @@ vorhandenen Pipeline machbar; die ersten drei brauchen keinerlei neue Daten.
    publizierte Social-Media-Vorhersagestudien mit zufälligen Splits anwenden. Dieses Projekt
    liefert das durchgerechnete Beispiel und die Zahlen. (Befunde 1, 4, 5, 6)
 
-2. **Eine Replikation nur mit menschlichen Accounts.** Accounts als automatisiert oder menschlich
-   klassifizieren (Postvolumen, Duplikatrate, Vorlagenregelmäßigkeit, Regelmäßigkeit der
+2. **Eine quellenstratifizierte Replikation.** Accounts als automatisiert, professionell oder
+   individuell klassifizieren (Postvolumen, Duplikatrate, Vorlagenregelmäßigkeit, Regelmäßigkeit der
    Postzeiten) und dann jede Analyse allein auf der menschlichen Teilmenge wiederholen. Zwei Fragen:
    Erscheint irgendein Textsignal, sobald die Feeds weg sind, und wie viel von dem, was die
    Literatur "öffentliche Stimmung" über Unternehmen nennt, ist Feed-Ausgabe? Der Korpusanteil des
    obersten Prozents der Accounts sollte in jeder Arbeit berichtet werden, die diesen Datensatz
    nutzt. (Befund 3)
 
-3. **Die Quartale sauber beschreiben.** Den neuronalen Important-Word-Pfad durch eine
+3. **Das Informationsbroker-Netz modellieren.** Die 14.143 über Apple, Amazon und Tesla aktiven
+   Autoren als Graph untersuchen: Wer veröffentlicht eine Kennzahl oder Schätzung zuerst, wer
+   übernimmt sie, wie stabil ist die Quelle, und wie schnell wandert Information zwischen
+   Unternehmen? Identische Tweet-IDs müssen dabei vor jedem Cross-Company-Test entfernt werden.
+   Ein Autor-Holdout prüft, ob ein Signal auf neue Quellen überträgt. (Befunde 2, 3)
+
+4. **Die Quartale sauber beschreiben.** Den neuronalen Important-Word-Pfad durch eine
    Schlüsselwortstatistik je Quartal ersetzen (zum Beispiel gewichtete Log-Odds mit Prior) auf der
    menschlichen Teilmenge, plus Topic-Prävalenz über die zwanzig Quartale. Das liefert die
    Beschreibung "was wurde wann besprochen", die das Interpretationskapitel anstrebte, ohne den
    Umweg über 67 Millionen Parameter, und lässt sich als ausdrücklich explorative Analyse mit
    n = 20 mit den Kennzahlen korrelieren. (Befunde 3, 10)
 
-4. **Die Zahlen-als-Träger-Hypothese konfirmatorisch prüfen.** Das Tesla-Ergebnis legt nahe, dass
+5. **Die Zahlen-als-Träger-Hypothese konfirmatorisch prüfen.** Das Tesla-Ergebnis legt nahe, dass
    Social Media dort nützlich ist, wo die Öffentlichkeit eine Kennzahl vor ihrer Veröffentlichung
    numerisch zitiert. Solche Kennzahlen vorab wählen - Fahrzeugauslieferungen, Schätzungen von
    Stückzahlen, Abonnentenzuwächse, Kinokassen- oder Spieleverkaufszahlen, App-Downloads -, die
@@ -326,31 +426,49 @@ vorhandenen Pipeline machbar; die ersten drei brauchen keinerlei neue Daten.
    Holdout auswerten. Direkt gegen den Analystenkonsens vergleichen, um zu erfahren, ob der Text
    über den Konsens hinaus, den er weitergibt, irgendetwas beiträgt. (Befund 9)
 
-5. **Ein Ziel mit mehr als zwanzig Werten.** Zwanzig Quartale je Unternehmen können höchstens
+6. **Eine Informationskurve relativ zur Veröffentlichung messen.** Tweets nicht nur nach
+   Kalenderquartal, sondern nach Abstand zum Release gruppieren: 30 und 7 Tage vorher,
+   Veröffentlichungstag und danach. Dadurch werden Erwartung, Bekanntgabe und Reaktion getrennt.
+   Für den Forecast dürfen ausschließlich Vorveröffentlichungstexte verwendet werden. Der
+   Amazon-Zeitversatz macht diese Kontrolle zwingend. (Befunde 4, 9)
+
+7. **Ein Ziel mit mehr als zwanzig Werten.** Zwanzig Quartale je Unternehmen können höchstens
    zwanzig Fälle entscheiden. Entweder viele Unternehmen bündeln (dieselbe Pipeline über einige
    hundert Ticker ergibt Tausende Unternehmensquartale) oder zu einem feiner abgetasteten Ziel
    wechseln, etwa der Ergebnisüberraschung oder der Kursreaktion in den Tagen nach jeder
    Verkündung. Die schwache Spur in Apples Ergebniswoche ist genau die Stelle, an der ein
    Ereignisfenster-Design zuerst nachsehen würde. (Befunde 4, 8)
 
-6. **Die Abweichung vorhersagen, nicht das Niveau.** Weil die Labels saisonal alternieren, lautet
+8. **Die Abweichung vorhersagen, nicht das Niveau.** Weil die Labels saisonal alternieren, lautet
    die informative Frage nicht "geht es hoch", sondern "geht es stärker hoch als in diesem
    Quartal üblich". Das Ziel als Residuum gegenüber der saisonalen Erwartung definieren; ein
    Textsignal muss dann die Null schlagen statt den Kalender, und die Persistenzfalle verschwindet
    konstruktionsbedingt. (Befunde 5, 6)
 
-7. **Die Uhr als Forschungsgegenstand.** Driftraten und unternehmensübergreifende Übertragung auf
+9. **Die Uhr als Forschungsgegenstand.** Driftraten und unternehmensübergreifende Übertragung auf
    anderen Plattformen, Themen und Sprachen messen; die Beiträge von Ereignissen,
    Plattformvokabular und automatisierten Accounts trennen; prüfen, wie genau ein Modell einen
    undatierten Beitrag datieren kann. Anwendungen: Herkunftsprüfung, Erkennung rückdatierter oder
    synthetischer Inhalte, Altersschätzung archivierter Texte. (Befunde 1, 2, 7)
 
-8. **Die ursprüngliche Hypothese mit einer fairen Repräsentation erneut prüfen.** Die
+10. **Zeit-/Quellenrepräsentation und Finanzresiduum trennen.** Einen gemeinsamen Encoder auf allen
+    fünf Unternehmen Zeit, Ereignisse und Quelle lernen lassen. Ein adversarieller oder
+    orthogonalisierter zweiter Zweig soll daraus Zeit und Autor entfernen und nur den Zusatzbeitrag
+    zur saisonalen Quartalsbaseline vorhersagen. Google- und Microsoft-Tweets können dafür als
+    ungelabelte Kontrolldomänen dienen; das Target der drei Forecast-Unternehmen bleibt ihre
+    Quartalszahl. (Befunde 1–3, 7)
+
+11. **Die ursprüngliche Hypothese mit einer fairen Repräsentation erneut prüfen.** Die
    Bag-of-Words- und trainierbaren Embedding-Modelle sind möglicherweise schlicht die falschen
    Instrumente. Die zeitraumgruppierte Walk-forward-Auswertung mit einem modernen Satz-Encoder auf
    der menschlichen Teilmenge und dem Residualziel wiederholen. Wenn Semantik jenseits des
    Zeitraums existiert, ist dies das Setting, in dem sie sich endlich zeigen könnte; wenn nicht,
    wird das negative Ergebnis deutlich stärker. (Befund 10)
+
+12. **Die Aggregationsskala selbst untersuchen.** Dass N = 10 über viele Architekturen und
+    Unternehmen häufig besser als 5 oder 20 ist, kann ein echtes Verhältnis von Kontext zu Rauschen
+    anzeigen. Gruppen nach Tweetanzahl gegen feste Zeitfenster und längengleiche Kontrollen testen;
+    erst dann ist klar, ob N = 10 eine sprachliche, zeitliche oder rein technische Eigenschaft ist.
 
 ## Reproduktion
 
@@ -359,10 +477,15 @@ Aus `tweetsCompanyNumbersPrediction/src`, mit dem Repository im Pfad:
 | Skript | Erzeugt |
 | --- | --- |
 | `probes/exp_unexpected.py` | Abschnitte 1-3, die Q+1-Prognose, Tweet-Volumen |
-| `probes/exp_unexpected_control.py` | die Kontrolle ohne Bots und Duplikate sowie die Träger-Tokens der Uhr |
+| `probes/exp_unexpected_control.py` | die Kontrolle ohne das aktivste Prozent und ohne Duplikate sowie die Träger-Tokens der Uhr |
+| `probes/exp_cross_company_network.py` | Cross-Company-ID-, Autoren- und quellenexklusive Transferkontrollen aus Abschnitt 2 |
 | `probes/exp_deeper.py` | Abschnitt 4 (verzögertes Label, Zuwachs je Woche), Abschnitt 7, das Vokabular des Verkündungsmodells |
 | `probes/exp_calendar.py` | Abschnitt 6, Vokabular-Ablation |
 | `probes/exp_calendar2.py` | Abschnitt 6 (42-Wörter-Modell) und Abschnitt 5 (Persistenz-Echo) |
 | `trainNumericTextSignalQuarterModel.py` | Abschnitt 9 (`output/numeric_text_signal_quarter_results.json`) |
 
-Alle Untersuchungen laufen in Minuten auf der CPU; keine nutzt die Finanz-CSVs als Eingabe.
+Die Probes laufen auf der CPU; die großen TF-IDF-Kontrollen können mehrere Minuten benötigen. Unter
+Windows sollte für `exp_deeper.py` UTF-8-Ausgabe aktiviert werden, weil einzelne Tokens nicht in
+CP1252 darstellbar sind. Nur die Tweet-Volumenanalyse in `exp_unexpected.py` lädt die Finanz-CSVs;
+Datierungs-, Quellen- und Vokabularbefunde verwenden sie nicht. Die Forecast-Ziele der übrigen
+Probes stammen aus den bereits gelabelten Dataframes.
